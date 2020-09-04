@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "257677859363",
+    "firebase_url": "https://hikomaryu.firebaseio.com",
+    "project_id": "hikomaryu",
+    "storage_bucket": "hikomaryu.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257677859363:android:b5a41da6f55d72834aef96",
+        "android_client_info": {
+          "package_name": "com.hikomaryu.echo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "257677859363-i4aupq2qaqrfl0bi913f4lr00brj946g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hikomaryu.echo",
+            "certificate_hash": "944647ad2269a0745231899aa97aefe3b2a14bb9"
+          }
+        },
+        {
+          "client_id": "257677859363-lpb7kpa44agg86sh9p4pakr3uhun55hm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY5uH7BZ1lNBBETrRWzN-WhEkN3aWJvB4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "257677859363-lpb7kpa44agg86sh9p4pakr3uhun55hm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "257677859363-mpb9hr5e1huhkqpcnjnssbkjvi6h0kh4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hikomaryu.echo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
