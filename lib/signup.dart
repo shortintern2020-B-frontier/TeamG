@@ -20,7 +20,9 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class SignUpScreenState extends State<SignUpScreen> {
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
   SharedPreferences prefs;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -46,6 +48,11 @@ class SignUpScreenState extends State<SignUpScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _universityController.dispose();
+    _faculityController.dispose();
+    _majorController.dispose();
+    _gradeController.dispose();
+    _nicknameController.dispose();
     super.dispose();
   }
 
@@ -78,68 +85,68 @@ class SignUpScreenState extends State<SignUpScreen> {
     return null;
   }
 
-  Future<Null> handleSignIn() async {
+  void _setStateIsLoadingFalse(String msg) {
+    Fluttertoast.showToast(msg: msg);
+    this.setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<Null> _handleSignIn() async {
     prefs = await SharedPreferences.getInstance();
 
     this.setState(() {
       isLoading = true;
     });
 
-    // TODO - 新規登録時にフォームから取得.
-    String _nickname = 'test';
-    final _email = 'test@example.com';
-    final _password = '1qazxsw2';
-    User firebaseUser = (await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(email: _email, password: _password))
-        .user;
+    // 新規登録時にフォームから取得
+    try {
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+              email: _emailController.text, password: _passwordController.text);
 
-    if (firebaseUser != null) {
-      // Check is already sign up
-      final QuerySnapshot result = await FirebaseFirestore.instance
+      // Update data to server if new user
+      FirebaseFirestore.instance
           .collection('users')
-          .where('id', isEqualTo: firebaseUser.uid)
-          .get();
-      final List<DocumentSnapshot> documents = result.docs;
-      if (documents.length == 0) {
-        // Update data to server if new user
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(firebaseUser.uid)
-            .set({
-          'nickname': _nickname,
-          'id': firebaseUser.uid,
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'photoUrl': null,
-          'chattingWith': null
-        });
-
-        // Write data to local
-        currentUser = firebaseUser;
-        await prefs.setString('id', currentUser.uid);
-        await prefs.setString('nickname', _nickname);
-        // await prefs.setString('id', documents[0].data()['id']);
-        // await prefs.setString('nickname', documents[0].data()['nickname']);
-        // await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
-        // await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
-      } else {
-        // Write data to local
-        // 既にユーザーが登録されていますエラーを出す
-      }
-      Fluttertoast.showToast(msg: "Sign in success");
-      this.setState(() {
-        isLoading = false;
+          .doc(userCredential.user.uid)
+          .set({
+        'nickname': _nicknameController.text,
+        'university': _universityController.text,
+        'faculity': _faculityController.text,
+        'major': _majorController.text,
+        'grade': _gradeController.text,
+        'id': userCredential.user.uid,
+        'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+        'photoUrl': null,
+        'chattingWith': null
       });
+      _setStateIsLoadingFalse("Sign in success");
+      // print('新規登録成功!!!!!!');
+
+      // Write data to local この部分を忘れずに
+      await prefs.setString('id', userCredential.user.uid);
+      await prefs.setString('nickname', _nicknameController.text);
+      // await prefs.setString('id', documents[0].data()['id']);
+      // await prefs.setString('nickname', documents[0].data()['nickname']);
+      // await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
+      // await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
 
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  HomeScreen(currentUserId: firebaseUser.uid)));
-    } else {
-      Fluttertoast.showToast(msg: "Sign in fail");
-      this.setState(() {
-        isLoading = false;
-      });
+                  HomeScreen(currentUserId: userCredential.user.uid)));
+      return null;
+    } on FirebaseAuthException catch (e) {
+      print(signUpErrorMsgs[e]);
+      Fluttertoast.showToast(msg: signUpErrorMsgs[e]);
+      _setStateIsLoadingFalse(signUpErrorMsgs[e]);
+      return null;
+    } catch (e) {
+      print(e.toString());
+      _setStateIsLoadingFalse(signUpErrorMsgs['other']);
+      // print('新規登録失敗!!!!!!');
+      return null;
     }
   }
 
@@ -162,15 +169,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                 child: Column(
                   children: <Widget>[
                     TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(labelText: 'Email'),
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      },
-                    ),
+                        controller: _emailController,
+                        decoration: const InputDecoration(labelText: 'Email'),
+                        validator: (String value) => isEmptyValidator(value)),
                     TextFormField(
                         obscureText: true,
                         controller: _passwordController,
@@ -293,7 +294,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                 ),
                 onPressed: () async {
                   if (_formKey.currentState.validate()) {
-                    // handleSignIn();
+                    _handleSignIn();
                   }
                 },
               ),
