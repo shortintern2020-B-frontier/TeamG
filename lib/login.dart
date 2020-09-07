@@ -75,16 +75,12 @@ class LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
-    // TODO - 新規登録時にフォームから取得.
-    String _nickname = 'test';
-
-    // TODO - 新規登録時にはこっちを使う。
-    // User firebaseUser = (await FirebaseAuth.instance
-    //         .createUserWithEmailAndPassword(email: _email, password: _password))
-    //     .user;
     User firebaseUser = (await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: _emailController.text, password: _passwordController.text))
         .user;
+
+    // print('hello!!!!!!!!');
+    // print(firebaseUser);
 
     if (firebaseUser != null) {
       // Check is already sign up
@@ -94,7 +90,7 @@ class LoginScreenState extends State<LoginScreen> {
           .get();
       final List<DocumentSnapshot> documents = result.docs;
       if (documents.length == 0) {
-        // TODO - ユーザがありませんエラーを出す
+        // TODO - 「ユーザがありません」エラーを出す
         // // Update data to server if new user
         // FirebaseFirestore.instance
         //     .collection('users')
