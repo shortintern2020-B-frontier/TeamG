@@ -307,7 +307,7 @@ class ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 isLastMessageLeft(index)
                     ? Material(
-                        child: peerAvatar != null
+                        child: peerAvatar != null && peerAvatar.isNotEmpty
                             ? CachedNetworkImage(
                                 placeholder: (context, url) => Container(
                                   child: CircularProgressIndicator(
