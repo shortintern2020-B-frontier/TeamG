@@ -85,13 +85,6 @@ class SignUpScreenState extends State<SignUpScreen> {
     return null;
   }
 
-  void _setStateIsLoadingFalse(String msg) {
-    Fluttertoast.showToast(msg: msg);
-    this.setState(() {
-      isLoading = false;
-    });
-  }
-
   Future<Null> _handleSignIn() async {
     prefs = await SharedPreferences.getInstance();
 
@@ -120,7 +113,11 @@ class SignUpScreenState extends State<SignUpScreen> {
         'photoUrl': null,
         'chattingWith': null
       });
-      _setStateIsLoadingFalse("Sign in success");
+      Fluttertoast.showToast(
+          msg: signUpMsgs['success'], backgroundColor: themeColor);
+      this.setState(() {
+        isLoading = false;
+      });
       // print('新規登録成功!!!!!!');
 
       // Write data to local この部分を忘れずに
@@ -131,6 +128,7 @@ class SignUpScreenState extends State<SignUpScreen> {
       // await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
       // await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
 
+      // TODO - プロフィール詳細設定画面へ遷移するようにする
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -138,13 +136,20 @@ class SignUpScreenState extends State<SignUpScreen> {
                   HomeScreen(currentUserId: userCredential.user.uid)));
       return null;
     } on FirebaseAuthException catch (e) {
-      print(signUpMsgs[e]);
-      Fluttertoast.showToast(msg: signUpMsgs[e]);
-      _setStateIsLoadingFalse(signUpMsgs[e]);
+      print(signUpMsgs[e.code]);
+      Fluttertoast.showToast(
+          msg: signUpMsgs[e.code], backgroundColor: themeColor);
+      this.setState(() {
+        isLoading = false;
+      });
       return null;
     } catch (e) {
       print(e.toString());
-      _setStateIsLoadingFalse(signUpMsgs['other']);
+      Fluttertoast.showToast(
+          msg: signUpMsgs['other'], backgroundColor: themeColor);
+      this.setState(() {
+        isLoading = false;
+      });
       // print('新規登録失敗!!!!!!');
       return null;
     }
