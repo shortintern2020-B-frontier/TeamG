@@ -8,7 +8,6 @@ import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/home.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,9 +20,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   SharedPreferences prefs;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   bool isLoading = false;
   bool isLoggedIn = false;
@@ -35,6 +37,13 @@ class LoginScreenState extends State<LoginScreen> {
     isSignedIn();
   }
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   void isSignedIn() async {
     this.setState(() {
       isLoading = true;
@@ -42,8 +51,8 @@ class LoginScreenState extends State<LoginScreen> {
 
     prefs = await SharedPreferences.getInstance();
 
-    isLoggedIn = await googleSignIn.isSignedIn();
-    if (isLoggedIn) {
+    User user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -64,17 +73,15 @@ class LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
-    // TODO - フォームから取得.
-    String _email = 'test@example.com';
-    String _password = '1qazxsw2';
+    // TODO - 新規登録時にフォームから取得.
     String _nickname = 'test';
 
     // TODO - 新規登録時にはこっちを使う。
     // User firebaseUser = (await FirebaseAuth.instance
     //         .createUserWithEmailAndPassword(email: _email, password: _password))
     //     .user;
-    User firebaseUser = (await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: _email, password: _password))
+    User firebaseUser = (await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: _emailController.text, password: _passwordController.text))
         .user;
 
     if (firebaseUser != null) {
@@ -93,6 +100,7 @@ class LoginScreenState extends State<LoginScreen> {
           'nickname': _nickname,
           'id': firebaseUser.uid,
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+          'photoUrl': null,
           'chattingWith': null
         });
 
@@ -104,6 +112,7 @@ class LoginScreenState extends State<LoginScreen> {
         // Write data to local
         await prefs.setString('id', documents[0].data()['id']);
         await prefs.setString('nickname', documents[0].data()['nickname']);
+        await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
         await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
       }
       Fluttertoast.showToast(msg: "Sign in success");
@@ -136,18 +145,48 @@ class LoginScreenState extends State<LoginScreen> {
         ),
         body: Stack(
           children: <Widget>[
-            Center(
-              child: FlatButton(
-                  onPressed: handleSignIn,
-                  child: Text(
-                    'Login',
-                    style: TextStyle(fontSize: 16.0),
-                  ),
-                  color: Color(0xffdd4b39),
-                  highlightColor: Color(0xffff7f7f),
-                  splashColor: Colors.transparent,
-                  textColor: Colors.white,
-                  padding: EdgeInsets.fromLTRB(30.0, 15.0, 30.0, 15.0)),
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return 'Please enter some text';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      obscureText: true,
+                      controller: _passwordController,
+                      decoration: const InputDecoration(labelText: 'Password'),
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return 'Please enter some text';
+                        }
+                        return null;
+                      },
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      alignment: Alignment.center,
+                      child: RaisedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState.validate()) {
+                            handleSignIn();
+                          }
+                        },
+                        child: const Text('Login'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             // Loading

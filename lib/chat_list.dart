@@ -11,11 +11,11 @@ class ChatList extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _ChatListState();
+    return ChatListState();
   }
 }
 
-class _ChatListState extends State<ChatList> {
+class ChatListState extends State<ChatList> {
   @override
   void initState() {
     super.initState();
