@@ -138,13 +138,13 @@ class SignUpScreenState extends State<SignUpScreen> {
                   HomeScreen(currentUserId: userCredential.user.uid)));
       return null;
     } on FirebaseAuthException catch (e) {
-      print(signUpErrorMsgs[e]);
-      Fluttertoast.showToast(msg: signUpErrorMsgs[e]);
-      _setStateIsLoadingFalse(signUpErrorMsgs[e]);
+      print(signUpMsgs[e]);
+      Fluttertoast.showToast(msg: signUpMsgs[e]);
+      _setStateIsLoadingFalse(signUpMsgs[e]);
       return null;
     } catch (e) {
       print(e.toString());
-      _setStateIsLoadingFalse(signUpErrorMsgs['other']);
+      _setStateIsLoadingFalse(signUpMsgs['other']);
       // print('新規登録失敗!!!!!!');
       return null;
     }
