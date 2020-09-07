@@ -94,8 +94,10 @@ class ChatListState extends State<ChatList> {
                                           themeColor)));
                             } else {
                               return Text(
-                                messageSnapshot.data.documents[0]
-                                    .data()['content'],
+                                messageSnapshot.data.documents.length == 0
+                                    ? ''
+                                    : messageSnapshot.data.documents[0]
+                                        .data()['content'],
                                 style: TextStyle(color: Colors.grey[700]),
                               );
                             }
