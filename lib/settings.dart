@@ -13,7 +13,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-List cardList = [['Affiliation', '所属'], ['Grade', '学年'], ['Residence', '居住地'], ['circle', 'サークル']];
+List cardList = [ ['affiliation', '所属'], ['grade', '学年'], ['residence', '居住地'], ['circle', 'サークル'] ];
 
 class ChatSettings extends StatelessWidget {
   @override
@@ -50,10 +50,6 @@ class SettingsScreenState extends State<SettingsScreen> {
   String nickname = '';
 
   List<String> categoryList = new List(cardList.length);
-  String affiliation = '';
-  String grade = '';
-  String residence = '';
-  String circle = '';
 
   String photoUrl = '';
   bool isMyProfile = true;
@@ -79,7 +75,8 @@ class SettingsScreenState extends State<SettingsScreen> {
     id = prefs.getString('id') ?? '';
     nickname = prefs.getString('nickname') ?? '';
     for (int i = 0; i < cardList.length; i++) {
-      categoryList[i] = prefs.getString(cardList[i][0].toLowerCase()) ?? '';
+      categoryList[i] = prefs.getString(cardList[i][0]) ?? '';
+      print(':::' + cardList[i][0]);
     }
     photoUrl = prefs.getString('photoUrl') ?? '';
 
@@ -119,7 +116,7 @@ class SettingsScreenState extends State<SettingsScreen> {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
-   
+
           FirebaseFirestore.instance.collection('users').doc(id).update({
             'photoUrl': photoUrl
           }).then((data) async {
@@ -169,11 +166,11 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     List<Future<void>> futureList = [];
     for (int i = 0; i < cardList.length; i++) {
-      futureList.add(FirebaseFirestore.instance.collection('users').doc(id).update({cardList[i][0].toLowerCase(): categoryList[i]}));
+      futureList.add(FirebaseFirestore.instance.collection('users').doc(id).update({cardList[i][0]: categoryList[i]}));
     }
     var futureWait = Future.wait(futureList).then((content) async {
       for (int i = 0;i < categoryList.length; i++) {
-        await prefs.setString(cardList[i][0].toLowerCase(), categoryList[i]);
+        await prefs.setString(cardList[i][0], categoryList[i]);
       }
     });
 
@@ -198,7 +195,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  Widget makeBasicInfomationCard(
+  Widget makeOneBasicInfomationCard(
       BuildContext context,
       int categoryIdx,
       String displayName)
@@ -228,7 +225,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ),
                   controller: controllerList[categoryIdx],
                   onChanged: (value) {
-                      categoryList[categoryIdx] = value;
+                    categoryList[categoryIdx] = value;
                   },
                   focusNode: focusNodeList[categoryIdx],
                 ),
@@ -240,6 +237,8 @@ class SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -331,28 +330,37 @@ class SettingsScreenState extends State<SettingsScreen> {
                     // 所属
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
-                      child: Container(
-                      height: 45,
                       child: Card(
                         color: orangeColor,
-
                         child: Row(
                           children: <Widget>[
                             Container(
-                            child: Text(
-                              '所属',
-                              style: TextStyle(fontSize: 23),
+                              child: Text(
+                                '所属',
+                                style: TextStyle(fontSize: 23),
                               ),
                               margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                              ),
-                              Text(
-                                affiliation,
-                                style: TextStyle(fontSize: 17),
+                            ),
+                            Theme(
+                              data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                              child: Flexible(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: '〇〇大学××学部',
+                                    contentPadding: EdgeInsets.all(5.0),
+                                    hintStyle: TextStyle(color: greyColor),
+                                  ),
+                                  controller: controllerList[categoryIdx],
+                                  onChanged: (value) {
+                                    categoryList[categoryIdx] = value;
+                                  },
+                                  focusNode: focusNodeList[categoryIdx],
                                 ),
-                            ],
-                          ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                              ),
+                            ),
+                          ],
                         ),
+                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
                       ),
                     ),
                     // 学年
@@ -447,6 +455,22 @@ class SettingsScreenState extends State<SettingsScreen> {
         ],
       );
     } else {
+      Widget baseInfo = Container(
+        child: Text(
+          '基本情報',
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 25,
+              color: primaryColor),
+        ),
+        margin: EdgeInsets.only(
+            left: 10.0, bottom: 5.0, top: 10.0),
+      );
+      var cdList = [baseInfo];
+      for (int i = 0; i < cardList.length; i++) {
+        cdList.add(makeOneBasicInfomationCard(context, i, cardList[i][1]));
+        print(i);
+      }
       return Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -515,6 +539,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       width: 90,
                       margin: EdgeInsets.all(20.0),
                     ),
+                    // Nickname
                     Container(
                       child: Theme(
                         data: Theme.of(context)
@@ -537,32 +562,9 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ],
                 ),
-
-                // Input
                 Column(
-                  children: <Widget>[
-                    // 基本情報
-                    Container(
-                      child: Text(
-                        '基本情報',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 25,
-                            color: primaryColor),
-                      ),
-                      margin: EdgeInsets.only(
-                          left: 10.0, bottom: 5.0, top: 10.0),
-                    ),
-
-                    for (int i = 0; i < cardList.length; i++) {
-                      makeBasicInfomationCard(context, i, cardList[i][1]),
-                    }
-
-
-                  ],
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: cdList,
                 ),
-
                 // Button
                 Container(
                   child: FlatButton(
