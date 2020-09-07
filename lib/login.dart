@@ -10,6 +10,8 @@ import 'package:hikomaryu/widget/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import './signup.dart';
+
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);
 
@@ -92,22 +94,23 @@ class LoginScreenState extends State<LoginScreen> {
           .get();
       final List<DocumentSnapshot> documents = result.docs;
       if (documents.length == 0) {
-        // Update data to server if new user
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(firebaseUser.uid)
-            .set({
-          'nickname': _nickname,
-          'id': firebaseUser.uid,
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'photoUrl': null,
-          'chattingWith': null
-        });
+        // TODO - ユーザがありませんエラーを出す
+        // // Update data to server if new user
+        // FirebaseFirestore.instance
+        //     .collection('users')
+        //     .doc(firebaseUser.uid)
+        //     .set({
+        //   'nickname': _nickname,
+        //   'id': firebaseUser.uid,
+        //   'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+        //   'photoUrl': null,
+        //   'chattingWith': null
+        // });
 
-        // Write data to local
-        currentUser = firebaseUser;
-        await prefs.setString('id', currentUser.uid);
-        await prefs.setString('nickname', _nickname);
+        // // Write data to local
+        // currentUser = firebaseUser;
+        // await prefs.setString('id', currentUser.uid);
+        // await prefs.setString('nickname', _nickname);
       } else {
         // Write data to local
         await prefs.setString('id', documents[0].data()['id']);
@@ -143,7 +146,7 @@ class LoginScreenState extends State<LoginScreen> {
           ),
           centerTitle: true,
         ),
-        body: Stack(
+        body: ListView(
           children: <Widget>[
             Container(
               padding: const EdgeInsets.all(20),
@@ -172,23 +175,45 @@ class LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      alignment: Alignment.center,
-                      child: RaisedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState.validate()) {
-                            handleSignIn();
-                          }
-                        },
-                        child: const Text('Login'),
-                      ),
-                    ),
                   ],
                 ),
               ),
             ),
-
+            Container(
+              alignment: Alignment.center,
+              child: MaterialButton(
+                child: const Text('Log in'),
+                minWidth: 200,
+                color: themeColor,
+                textColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                onPressed: () async {
+                  if (_formKey.currentState.validate()) {
+                    handleSignIn();
+                  }
+                },
+              ),
+            ),
+            Container(
+              alignment: Alignment.center,
+              child: MaterialButton(
+                child: const Text('Sign up'),
+                minWidth: 200,
+                textColor: themeColor,
+                shape: OutlineInputBorder(
+                  borderSide: BorderSide(color: themeColor),
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                ),
+                onPressed: () async {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SignUpScreen(title: 'echo')));
+                },
+              ),
+            ),
             // Loading
             Positioned(
               child: isLoading ? const Loading() : Container(),
