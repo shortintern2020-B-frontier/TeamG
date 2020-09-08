@@ -91,7 +91,6 @@ class SettingsScreenState extends State<SettingsScreen> {
     circle = prefs.getString('circle') ?? '';
     photoUrl = prefs.getString('photoUrl') ?? '';
 
-
     controllerNickname = TextEditingController(text: nickname);
     // controllerAffiliation = TextEditingController(text: affiliation);
     controllerGrade = TextEditingController(text: grade);
@@ -99,7 +98,6 @@ class SettingsScreenState extends State<SettingsScreen> {
     controllerResidence = TextEditingController(text: residence);
     controllerBirthplace = TextEditingController(text: birthplace);
     controllerCircle = TextEditingController(text: circle);
-
 
     // Force refresh input
     setState(() {});
