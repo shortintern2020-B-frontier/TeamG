@@ -49,13 +49,14 @@ class SettingsScreenState extends State<SettingsScreen> {
   String nickname = '';
   String university = '';
   String faculty = '';
-  String major = '';
+  String department = '';
   String grade = '';
   String age = '';
   String residence = '';
   String birthplace = '';
   String circle = '';
   String photoUrl = '';
+  List<String> selectedItems = [];
   bool isMyProfile = true;
 
   bool isLoading = false;
@@ -78,10 +79,11 @@ class SettingsScreenState extends State<SettingsScreen> {
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
     id = prefs.getString('id') ?? '';
+    print('idddd' + id);
     nickname = prefs.getString('nickname') ?? '';
     university = prefs.getString('university') ?? '';
     faculty = prefs.getString('faculty') ?? '';
-    major = prefs.getString('major') ?? '';
+    department = prefs.getString('department') ?? '';
     grade = prefs.getString('grade') ?? '';
     age = prefs.getString('age') ?? '';
     residence = prefs.getString('residence') ?? '';
@@ -100,6 +102,16 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     // Force refresh input
     setState(() {});
+  }
+
+  void readSetting(String id) async {
+    if (!id.isEmpty) {
+      print('idi' + id);
+      final setting = await Firestore.instance.collection('users')
+          .document(id)
+          .get();
+      print('test');
+    }
   }
 
   Future getImage() async {
@@ -187,7 +199,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       //await prefs.setString('affiliation', affiliation);
       await prefs.setString('university', university);
       await prefs.setString('faculty', faculty);
-      await prefs.setString('major', major);
+      await prefs.setString('department', department);
       await prefs.setString('grade', grade);
       await prefs.setString('age', age);
       await prefs.setString('residence', residence);
@@ -209,8 +221,21 @@ class SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
+  String makeCircleStr(List<DropdownMenuItem> l, List<int> idx) {
+    String st = "";
+    for (int i = 0;i < idx.length; i++) {
+      st = st + l[idx[i]].value;
+      if (i != idx.length-1) {
+        st = st + ',';
+      }
+    }
+    return st;
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(';;;' + id);
+    readSetting(id);
     if (!isMyProfile) {
       return Stack(
         children: <Widget>[
@@ -367,7 +392,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
-                                major,
+                                department,
                                 style: TextStyle(fontSize: 17),
                               ),
                             ],
@@ -533,6 +558,29 @@ class SettingsScreenState extends State<SettingsScreen> {
         ],
       );
     } else {
+      List<DropdownMenuItem> circleList = [
+        DropdownMenuItem(
+            child: Text('サッカー'),
+            value: 'サッカー'
+        ),
+        DropdownMenuItem(
+            child: Text('野球'),
+            value: '野球'
+        ),
+        DropdownMenuItem(
+            child: Text('バスケットボール'),
+            value: 'バスケットボール'
+        ),
+        DropdownMenuItem(
+            child: Text('アカペラ'),
+            value: 'アカペラ'
+        ),
+        DropdownMenuItem(
+            child: Text('管弦楽団'),
+            value: '管弦楽団'
+        ),
+      ];
+
       return Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -708,7 +756,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                             margin: EdgeInsets.only(left: 10.0, right: 10.0),
                           ),
                           Text(
-                            major,
+                            department,
                             style: TextStyle(fontSize: 17),
                           ),
                         ],
@@ -734,6 +782,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         ),
                         Theme(
                           data: Theme.of(context).copyWith(primaryColor: primaryColor),
+
                           child: SearchChoices.single(
                             items: [
                               DropdownMenuItem(
@@ -758,6 +807,15 @@ class SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ],
                             value: grade,
+                            displayClearIcon: false,
+                            validator: (value) {
+                              print(':::' + value);
+                              print(value.length);
+                              if (value.isEmpty) {
+                                return ("学年は必ず入力してください．");
+                              }
+                              return (null);
+                            },
                             onChanged: (value) {
                               setState(() {
                                 grade = value;
@@ -907,17 +965,15 @@ class SettingsScreenState extends State<SettingsScreen> {
                         Theme(
                           data: Theme.of(context).copyWith(primaryColor: primaryColor),
                           child: Flexible(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'サッカー',
-                                contentPadding: EdgeInsets.all(5.0),
-                                hintStyle: TextStyle(color: greyColor),
-                              ),
-                              controller: controllerCircle,
+                            child: SearchChoices.multiple(
+                              items: circleList,
+
+                              //selectedItems: selectedItems,
                               onChanged: (value) {
-                                circle = value;
+                                setState(() {
+                                  circle = makeCircleStr(circleList, value);
+                                });
                               },
-                              focusNode: focusNodeCircle,
                             ),
                           ),
                         ),
