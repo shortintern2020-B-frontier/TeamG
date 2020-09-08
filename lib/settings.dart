@@ -3,7 +3,7 @@ import 'dart:async';
 // not foundのエラーが出たためコメントアウト
 //import 'dart:html';
 import 'dart:io';
-
+import 'package:search_choices/search_choices.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -36,18 +36,24 @@ class SettingsScreen extends StatefulWidget {
 
 class SettingsScreenState extends State<SettingsScreen> {
   TextEditingController controllerNickname;
-  TextEditingController controllerAffiliation;
+  // TextEditingController controllerAffiliation;
   TextEditingController controllerGrade;
+  TextEditingController controllerAge;
   TextEditingController controllerResidence;
+  TextEditingController controllerBirthplace;
   TextEditingController controllerCircle;
 
   SharedPreferences prefs;
 
   String id = '';
   String nickname = '';
-  String affiliation = '';
+  String university = '';
+  String faculty = '';
+  String major = '';
   String grade = '';
+  String age = '';
   String residence = '';
+  String birthplace = '';
   String circle = '';
   String photoUrl = '';
   bool isMyProfile = true;
@@ -56,9 +62,11 @@ class SettingsScreenState extends State<SettingsScreen> {
   File avatarImageFile;
 
   final FocusNode focusNodeNickname = FocusNode();
-  final FocusNode focusNodeAffiliation = FocusNode();
+  // final FocusNode focusNodeAffiliation = FocusNode();
   final FocusNode focusNodeGrade = FocusNode();
-  final FocusNode focusNodeResidence = FocusNode();
+  final FocusNode focusNodeAge = FocusNode();
+    final FocusNode focusNodeResidence = FocusNode();
+  final FocusNode focusNodeBirthplace = FocusNode();
   final FocusNode focusNodeCircle = FocusNode();
 
   @override
@@ -71,16 +79,22 @@ class SettingsScreenState extends State<SettingsScreen> {
     prefs = await SharedPreferences.getInstance();
     id = prefs.getString('id') ?? '';
     nickname = prefs.getString('nickname') ?? '';
-    affiliation = prefs.getString('affiliation') ?? '';
+    university = prefs.getString('university') ?? '';
+    faculty = prefs.getString('faculty') ?? '';
+    major = prefs.getString('major') ?? '';
     grade = prefs.getString('grade') ?? '';
+    age = prefs.getString('age') ?? '';
     residence = prefs.getString('residence') ?? '';
+    birthplace = prefs.getString('birthplace') ?? '';
     circle = prefs.getString('circle') ?? '';
     photoUrl = prefs.getString('photoUrl') ?? '';
 
     controllerNickname = TextEditingController(text: nickname);
-    controllerAffiliation= TextEditingController(text: affiliation);
+    // controllerAffiliation = TextEditingController(text: affiliation);
     controllerGrade = TextEditingController(text: grade);
+    controllerAge = TextEditingController(text: age);
     controllerResidence = TextEditingController(text: residence);
+    controllerBirthplace = TextEditingController(text: birthplace);
     controllerCircle = TextEditingController(text: circle);
 
 
@@ -152,7 +166,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   void handleUpdateData() {
     focusNodeNickname.unfocus();
-    focusNodeAffiliation.unfocus();
+    // focusNodeAffiliation.unfocus();
     focusNodeGrade.unfocus();
     focusNodeResidence.unfocus();
     focusNodeCircle.unfocus();
@@ -162,16 +176,22 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     FirebaseFirestore.instance.collection('users').doc(id).update({
       'nickname': nickname,
-      'affiliation': affiliation,
       'grade': grade,
+      'age': age,
       'residence': residence,
+      'birthplace': birthplace,
       'circle': circle,
       'photoUrl': photoUrl
     }).then((data) async {
       await prefs.setString('nickname', nickname);
-      await prefs.setString('affiliation', affiliation);
+      //await prefs.setString('affiliation', affiliation);
+      await prefs.setString('university', university);
+      await prefs.setString('faculty', faculty);
+      await prefs.setString('major', major);
       await prefs.setString('grade', grade);
+      await prefs.setString('age', age);
       await prefs.setString('residence', residence);
+      await prefs.setString('birthplace', birthplace);
       await prefs.setString('circle', circle);
       await prefs.setString('photoUrl', photoUrl);
 
@@ -263,20 +283,19 @@ class SettingsScreenState extends State<SettingsScreen> {
                 // Input
                 Column(
                   children: <Widget>[
-                    // 基本情報
+                    // 大学情報
                     Container(
                       child: Text(
-                        '基本情報',
+                        '大学情報',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 25,
                             color: primaryColor),
                       ),
-                      alignment: Alignment.topLeft,
                       margin: EdgeInsets.only(
                           left: 10.0, bottom: 5.0, top: 10.0),
                     ),
-                    // 所属
+                    // 大学名
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
@@ -288,13 +307,67 @@ class SettingsScreenState extends State<SettingsScreen> {
                             children: <Widget>[
                               Container(
                                 child: Text(
-                                  '所属',
+                                  '大学',
                                   style: TextStyle(fontSize: 23),
                                 ),
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
-                                affiliation,
+                                university,
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
+                    // 学部名
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        height: 45,
+                        child: Card(
+                          color: orangeColor,
+
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  '学部',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Text(
+                                faculty,
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
+                    // 学科名
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        height: 45,
+                        child: Card(
+                          color: orangeColor,
+
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  '学科',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Text(
+                                major,
                                 style: TextStyle(fontSize: 17),
                               ),
                             ],
@@ -305,7 +378,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                     // 学年
                     Padding(
-                    padding: EdgeInsets.only(top: 15, bottom: 15),
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
                         height: 45,
                         child: Card(
@@ -330,7 +403,47 @@ class SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                     ),
-                    // 居住地
+                    // 基本情報
+                    Container(
+                      child: Text(
+                        '基本情報',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            color: primaryColor),
+                      ),
+                      alignment: Alignment.topLeft,
+                      margin: EdgeInsets.only(
+                          left: 10.0, bottom: 5.0, top: 10.0),
+                    ),
+                    // 年齢
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        height: 45,
+                        child: Card(
+                          color: orangeColor,
+
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  '年齢',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Text(
+                                age,
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
+                    //居住地
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
@@ -354,6 +467,33 @@ class SettingsScreenState extends State<SettingsScreen> {
                             ],
                           ),
                         margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
+                    // 出身地
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        height: 45,
+                        child: Card(
+                          color: orangeColor,
+
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  '出身地',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Text(
+                                birthplace,
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
                         ),
                       ),
                     ),
@@ -393,18 +533,6 @@ class SettingsScreenState extends State<SettingsScreen> {
         ],
       );
     } else {
-      Widget baseInfo = Container(
-        child: Text(
-          '基本情報',
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 25,
-              color: primaryColor),
-        ),
-        margin: EdgeInsets.only(
-            left: 10.0, bottom: 5.0, top: 10.0),
-      );
-
       return Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -496,9 +624,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ],
                 ),
+                // 大学情報
                 Container(
                   child: Text(
-                    '基本情報',
+                    '大学情報',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 25,
@@ -507,43 +636,87 @@ class SettingsScreenState extends State<SettingsScreen> {
                   margin: EdgeInsets.only(
                       left: 10.0, bottom: 5.0, top: 10.0),
                 ),
-                // 所属
+                // 大学名
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
-                  child: Card(
-                    color: orangeColor,
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          child: Text(
-                            '所属',
-                            style: TextStyle(fontSize: 23),
-                          ),
-                          margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                        ),
-                        Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
-                          child: Flexible(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: '〇〇大学××学部',
-                                contentPadding: EdgeInsets.all(5.0),
-                                hintStyle: TextStyle(color: greyColor),
-                              ),
-                              controller: controllerAffiliation,
-                              onChanged: (value) {
-                                affiliation = value;
-                              },
-                              focusNode: focusNodeAffiliation,
+                  child: Container(
+                    height: 45,
+                    child: Card(
+                      color: orangeColor,
+
+                      child: Row(
+                        children: <Widget>[
+                          Container(
+                            child: Text(
+                              '大学',
+                              style: TextStyle(fontSize: 23),
                             ),
+                            margin: EdgeInsets.only(left: 10.0, right: 10.0),
                           ),
-                        ),
-                      ],
+                          Text(
+                            university,
+                            style: TextStyle(fontSize: 17),
+                          ),
+                        ],
+                      ),
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
                     ),
-                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
                   ),
                 ),
+                // 学部名
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Container(
+                    height: 45,
+                    child: Card(
+                      color: orangeColor,
 
+                      child: Row(
+                        children: <Widget>[
+                          Container(
+                            child: Text(
+                              '学部',
+                              style: TextStyle(fontSize: 23),
+                            ),
+                            margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                          ),
+                          Text(
+                            faculty,
+                            style: TextStyle(fontSize: 17),
+                          ),
+                        ],
+                      ),
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                    ),
+                  ),
+                ),
+                // 学科名
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Container(
+                    height: 45,
+                    child: Card(
+                      color: orangeColor,
+
+                      child: Row(
+                        children: <Widget>[
+                          Container(
+                            child: Text(
+                              '学科',
+                              style: TextStyle(fontSize: 23),
+                            ),
+                            margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                          ),
+                          Text(
+                            major,
+                            style: TextStyle(fontSize: 17),
+                          ),
+                        ],
+                      ),
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                    ),
+                  ),
+                ),
                 // 学年
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -580,7 +753,54 @@ class SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(left: 30.0, right: 30.0),
                   ),
                 ),
-
+                // 基本情報
+                Container(
+                  child: Text(
+                    '基本情報',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: primaryColor),
+                  ),
+                  margin: EdgeInsets.only(
+                      left: 10.0, bottom: 5.0, top: 10.0),
+                ),
+                // 年齢
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Card(
+                    color: orangeColor,
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            '年齢',
+                            style: TextStyle(fontSize: 23),
+                          ),
+                          margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                        ),
+                        Theme(
+                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          child: Flexible(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: '23',
+                                contentPadding: EdgeInsets.all(5.0),
+                                hintStyle: TextStyle(color: greyColor),
+                              ),
+                              controller: controllerAge,
+                              onChanged: (value) {
+                                age = value;
+                              },
+                              focusNode: focusNodeAge,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  ),
+                ),
                 // 居住地
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -617,7 +837,42 @@ class SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(left: 30.0, right: 30.0),
                   ),
                 ),
-
+                // 出身地
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Card(
+                    color: orangeColor,
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            '出身地',
+                            style: TextStyle(fontSize: 23),
+                          ),
+                          margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                        ),
+                        Theme(
+                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          child: Flexible(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: '東京',
+                                contentPadding: EdgeInsets.all(5.0),
+                                hintStyle: TextStyle(color: greyColor),
+                              ),
+                              controller: controllerBirthplace,
+                              onChanged: (value) {
+                                birthplace = value;
+                              },
+                              focusNode: focusNodeBirthplace,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  ),
+                ),
                 // サークル
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -654,7 +909,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(left: 30.0, right: 30.0),
                   ),
                 ),
-
                 // Button
                 Container(
                   child: FlatButton(
