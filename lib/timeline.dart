@@ -31,7 +31,7 @@ class TimelineState extends State<Timeline> {
         if (!userSnapshot.hasData) {
           return Center(
               child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+                  valueColor: AlwaysStoppedAnimation<Color>(whiteColor)));
         } else {
           return Container(
             child: FlatButton(
@@ -45,7 +45,7 @@ class TimelineState extends State<Timeline> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 1.0,
                                 valueColor:
-                                    AlwaysStoppedAnimation<Color>(themeColor),
+                                    AlwaysStoppedAnimation<Color>(whiteColor),
                               ),
                               width: 50.0,
                               height: 50.0,
@@ -72,7 +72,7 @@ class TimelineState extends State<Timeline> {
                             child: Text(
                               userSnapshot.data.data()['nickname'],
                               style:
-                                TextStyle(color: primaryColor, fontSize: 14, fontWeight: FontWeight.bold),
+                                TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
@@ -102,10 +102,9 @@ class TimelineState extends State<Timeline> {
                 //                 peerAvatar: document.data()['photoUrl'],
                 //               )));
               },
-              color: greyColor2,
+              color: whiteColor,
               padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)),
+              shape: UnderlineInputBorder(borderSide: BorderSide(color: greyColor2)),
             ),
             margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
           );
@@ -143,7 +142,7 @@ class TimelineState extends State<Timeline> {
         if (!postSnapshot.hasData) {
           return Center(
               child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+                  valueColor: AlwaysStoppedAnimation<Color>(whiteColor)));
         } else {
           return Stack(
             children: <Widget>[
