@@ -717,6 +717,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
+
                 // 学年
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -733,19 +734,35 @@ class SettingsScreenState extends State<SettingsScreen> {
                         ),
                         Theme(
                           data: Theme.of(context).copyWith(primaryColor: primaryColor),
-                          child: Flexible(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: '1年',
-                                contentPadding: EdgeInsets.all(5.0),
-                                hintStyle: TextStyle(color: greyColor),
+                          child: SearchChoices.single(
+                            items: [
+                              DropdownMenuItem(
+                                child: Text('1年'),
+                                value: '1年',
                               ),
-                              controller: controllerGrade,
-                              onChanged: (value) {
+                              DropdownMenuItem(
+                                child: Text('2年'),
+                                value: '2年',
+                              ),
+                              DropdownMenuItem(
+                                child: Text('3年'),
+                                value: '3年',
+                              ),
+                              DropdownMenuItem(
+                                child: Text('4年'),
+                                value: '4年',
+                              ),
+                              DropdownMenuItem(
+                                child: Text('卒業生'),
+                                value: '卒業生',
+                              ),
+                            ],
+                            value: grade,
+                            onChanged: (value) {
+                              setState(() {
                                 grade = value;
-                              },
-                              focusNode: focusNodeGrade,
-                            ),
+                              });
+                            },
                           ),
                         ),
                       ],
