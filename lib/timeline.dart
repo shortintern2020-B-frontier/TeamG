@@ -72,13 +72,17 @@ class TimelineState extends State<Timeline> {
                             child: Text(
                               userSnapshot.data.data()['nickname'],
                               style:
-                                  TextStyle(color: primaryColor, fontSize: 18),
+                                TextStyle(color: primaryColor, fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
                           ),
                           Container(
-                            child: Text(document.data()['content']),
+                            child: Text(
+                              document.data()['content'],
+                              style:
+                                TextStyle(color: primaryColor, fontSize: 18),
+                              ),
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
                           )
