@@ -3,6 +3,7 @@ import 'dart:async';
 // not foundのエラーが出たためコメントアウト
 //import 'dart:html';
 import 'dart:io';
+import 'package:hikomaryu/chat.dart';
 import 'package:search_choices/search_choices.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatSettings extends StatelessWidget {
+  final String currentUserId;
+  final isMyProfile;
+  ChatSettings({this.currentUserId, this.isMyProfile});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,12 +29,16 @@ class ChatSettings extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: SettingsScreen(),
+      body: SettingsScreen(currentUserId: currentUserId, isMyProfile: isMyProfile),
     );
   }
 }
 
 class SettingsScreen extends StatefulWidget {
+  final String currentUserId;
+  final bool isMyProfile;
+  SettingsScreen({this.currentUserId, this.isMyProfile});
+
   @override
   State createState() => SettingsScreenState();
 }
@@ -45,7 +54,6 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   SharedPreferences prefs;
 
-  String id = '';
   String nickname = '';
   String university = '';
   String faculty = '';
@@ -56,8 +64,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   String birthplace = '';
   String circle = '';
   String photoUrl = '';
-  List<String> selectedItems = [];
-  bool isMyProfile = true;
+  // List<String> selectedItems = [];
 
   bool isLoading = false;
   File avatarImageFile;
@@ -79,7 +86,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
-    id = prefs.getString('id') ?? '';
+    /*
     nickname = prefs.getString('nickname') ?? '';
     university = prefs.getString('university') ?? '';
     faculty = prefs.getString('faculty') ?? '';
@@ -90,7 +97,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     birthplace = prefs.getString('birthplace') ?? '';
     circle = prefs.getString('circle') ?? '';
     photoUrl = prefs.getString('photoUrl') ?? '';
-
+*/
     controllerNickname = TextEditingController(text: nickname);
     // controllerAffiliation = TextEditingController(text: affiliation);
     controllerGrade = TextEditingController(text: grade);
@@ -104,18 +111,13 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void readSetting() async {
-    print('idi' + id);
-    if (!id.isEmpty) {
-
-      final setting = await Firestore.instance.collection('users')
-          .document(id)
+      final setting = await FirebaseFirestore.instance.collection('users')
+          .doc(widget.currentUserId)
           .get();
       final data = setting.data();
-      print(data);
       setState(() {
         nickname = data['nickname'];
       });
-    }
   }
 
   Future getImage() async {
@@ -136,7 +138,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future uploadFile() async {
-    String fileName = id;
+    String fileName = widget.currentUserId;
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
     StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
     StorageTaskSnapshot storageTaskSnapshot;
@@ -146,7 +148,7 @@ class SettingsScreenState extends State<SettingsScreen> {
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
 
-          FirebaseFirestore.instance.collection('users').doc(id).update({
+          FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
             'photoUrl': photoUrl
           }).then((data) async {
             await prefs.setString('photoUrl', photoUrl);
@@ -190,7 +192,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       isLoading = true;
     });
 
-    FirebaseFirestore.instance.collection('users').doc(id).update({
+    FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
       'nickname': nickname,
       'grade': grade,
       'age': age,
@@ -238,8 +240,9 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(';;;' + id);
-    if (!isMyProfile) {
+    // readSetting();
+    print('nickname: ' + nickname);
+    if (!widget.isMyProfile) {
       return Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -768,7 +771,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
-
                 // 学年
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -811,6 +813,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                             ],
                             value: grade,
                             displayClearIcon: false,
+                            /*
                             validator: (value) {
                               print(':::' + value);
                               print(value.length);
@@ -819,6 +822,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               }
                               return (null);
                             },
+                             */
                             onChanged: (value) {
                               setState(() {
                                 grade = value;

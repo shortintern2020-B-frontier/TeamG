@@ -100,7 +100,7 @@ class HomeScreenState extends State<HomeScreen> {
       handleSignOut();
     } else {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChatSettings()));
+          context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: currentUserId, isMyProfile: true)));
     }
   }
 
