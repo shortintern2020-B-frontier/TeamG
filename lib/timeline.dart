@@ -6,8 +6,7 @@ import 'package:hikomaryu/const.dart';
 
 class Timeline extends StatefulWidget {
   final String currentUserId;
-  final AsyncSnapshot snapshot;
-  Timeline({this.currentUserId, this.snapshot});
+  Timeline({this.currentUserId});
 
   @override
   State<StatefulWidget> createState() {
@@ -21,8 +20,14 @@ class TimelineState extends State<Timeline> {
     super.initState();
   }
 
-    Widget buildItem(BuildContext context, DocumentSnapshot document) {
-      Container(
+  Future < Widget buildItem(BuildContext context, DocumentSnapshot document) {
+    String nickname, photoURL;
+      .collection('users')
+      .doc(document('data')['post_user_id'])
+      .get()
+      .then();
+
+      return Container(
         child: FlatButton(
           child: Row(
             children: <Widget>[
@@ -59,36 +64,15 @@ class TimelineState extends State<Timeline> {
                     children: <Widget>[
                       Container(
                         child: Text(
-                          document.data()['content'],
+                          // "タイムライン",
+                         document.data()['post_user_id'],
                           style: TextStyle(color: primaryColor, fontSize: 18),
                         ),
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
                       ),
                       Container(
-                        child: StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('posts')
-                              .orderBy('created_at', descending: true)
-                              .limit(1)
-                              .snapshots(),
-                          builder: (context, postSnapshot) {
-                            if (!postSnapshot.hasData) {
-                              return Center(
-                                  child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          themeColor)));
-                            } else {
-                              return Text(
-                                postSnapshot.data.documents.length == 0
-                                    ? ''
-                                    : postSnapshot.data.documents[0]
-                                        .data()['content'],
-                                style: TextStyle(color: Colors.grey[700]),
-                              );
-                            }
-                          },
-                        ),
+                        Text(document.data()['content']),
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
                       )
@@ -120,12 +104,26 @@ class TimelineState extends State<Timeline> {
 
   @override
   Widget build(BuildContext context) {
-    // return PostView.builder(
-    //   padding: EdgeInsets.all(10.0),
-    //   itemBuilder: (content, index) =>
-    //       buildItem(content, widget.snapshot.data.documents[index]),
-    //   itemCount: widget.snapshot.data.documents.length,
-    // );
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy('created_at', descending: true) 
+        .snapshots();
+      builder: (context, postSnapshot) {
+        if (!postSnapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+        } else { 
+          return ListView.builder(
+            padding: EdgeInsets.all(10.0),
+            itemBuilder: (content, index) =>
+              buildItem(content, widget.snapshot.data.documents[index]),
+            itemCount: widget.snapshot.data.documents.length
+          );
+        }
+      },
+    );
   }
 
 }

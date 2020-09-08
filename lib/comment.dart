@@ -13,40 +13,40 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Comment extends StatelessWidget {
-  final String postId;
+// class Comment extends StatelessWidget {
+//   final String postId;
 
-  Comment({Key key, @required this.post})
-      : super(key: key);
+//   Comment({Key key, @required this.post})
+//       : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Post detail',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      body: PostDetail(
-        postId: postId,
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(
+//           'Post detail',
+//           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+//         ),
+//         centerTitle: true,
+//       ),
+//       body: PostDetail(
+//         postId: postId,
+//       ),
+//     );
+//   }
+// }
 
-class PostDetail extends StatefulWidget {
-  final String postId;
+// class PostDetail extends StatefulWidget {
+//   final String postId;
 
-  ChatScreen({Key key, @required this.postId})
-      : super(key: key);
+//   ChatScreen({Key key, @required this.postId})
+//       : super(key: key);
 
-  @override
-  State createState() =>
-      PostState(postId: postId);
-}
+//   @override
+//   State createState() =>
+//       PostState(postId: postId);
+// }
 
-class PostState extends State<PostDetail> {
-  PostDetailState({Key key, @required this.postId});
-}
+// class PostState extends State<PostDetail> {
+//   PostDetailState({Key key, @required this.postId});
+// }
