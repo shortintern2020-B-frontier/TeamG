@@ -3,6 +3,8 @@ import 'dart:async';
 // not foundのエラーが出たためコメントアウト
 //import 'dart:html';
 import 'dart:io';
+import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:hikomaryu/chat.dart';
 import 'package:search_choices/search_choices.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -62,7 +64,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   String age = '';
   String residence = '';
   String birthplace = '';
-  String circle = '';
+  List<int> circle = [];
   String photoUrl = '';
   // List<String> selectedItems = [];
 
@@ -73,7 +75,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   // final FocusNode focusNodeAffiliation = FocusNode();
   final FocusNode focusNodeGrade = FocusNode();
   final FocusNode focusNodeAge = FocusNode();
-    final FocusNode focusNodeResidence = FocusNode();
+  final FocusNode focusNodeResidence = FocusNode();
   final FocusNode focusNodeBirthplace = FocusNode();
   final FocusNode focusNodeCircle = FocusNode();
 
@@ -85,26 +87,19 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void readLocal() async {
+
     prefs = await SharedPreferences.getInstance();
-    /*
-    nickname = prefs.getString('nickname') ?? '';
-    university = prefs.getString('university') ?? '';
-    faculty = prefs.getString('faculty') ?? '';
-    department = prefs.getString('department') ?? '';
-    grade = prefs.getString('grade') ?? '';
-    age = prefs.getString('age') ?? '';
-    residence = prefs.getString('residence') ?? '';
-    birthplace = prefs.getString('birthplace') ?? '';
-    circle = prefs.getString('circle') ?? '';
-    photoUrl = prefs.getString('photoUrl') ?? '';
-*/
+    age = prefs.getString('age');
+    residence = prefs.getString('residence');
+    birthplace = prefs.getString('birthplace');
+    // circle = conv_to_intList(prefs.getStringList('circle'));
     controllerNickname = TextEditingController(text: nickname);
     // controllerAffiliation = TextEditingController(text: affiliation);
     controllerGrade = TextEditingController(text: grade);
     controllerAge = TextEditingController(text: age);
     controllerResidence = TextEditingController(text: residence);
     controllerBirthplace = TextEditingController(text: birthplace);
-    controllerCircle = TextEditingController(text: circle);
+    //controllerCircle = TextEditingController(list: circle);
 
     // Force refresh input
     setState(() {});
@@ -116,7 +111,17 @@ class SettingsScreenState extends State<SettingsScreen> {
           .get();
       final data = setting.data();
       setState(() {
-        nickname = data['nickname'];
+        controllerNickname.text = data['nickname'];
+        university = data['university'];
+        faculty = data['faculty'];
+        department = data['department'];
+        grade = data['grade'];
+        controllerGrade.text = data['grade'];
+        controllerAge.text = data['age'];
+        controllerResidence.text = data['residence'];
+        controllerBirthplace.text = data['birthplace'];
+        circle = conv_to_intList(data['circle'].cast<String>());
+        photoUrl = data['photoUrl'];
       });
   }
 
@@ -198,7 +203,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       'age': age,
       'residence': residence,
       'birthplace': birthplace,
-      'circle': circle,
+      'circle': conv_to_stringList(circle),
       'photoUrl': photoUrl
     }).then((data) async {
       await prefs.setString('nickname', nickname);
@@ -210,7 +215,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       await prefs.setString('age', age);
       await prefs.setString('residence', residence);
       await prefs.setString('birthplace', birthplace);
-      await prefs.setString('circle', circle);
+      await prefs.setStringList('circle', conv_to_stringList(circle));
       await prefs.setString('photoUrl', photoUrl);
 
       setState(() {
@@ -227,22 +232,49 @@ class SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  String makeCircleStr(List<DropdownMenuItem> l, List<int> idx) {
-    String st = "";
-    for (int i = 0;i < idx.length; i++) {
-      st = st + l[idx[i]].value;
-      if (i != idx.length-1) {
-        st = st + ',';
-      }
+  List<String> conv_to_stringList(List<int> l) {
+    List<String> ret = [];
+    for (int i = 0;i < l.length; i++) {
+      ret.add(l[i].toString());
     }
-    return st;
+    return ret;
+  }
+
+  List<int> conv_to_intList(List<String> l) {
+    List<int> ret = [];
+    for (int i = 0;i < l.length; i++) {
+      ret.add(int.parse(l[i]));
+    }
+    return ret;
   }
 
   @override
   Widget build(BuildContext context) {
-    // readSetting();
-    print('nickname: ' + nickname);
-    if (!widget.isMyProfile) {
+    List<DropdownMenuItem> circleList = [
+      DropdownMenuItem(
+          child: Text('サッカー'),
+          value: 'サッカー'
+      ),
+      DropdownMenuItem(
+          child: Text('野球'),
+          value: '野球'
+      ),
+      DropdownMenuItem(
+          child: Text('バスケットボール'),
+          value: 'バスケットボール'
+      ),
+      DropdownMenuItem(
+          child: Text('アカペラ'),
+          value: 'アカペラ'
+      ),
+      DropdownMenuItem(
+          child: Text('管弦楽団'),
+          value: '管弦楽団'
+      ),
+    ];
+
+
+     if (!widget.isMyProfile) {
       return Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -323,6 +355,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                             fontSize: 25,
                             color: primaryColor),
                       ),
+                      alignment: Alignment.topLeft,
                       margin: EdgeInsets.only(
                           left: 10.0, bottom: 5.0, top: 10.0),
                     ),
@@ -414,24 +447,30 @@ class SettingsScreenState extends State<SettingsScreen> {
                         height: 45,
                         child: Card(
                           color: orangeColor,
-
-                          child: Row(
+                          child: Column(
                             children: <Widget>[
                               Container(
                                 child: Text(
                                   '学年',
                                   style: TextStyle(fontSize: 23),
                                 ),
+                                alignment: Alignment.topLeft,
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
-                              Text(
-                                grade,
-                                style: TextStyle(fontSize: 17),
+                              Column(
+                                children: <Widget>[
+                                  Text(
+                                    controllerGrade.text,
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                           margin: EdgeInsets.only(left: 30.0, right: 30.0),
                         ),
+                        width: 500,
+                        //height: 100,
                       ),
                     ),
                     // 基本情報
@@ -465,7 +504,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
-                                age,
+                                controllerAge.text,
                                 style: TextStyle(fontSize: 17),
                               ),
                             ],
@@ -492,7 +531,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
-                                residence,
+                                controllerResidence.text,
                                 style: TextStyle(fontSize: 17),
                                 ),
                             ],
@@ -519,7 +558,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
-                                birthplace,
+                                controllerBirthplace.text,
                                 style: TextStyle(fontSize: 17),
                               ),
                             ],
@@ -532,26 +571,27 @@ class SettingsScreenState extends State<SettingsScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
-                      height: 45,
-                      child: Card(
-                        color: orangeColor,
-
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                            child: Text(
-                              'サークル',
-                              style: TextStyle(fontSize: 23),
-                              ),
-                              margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                              ),
-                              Text(
-                                circle,
-                                style: TextStyle(fontSize: 17),
+                        width: 400,
+                        child: Card(
+                          color: orangeColor,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  'サークル',
+                                  style: TextStyle(fontSize: 23),
                                 ),
+                                alignment: Alignment.topLeft,
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  for (var i in circle) Text(circleList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                ],
+                              ),
                             ],
                           ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
                         ),
                       ),
                     ),
@@ -564,29 +604,6 @@ class SettingsScreenState extends State<SettingsScreen> {
         ],
       );
     } else {
-      List<DropdownMenuItem> circleList = [
-        DropdownMenuItem(
-            child: Text('サッカー'),
-            value: 'サッカー'
-        ),
-        DropdownMenuItem(
-            child: Text('野球'),
-            value: '野球'
-        ),
-        DropdownMenuItem(
-            child: Text('バスケットボール'),
-            value: 'バスケットボール'
-        ),
-        DropdownMenuItem(
-            child: Text('アカペラ'),
-            value: 'アカペラ'
-        ),
-        DropdownMenuItem(
-            child: Text('管弦楽団'),
-            value: '管弦楽団'
-        ),
-      ];
-
       return Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -776,12 +793,13 @@ class SettingsScreenState extends State<SettingsScreen> {
                   padding: EdgeInsets.only(top: 15, bottom: 15),
                   child: Card(
                     color: orangeColor,
-                    child: Row(
+                    child: Column(
                       children: <Widget>[
                         Container(
                           child: Text(
                             '学年',
                             style: TextStyle(fontSize: 23),
+                            textAlign: TextAlign.left,
                           ),
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
@@ -813,21 +831,14 @@ class SettingsScreenState extends State<SettingsScreen> {
                             ],
                             value: grade,
                             displayClearIcon: false,
-                            /*
-                            validator: (value) {
-                              print(':::' + value);
-                              print(value.length);
-                              if (value.isEmpty) {
-                                return ("学年は必ず入力してください．");
-                              }
-                              return (null);
-                            },
-                             */
                             onChanged: (value) {
                               setState(() {
                                 grade = value;
                               });
                             },
+                            dialogBox: false,
+                            isExpanded: true,
+                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
@@ -960,7 +971,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   padding: EdgeInsets.only(top: 15, bottom: 15),
                   child: Card(
                     color: orangeColor,
-                    child: Row(
+                    child: Column(
                       children: <Widget>[
                         Container(
                           child: Text(
@@ -971,17 +982,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                         ),
                         Theme(
                           data: Theme.of(context).copyWith(primaryColor: primaryColor),
-                          child: Flexible(
-                            child: SearchChoices.multiple(
-                              items: circleList,
-
-                              //selectedItems: selectedItems,
-                              onChanged: (value) {
-                                setState(() {
-                                  circle = makeCircleStr(circleList, value);
-                                });
-                              },
-                            ),
+                          child: SearchChoices.multiple(
+                            items: circleList,
+                            selectedItems: circle,
+                            onChanged: (value) {
+                              setState(() {
+                                circle = value;
+                              });
+                            },
+                            dialogBox: false,
+                            isExpanded: true,
+                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
