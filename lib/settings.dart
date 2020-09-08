@@ -112,6 +112,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       final data = setting.data();
       setState(() {
         controllerNickname.text = data['nickname'];
+        nickname = data['nickname'];
         university = data['university'];
         faculty = data['faculty'];
         department = data['department'];
@@ -334,7 +335,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                     Container(
                       child: Text(
-                        nickname,
+                        controllerNickname.text,
                         style: TextStyle(fontSize: 23),
                       ),
                       width: 200,
@@ -444,7 +445,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
-                        height: 45,
+                        height: 55,
                         child: Card(
                           color: orangeColor,
                           child: Column(
