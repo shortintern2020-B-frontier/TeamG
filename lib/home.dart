@@ -203,8 +203,7 @@ class HomeScreenState extends State<HomeScreen> {
                         Text("Search"),
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
-                        new Timeline(
-                            currentUserId: currentUserId, snapshot: snapshot),
+                        new Timeline(currentUserId: currentUserId),
                         Text("Account"),
                       ],
                     );
