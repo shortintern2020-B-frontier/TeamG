@@ -204,7 +204,7 @@ class HomeScreenState extends State<HomeScreen> {
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
                         new Timeline(
-                            currentUserId: currentUserId, snapshot: snapshot),
+                            currentUserId: currentUserId),
                         Text("Account"),
                       ],
                     );
