@@ -74,12 +74,12 @@ class SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     readLocal();
+    readSetting();
   }
 
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
     id = prefs.getString('id') ?? '';
-    print('idddd' + id);
     nickname = prefs.getString('nickname') ?? '';
     university = prefs.getString('university') ?? '';
     faculty = prefs.getString('faculty') ?? '';
@@ -90,6 +90,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     birthplace = prefs.getString('birthplace') ?? '';
     circle = prefs.getString('circle') ?? '';
     photoUrl = prefs.getString('photoUrl') ?? '';
+
 
     controllerNickname = TextEditingController(text: nickname);
     // controllerAffiliation = TextEditingController(text: affiliation);
@@ -104,13 +105,18 @@ class SettingsScreenState extends State<SettingsScreen> {
     setState(() {});
   }
 
-  void readSetting(String id) async {
+  void readSetting() async {
+    print('idi' + id);
     if (!id.isEmpty) {
-      print('idi' + id);
+
       final setting = await Firestore.instance.collection('users')
           .document(id)
           .get();
-      print('test');
+      final data = setting.data();
+      print(data);
+      setState(() {
+        nickname = data['nickname'];
+      });
     }
   }
 
@@ -235,7 +241,6 @@ class SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     print(';;;' + id);
-    readSetting(id);
     if (!isMyProfile) {
       return Stack(
         children: <Widget>[
