@@ -31,11 +31,9 @@ Future<List<String>> getList(
       var jsRes = convert.jsonDecode(res.body);
       jsRes['results']['school'].forEach((item) => list.add(item['name']));
     } else if (mode == apiMode.faculty) {
-      if (res.statusCode == 200) {
-        var jsRes = convert.jsonDecode(res.body);
-        jsRes['results']['school'][0]['faculty']
-            .forEach((item) => list.add(item['name']));
-      }
+      var jsRes = convert.jsonDecode(res.body);
+      jsRes['results']['school'][0]['faculty']
+          .forEach((item) => list.add(item['name']));
     } else if (mode == apiMode.department) {
       jsRes['results']['school'][0]['faculty'].forEach((item) {
         if (item['name'] == faculty) {
@@ -52,8 +50,7 @@ void makeDropdownMenu(StreamController<List<DropdownMenuItem<String>>> events,
     [String university = '', String faculty = '']) async {
   List<String> list =
       await getList(mode, prefectures[prefecture], university, faculty);
-  List<DropdownMenuItem<String>> menu = makeDropdowmMenuFromStringList(list);
-  events.add(menu);
+  events.add(makeDropdowmMenuFromStringList(list));
 }
 
 // この関数は一旦放置
@@ -67,56 +64,70 @@ void makeDropdownMenu(StreamController<List<DropdownMenuItem<String>>> events,
 //   return classesList;
 // }
 
-// 大学一覧はこの関数でfirebaseから取得する
-void getUniversitiesFireStore(
-    StreamController<List<DropdownMenuItem<String>>> events) async {
-  List<String> universitesList = [];
-  QuerySnapshot universitySnapShot =
-      await FirebaseFirestore.instance.collection("users").get();
-  universitySnapShot.docs.forEach((doc) {
-    if (!universitesList.contains(doc.data()["university"]) &&
-        doc.data()["university"] != null) {
-      universitesList.add(doc.data()["university"]);
-    }
-  });
-  events.add(makeDropdowmMenuFromStringList(universitesList));
-}
-
-// 学科一覧はこの関数でfirebaseから取得する
-void getFacultyFireStore(
-    StreamController<List<DropdownMenuItem<String>>> events,
-    String universityName) async {
-  print("wwww");
-  List<String> facultiesList = [];
-  print(universityName);
-  await FirebaseFirestore.instance
-      .collection("users")
-      .where("university", isEqualTo: universityName)
-      .get()
-      .then((contents) {
-    print(contents);
-    contents.docs.forEach((doc) {
-      if (!facultiesList.contains(doc.data()["university"]) &&
-          doc.data()["faculty"] != null) facultiesList.add(doc.data()["faculty"]);
+void getDataFromFireStore(
+    StreamController<List<DropdownMenuItem<String>>> events, apiMode mode,
+    [String universityName = '', String faculityName = '']) async {
+  List<String> list = [];
+  if (mode == apiMode.university) {
+    await FirebaseFirestore.instance.collection("users").get().then((content) {
+      content.docs.forEach((doc) {
+        if (!list.contains(doc.data()["university"]) &&
+            doc.data()["university"] != null) {
+          list.add(doc.data()["university"]);
+        }
+      });
     });
-  });
-  print(facultiesList);
-  events.add(makeDropdowmMenuFromStringList(facultiesList));
+  } else if (mode == apiMode.faculty) {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .where("university", isEqualTo: universityName)
+        .get()
+        .then((content) {
+      content.docs.forEach((doc) {
+        if (!list.contains(doc.data()["faculty"]) &&
+            doc.data()["faculty"] != null) list.add(doc.data()["faculty"]);
+      });
+    });
+  } else if (mode == apiMode.department) {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .where("university", isEqualTo: universityName)
+        .where("faculty", isEqualTo: faculityName)
+        .get()
+        .then((content) {
+      content.docs.forEach((doc) {
+        if (!list.contains(doc.data()["department"]) &&
+            doc.data()["department"] != null)
+          list.add(doc.data()["department"]);
+      });
+    });
+  }
+  events.add(makeDropdowmMenuFromStringList(list));
 }
 
-// この関数は一旦放置
-Future<QuerySnapshot> getUsersFireStore(selectUni, selectFac) async {
-  if (selectFac == null) {
+Future<QuerySnapshot> getUsersFromFireStore(
+    String selectedUni, String selectedFac, String selectedDep) async {
+  if (selectedUni == null && selectedFac == null && selectedDep == null) {
+    return null;
+  } else if (selectedFac == null && selectedDep == null) {
     QuerySnapshot userSnapShot = await FirebaseFirestore.instance
         .collection("users")
-        .where("university", isEqualTo: selectUni)
+        .where("university", isEqualTo: selectedUni)
+        .get();
+    return userSnapShot;
+  } else if (selectedDep == null) {
+    QuerySnapshot userSnapShot = await FirebaseFirestore.instance
+        .collection("users")
+        .where("university", isEqualTo: selectedUni)
+        .where("faculty", isEqualTo: selectedFac)
         .get();
     return userSnapShot;
   } else {
     QuerySnapshot userSnapShot = await FirebaseFirestore.instance
         .collection("users")
-        .where("university", isEqualTo: selectUni)
-        .where("faculty", isEqualTo: selectFac)
+        .where("university", isEqualTo: selectedUni)
+        .where("faculty", isEqualTo: selectedFac)
+        .where("department", isEqualTo: selectedDep)
         .get();
     return userSnapShot;
   }

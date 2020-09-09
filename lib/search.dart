@@ -8,8 +8,6 @@ import 'package:search_choices/search_choices.dart';
 import 'api.dart';
 import 'chat.dart';
 import 'const.dart';
-import 'home.dart';
-import 'signup.dart';
 
 class Search extends StatefulWidget {
   static final navKey = new GlobalKey<NavigatorState>();
@@ -27,32 +25,30 @@ class SearchState extends State<Search> {
   SearchState({Key navKey, @required this.currentUserId});
 
   final String currentUserId;
-  List<String> dropdownList = ["大学", "学部", "専攻", "学年"];
+  final List<String> dropdownList = ["大学", "学部", "専攻", "学年"];
+  final List<String> university = ["東京大学", "京都大学"];
   String selectedItem = "大学";
   List<String> dropdownFaculty = [];
   String _selectedUniversity;
-  // List<int> selectedClasses;
   String _selectedFaculty;
-  List<String> selectedDepartment;
+  String _selectedDepartment;
   String selectedSearchWord = "university";
   List<String> universitesList = [];
   List<String> classesList = [];
   List<String> usersList = [];
   var userList;
-  // List<DropdownMenuItem> items = [];
-  // List<DropdownMenuItem> classItems = [];
   String inputString = "";
   TextFormField input;
   List<DropdownMenuItem> editableItems = [];
   final _formKey = GlobalKey<FormState>();
   bool asTabs = false;
-  final List<String> university = ["東京大学", "京都大学"];
   List<int> selectedItemsMultiDialog = [];
 
   List<DropdownMenuItem<String>> _emptyItems = [];
 
   StreamController<List<DropdownMenuItem<String>>> _universityEvents;
   StreamController<List<DropdownMenuItem<String>>> _facultyEvents;
+  StreamController<List<DropdownMenuItem<String>>> _departmentEvents;
 
   @override
   void initState() {
@@ -60,10 +56,12 @@ class SearchState extends State<Search> {
 
     _universityEvents = StreamController<List<DropdownMenuItem<String>>>();
     _facultyEvents = StreamController<List<DropdownMenuItem<String>>>();
+    _departmentEvents = StreamController<List<DropdownMenuItem<String>>>();
 
-    // _universityEvents.add(_emptyItems);
-    getUniversitiesFireStore(_universityEvents);
+    // getUniversitiesFireStore(_universityEvents);
+    getDataFromFireStore(_universityEvents, apiMode.university);
     _facultyEvents.add(_emptyItems);
+    _departmentEvents.add(_emptyItems);
 
     super.initState();
   }
@@ -145,82 +143,76 @@ class SearchState extends State<Search> {
   }
 
   Widget buildListItem(BuildContext context, DocumentSnapshot document) {
-    if (document.data()["university"].contains(_selectedUniversity) &&
-        document.data()["faculty"].contains(_selectedFaculty)) {
-      return FlatButton(
-        child: Row(
-          children: <Widget>[
-            Material(
-              child: document.data()['photoUrl'] != null &&
-                      document.data()['photoUrl'].isNotEmpty
-                  ? CachedNetworkImage(
-                      placeholder: (context, url) => Container(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 1.0,
-                          valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                        ),
-                        width: 50.0,
-                        height: 50.0,
-                        padding: EdgeInsets.all(15.0),
+    return FlatButton(
+      child: Row(
+        children: <Widget>[
+          Material(
+            child: document.data()['photoUrl'] != null &&
+                    document.data()['photoUrl'].isNotEmpty
+                ? CachedNetworkImage(
+                    placeholder: (context, url) => Container(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                       ),
-                      imageUrl: document.data()['photoUrl'],
                       width: 50.0,
                       height: 50.0,
-                      fit: BoxFit.cover,
-                    )
-                  : Icon(
-                      Icons.account_circle,
-                      size: 50.0,
-                      color: greyColor,
+                      padding: EdgeInsets.all(15.0),
                     ),
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              clipBehavior: Clip.hardEdge,
-            ),
-            Flexible(
-              child: Container(
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: Text(
-                        document.data()['nickname'],
-                        style: TextStyle(color: primaryColor, fontSize: 18),
-                      ),
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
+                    imageUrl: document.data()['photoUrl'],
+                    width: 50.0,
+                    height: 50.0,
+                    fit: BoxFit.cover,
+                  )
+                : Icon(
+                    Icons.account_circle,
+                    size: 50.0,
+                    color: greyColor,
+                  ),
+            borderRadius: BorderRadius.all(Radius.circular(25.0)),
+            clipBehavior: Clip.hardEdge,
+          ),
+          Flexible(
+            child: Container(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    child: Text(
+                      document.data()['nickname'],
+                      style: TextStyle(color: primaryColor, fontSize: 18),
                     ),
-                    Container(
-                      child: Text(
-                        document.data()['university'] +
-                            document.data()["faculty"] +
-                            document.data()["department"] +
-                            " " +
-                            document.data()["grade"].toString() +
-                            "年",
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                    alignment: Alignment.centerLeft,
+                    margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
+                  ),
+                  Container(
+                    child: Text(
+                      document.data()['university'] +
+                          document.data()["faculty"] +
+                          document.data()["department"] +
+                          " " +
+                          document.data()["grade"].toString() +
+                          "年",
+                      style: TextStyle(color: Colors.grey[700]),
                     ),
-                  ],
-                ),
-                margin: EdgeInsets.only(left: 20.0),
+                    alignment: Alignment.centerLeft,
+                    margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                  ),
+                ],
               ),
+              margin: EdgeInsets.only(left: 20.0),
             ),
-          ],
-        ),
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => Chat(peerDoc: document)));
-        },
-        color: greyColor2,
-        padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      );
-    } else {
-      return SizedBox.shrink();
-    }
+          ),
+        ],
+      ),
+      onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => Chat(peerDoc: document)));
+      },
+      color: greyColor2,
+      padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+    );
   }
 
   @override
@@ -232,7 +224,6 @@ class SearchState extends State<Search> {
         children: <Widget>[
           buildLabel('大学名'),
           StreamBuilder(
-              // future: getUniversitiesFireStore(),
               stream: _universityEvents.stream,
               builder: (BuildContext context, snapshot) {
                 return SearchChoices.single(
@@ -243,12 +234,10 @@ class SearchState extends State<Search> {
                   onChanged: (value) {
                     setState(() {
                       _selectedUniversity = value;
-                      // getFacultyFireStore(value);
-                      getFacultyFireStore(_facultyEvents, _selectedUniversity);
-                      // if (_selectedUniversity == null) {
-                      // _facultyEvents.add(_emptyItems);
+                      getDataFromFireStore(
+                          _facultyEvents, apiMode.faculty, _selectedUniversity);
                       _selectedFaculty = null;
-                      // }
+                      _selectedDepartment = null;
                     });
                   },
                   isExpanded: true,
@@ -257,7 +246,6 @@ class SearchState extends State<Search> {
           SizedBox(height: 20),
           buildLabel('学部名'),
           StreamBuilder(
-              // future: getFacultyFireStore(_selectedUniversity),
               stream: _facultyEvents.stream,
               builder: (BuildContext context, snapshot) {
                 return AbsorbPointer(
@@ -266,32 +254,53 @@ class SearchState extends State<Search> {
                       items: _selectedUniversity == null
                           ? _emptyItems
                           : snapshot.data,
-                      // items: makeDropdowmMenuFromStringList(
-                      //     snapshot.hasData ? dropdownFaculty : ['東京']),
                       value: _selectedFaculty,
                       hint: "選択してください",
                       searchHint: "選択してください",
                       onChanged: (value) {
                         setState(() {
                           _selectedFaculty = value;
+                          getDataFromFireStore(
+                              _departmentEvents,
+                              apiMode.department,
+                              _selectedUniversity,
+                              _selectedDepartment);
+                          _selectedDepartment = null;
                         });
                       },
                       isExpanded: true,
                     ));
               }),
           SizedBox(height: 20),
+          buildLabel('学科名'),
+          StreamBuilder(
+              stream: _departmentEvents.stream,
+              builder: (BuildContext context, snapshot) {
+                return AbsorbPointer(
+                    absorbing:
+                        _selectedUniversity == null || _selectedFaculty == null,
+                    child: SearchChoices.single(
+                      items: _selectedUniversity == null ||
+                              _selectedFaculty == null
+                          ? _emptyItems
+                          : snapshot.data,
+                      value: _selectedDepartment,
+                      hint: "選択してください",
+                      searchHint: "選択してください",
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedDepartment = value;
+                        });
+                      },
+                      isExpanded: true,
+                    ));
+              }),
           Expanded(
             child: FutureBuilder(
-                // future: getUsersFireStore(_selectedUniversity, _selectedFaculty),
-                future: _selectedUniversity == null || _selectedFaculty == null
-                    ? null
-                    : getUsersFireStore(_selectedUniversity, _selectedFaculty),
+                future: getUsersFromFireStore(
+                    _selectedUniversity, _selectedFaculty, _selectedDepartment),
                 builder: (BuildContext context, snapshot) {
-                  // print('hello!!!!!');
-                  // print(snapshot.data);
-                  return snapshot.data == null ||
-                          _selectedUniversity == null ||
-                          _selectedFaculty == null
+                  return snapshot.data == null
                       ? Container()
                       : ListView.builder(
                           padding: EdgeInsets.all(10.0),
