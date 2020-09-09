@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hikomaryu/tags.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -316,18 +315,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                   padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
                 ),
                 margin: EdgeInsets.only(top: 50.0, bottom: 50.0),
-              ),
-              Container(
-                child: RaisedButton(
-                  child: Text('タグへ'),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TagsScreen(),
-                        ));
-                  },
-                ),
               ),
             ],
           ),
