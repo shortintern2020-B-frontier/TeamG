@@ -118,18 +118,21 @@ class HomeScreenState extends State<HomeScreen> {
   void onItemMenuPress(Choice choice) {
     if (choice.title == 'Log out') {
       handleSignOut();
-    } else if (choice.title == 'Tags') {
+    }
+    /*
+    else if (choice.title == 'Tags') {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => ChatTags()));
     } else if (choice.title == 'Classes') {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => Classes(currentUserId, "琉球大学")));
+              builder: (context) => Classes(currentUserId, "琉球大学", false)));
     } else {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: currentUserId, isMyProfile: true)));
     }
+     */
   }
 
   Future<Null> handleSignOut() async {

@@ -18,7 +18,7 @@ class Classes extends StatelessWidget {
   final String currentUserId;
   final String university;
   final bool isMyProfile;
-  Classes(this.currentUserId, this.university, this.isMyProfile);
+  Classes({this.currentUserId, this.university, this.isMyProfile});
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +120,8 @@ class ClassesScreenState extends State<ClassesScreen> {
                       ),
                     );
                   } else {
-                    return Column(
+                    return SingleChildScrollView(
+                      child: Column(
                       children: <Widget>[
                         //ClassName
                         Text(
@@ -130,6 +131,7 @@ class ClassesScreenState extends State<ClassesScreen> {
                         ),
                         Row(
                           children: <Widget>[
+                            // 授業名
                             Container(
                               //content1_title
                               width: 80,
@@ -147,8 +149,9 @@ class ClassesScreenState extends State<ClassesScreen> {
                                 ),
                               ),
                             ),
+                            // search_choices
                             Container(
-                              width: 250,
+                              width: 220,
                               child: SearchChoices.multiple(
                                 items: circleList,
                                 selectedItems: circle,
@@ -175,6 +178,8 @@ class ClassesScreenState extends State<ClassesScreen> {
                         ),
                       ],
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                      padding: EdgeInsets.only(left: 15.0, right: 15.0),
                     );
                   }
                 },
