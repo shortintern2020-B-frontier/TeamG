@@ -45,6 +45,23 @@ class SearchState extends State<Search> {
     super.initState();
   }
 
+  String makeUserBelongs(DocumentSnapshot document) {
+    String userBelongs = '';
+    if (document.data()['university'] != null) {
+      userBelongs += document.data()['university'];
+    }
+    if (document.data()['faculty'] != null) {
+      userBelongs += document.data()['faculty'];
+    }
+    if (document.data()['department'] != null) {
+      userBelongs += document.data()['department'];
+    }
+    if (document.data()['grade'] != null) {
+      userBelongs += '   ' + document.data()["grade"].toString() + "年";
+    }
+    return userBelongs;
+  }
+
   Widget buildLabel(String textValue) {
     return Container(
       padding: EdgeInsets.all(8),
@@ -102,12 +119,7 @@ class SearchState extends State<Search> {
                     ),
                     Container(
                       child: Text(
-                        document.data()['university'] +
-                            document.data()["faculty"] +
-                            document.data()["department"] +
-                            " " +
-                            document.data()["grade"].toString() +
-                            "年",
+                        makeUserBelongs(document),
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                       alignment: Alignment.centerLeft,
