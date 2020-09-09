@@ -29,6 +29,23 @@ class ChatListState extends State<ChatList> {
     return '$otherId-$id';
   }
 
+  String convertMessage(Map<String, dynamic> message) {
+    switch (message['type']) {
+      case 0:
+        return message['content'];
+        break;
+      case 1:
+        return '画像が送信されました';
+        break;
+      case 2:
+        return 'スタンプが送信されました';
+        break;
+      default:
+        return '';
+        break;
+    }
+  }
+
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
     if (document.data()['id'] == widget.currentUserId) {
       return Container();
@@ -96,8 +113,9 @@ class ChatListState extends State<ChatList> {
                               return Text(
                                 messageSnapshot.data.documents.length == 0
                                     ? ''
-                                    : messageSnapshot.data.documents[0]
-                                        .data()['content'],
+                                    : convertMessage(messageSnapshot
+                                        .data.documents[0]
+                                        .data()),
                                 style: TextStyle(color: Colors.grey[700]),
                               );
                             }
@@ -117,10 +135,7 @@ class ChatListState extends State<ChatList> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => Chat(
-                          peerId: document.id,
-                          peerAvatar: document.data()['photoUrl'],
-                        )));
+                    builder: (context) => Chat(peerDoc: document)));
           },
           color: greyColor2,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
