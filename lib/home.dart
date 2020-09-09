@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:hikomaryu/chat_list.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
+import 'package:hikomaryu/search.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -302,7 +303,7 @@ class HomeScreenState extends State<HomeScreen> {
                         });
                       },
                       children: [
-                        Text("Search"),
+                        new Search(),
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
                         Text("Timeline"),
