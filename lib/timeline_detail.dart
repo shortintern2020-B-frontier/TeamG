@@ -23,7 +23,7 @@ class TimelineDetail extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Timeline Detail',
+          'タイムライン詳細',
           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
