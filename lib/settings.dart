@@ -828,7 +828,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       child: Stack(
                         children: <Widget>[
                           (avatarImageFile == null)
-                              ? (photoUrl != ''
+                              ? (photoUrl != null && photoUrl != ''
                               ? Material(
                             child: CachedNetworkImage(
                               placeholder: (context, url) =>
