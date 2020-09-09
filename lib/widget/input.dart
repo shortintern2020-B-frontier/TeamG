@@ -15,16 +15,22 @@ class Input extends StatefulWidget {
   final String peerId;
   final Function(String, int) onSendMessage;
   final Widget listWidget;
+  final bool isTimeline;
 
-  Input({Key key, this.peerId, this.listWidget, this.onSendMessage})
+  Input(
+      {Key key,
+      this.peerId,
+      this.listWidget,
+      this.onSendMessage,
+      this.isTimeline})
       : super(key: key);
 
   @override
-  State createState() => InputState(peerId: peerId);
+  State createState() => InputState(peerId: peerId, isTimeline: isTimeline);
 }
 
 class InputState extends State<Input> {
-  InputState({Key key, this.peerId});
+  InputState({Key key, this.peerId, this.isTimeline});
 
   String peerId;
   String id;
@@ -36,6 +42,7 @@ class InputState extends State<Input> {
   File imageFile;
   bool isLoading;
   bool isShowSticker;
+  bool isTimeline;
   String imageUrl;
 
   final TextEditingController textEditingController = TextEditingController();
@@ -128,29 +135,37 @@ class InputState extends State<Input> {
     return Container(
       child: Row(
         children: <Widget>[
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: IconButton(
-                icon: Icon(Icons.image),
-                onPressed: getImage,
-                color: primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ),
+          // Slect image
+          isTimeline == null
+              ? Material(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 1.0),
+                    child: IconButton(
+                      icon: Icon(Icons.image),
+                      onPressed: getImage,
+                      color: primaryColor,
+                    ),
+                  ),
+                  color: Colors.white,
+                )
+              : Container(),
 
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: IconButton(
-                icon: Icon(Icons.face),
-                onPressed: getSticker,
-                color: primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ),
+          // Slect Sticker
+          isTimeline == null
+              ? Material(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 1.0),
+                    child: IconButton(
+                      icon: Icon(Icons.face),
+                      onPressed: getSticker,
+                      color: primaryColor,
+                    ),
+                  ),
+                  color: Colors.white,
+                )
+              : Container(
+                  padding: EdgeInsets.only(left: 20.0),
+                ),
 
           // Edit text
           Flexible(
@@ -308,14 +323,14 @@ class InputState extends State<Input> {
     PickedFile pickedFile;
 
     pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
-    imageFile = File(pickedFile.path);
+    if (pickedFile == null) return;
 
-    if (imageFile != null) {
-      setState(() {
-        isLoading = true;
-      });
-      uploadFile();
-    }
+    imageFile = File(pickedFile.path);
+    if (imageFile == null) return;
+    setState(() {
+      isLoading = true;
+    });
+    uploadFile();
   }
 
   void getSticker() {
