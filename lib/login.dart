@@ -10,6 +10,8 @@ import 'package:hikomaryu/widget/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'signup.dart';
+
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);
 
@@ -20,21 +22,21 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  SharedPreferences prefs;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  SharedPreferences _prefs;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool isLoading = false;
-  bool isLoggedIn = false;
-  User currentUser;
+  bool _isLoading = false;
+  // bool _isLoggedIn = false;
+  // User _currentUser;
 
   @override
   void initState() {
     super.initState();
-    isSignedIn();
+    _isSignedIn();
   }
 
   @override
@@ -44,12 +46,12 @@ class LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void isSignedIn() async {
+  void _isSignedIn() async {
     this.setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
-    prefs = await SharedPreferences.getInstance();
+    _prefs = await SharedPreferences.getInstance();
 
     User user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -57,79 +59,74 @@ class LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                HomeScreen(currentUserId: prefs.getString('id'))),
+                HomeScreen(currentUserId: _prefs.getString('id'))),
       );
     }
 
     this.setState(() {
-      isLoading = false;
+      _isLoading = false;
     });
   }
 
-  Future<Null> handleSignIn() async {
-    prefs = await SharedPreferences.getInstance();
+  Future<Null> _handleSignIn() async {
+    _prefs = await SharedPreferences.getInstance();
 
     this.setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
-    // TODO - 新規登録時にフォームから取得.
-    String _nickname = 'test';
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: _emailController.text, password: _passwordController.text);
 
-    // TODO - 新規登録時にはこっちを使う。
-    // User firebaseUser = (await FirebaseAuth.instance
-    //         .createUserWithEmailAndPassword(email: _email, password: _password))
-    //     .user;
-    User firebaseUser = (await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: _emailController.text, password: _passwordController.text))
-        .user;
+      Fluttertoast.showToast(
+          msg: loginMsgs['success'], backgroundColor: themeColor);
+      this.setState(() {
+        _isLoading = false;
+      });
+      // print('ログイン成功!!!!!!');
 
-    if (firebaseUser != null) {
-      // Check is already sign up
       final QuerySnapshot result = await FirebaseFirestore.instance
           .collection('users')
-          .where('id', isEqualTo: firebaseUser.uid)
+          .where('id', isEqualTo: userCredential.user.uid)
           .get();
       final List<DocumentSnapshot> documents = result.docs;
-      if (documents.length == 0) {
-        // Update data to server if new user
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(firebaseUser.uid)
-            .set({
-          'nickname': _nickname,
-          'id': firebaseUser.uid,
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'photoUrl': null,
-          'chattingWith': null
-        });
 
-        // Write data to local
-        currentUser = firebaseUser;
-        await prefs.setString('id', currentUser.uid);
-        await prefs.setString('nickname', _nickname);
-      } else {
-        // Write data to local
-        await prefs.setString('id', documents[0].data()['id']);
-        await prefs.setString('nickname', documents[0].data()['nickname']);
-        await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
-        await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
-      }
-      Fluttertoast.showToast(msg: "Sign in success");
+      // Write data to local
+      await _prefs.setString('id', documents[0].data()['id']);
+      await _prefs.setString('nickname', documents[0].data()['nickname']);
+      await _prefs.setString('photoUrl', documents[0].data()['photoUrl']);
+      await _prefs.setString('aboutMe', documents[0].data()['aboutMe']);
+
+      Fluttertoast.showToast(
+          msg: loginMsgs['success'], backgroundColor: themeColor);
       this.setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
 
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  HomeScreen(currentUserId: firebaseUser.uid)));
-    } else {
-      Fluttertoast.showToast(msg: "Sign in fail");
+                  HomeScreen(currentUserId: userCredential.user.uid)));
+      return null;
+    } on FirebaseAuthException catch (e) {
+      // print(e.toString());
+      Fluttertoast.showToast(
+          msg: loginMsgs[e.code], backgroundColor: themeColor);
       this.setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
+      return null;
+    } catch (e) {
+      // print(e.toString());
+      Fluttertoast.showToast(
+          msg: loginMsgs['other'], backgroundColor: themeColor);
+      this.setState(() {
+        _isLoading = false;
+      });
+      // print('ログイン失敗!!!!!!');
+      return null;
     }
   }
 
@@ -145,54 +142,83 @@ class LoginScreenState extends State<LoginScreen> {
         ),
         body: Stack(
           children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(labelText: 'Email'),
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      },
+            ListView(
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: const InputDecoration(labelText: 'Email'),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return textFieldMsgs['required'];
+                            } else if (!RegExp(r"[\w\-\._]+@[\w\-\._]+\.ac\.jp")
+                                .hasMatch(value)) {
+                              return textFieldMsgs['uni-email-need'];
+                            }
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          obscureText: true,
+                          controller: _passwordController,
+                          decoration:
+                              const InputDecoration(labelText: 'Password'),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return textFieldMsgs['required'];
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
                     ),
-                    TextFormField(
-                      obscureText: true,
-                      controller: _passwordController,
-                      decoration: const InputDecoration(labelText: 'Password'),
-                      validator: (String value) {
-                        if (value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      },
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      alignment: Alignment.center,
-                      child: RaisedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState.validate()) {
-                            handleSignIn();
-                          }
-                        },
-                        child: const Text('Login'),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                Container(
+                  alignment: Alignment.center,
+                  child: MaterialButton(
+                    child: const Text('Log in'),
+                    minWidth: 200,
+                    color: themeColor,
+                    textColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    onPressed: () async {
+                      if (_formKey.currentState.validate()) {
+                        _handleSignIn();
+                      }
+                    },
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  child: MaterialButton(
+                    child: const Text('Sign up'),
+                    minWidth: 200,
+                    textColor: themeColor,
+                    shape: OutlineInputBorder(
+                      borderSide: BorderSide(color: themeColor),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    onPressed: () async {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  SignUpScreen(title: 'echo')));
+                    },
+                  ),
+                ),
+              ],
             ),
-
             // Loading
-            Positioned(
-              child: isLoading ? const Loading() : Container(),
-            ),
+            Positioned(child: _isLoading ? const Loading() : Container())
           ],
         ));
   }
