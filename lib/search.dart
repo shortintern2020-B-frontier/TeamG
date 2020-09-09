@@ -38,7 +38,6 @@ class SearchState extends State<Search> {
   final List<String> university = ["東京大学", "京都大学"];
   List<int> selectedItemsMultiDialog = [];
 
-
   Future handleSearch(word) async {
     userList = await FirebaseFirestore.instance.collection("users").get();
     final usersList = userList.docs.map((doc) {
@@ -112,10 +111,12 @@ class SearchState extends State<Search> {
 
   Future<void> getUniversitiesFireStore() async {
     QuerySnapshot  universitySnapShot = await FirebaseFirestore.instance.collection("users").get();
-    for (var i = 0; i < universitySnapShot.docs.length; i++) {
-      if (!universitesList.contains(universitySnapShot.docs[i].data()["university"]))
-        universitesList.add(universitySnapShot.docs[i].data()["university"]);
-    }
+    universitesList.removeRange(0, universitesList.length);
+    universitySnapShot.docs.forEach((doc) {
+      if (!universitesList.contains(doc.data()["university"]) && doc.data()["university"] != null){
+        universitesList.add(doc.data()["university"]);
+      }
+    });
     return universitesList;
   }
 
@@ -129,6 +130,7 @@ class SearchState extends State<Search> {
   }
 
   Future<void> getFacultyFireStore(universityName) async {
+    print("wwww");
     dropdownFaculty.removeRange(0, dropdownFaculty.length);
 
     // var resultFaculty = 
@@ -165,52 +167,10 @@ class SearchState extends State<Search> {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        children: [
-          Row(
-            children: [
-              // Expanded(
-              //   child: FutureBuilder(
-              //         future: getClassesFireStore(),
-              //         builder: (ctx, snapshot) {
-              //           if (snapshot.hasData) {
-              //             classItems.removeRange(0, classItems.length);
-              //             classesList.forEach((cl) {                          
-              //                 classItems.add(DropdownMenuItem(
-              //                   child: Text(cl),
-              //                   value: cl,
-              //                 ));
-              //             });
-              //             return SearchChoices.multiple(
-              //               items: classItems,
-              //               selectedItems: selectedItemsMultiDialog,
-              //               hint: Padding(
-              //                 padding: const EdgeInsets.all(12.0),
-              //                 child: Text("Select any"),
-              //               ),
-              //               searchHint: "Select any",
-              //               onChanged: (value) {
-              //                 setState(() {
-              //                   print(value);
-              //                   selectedClasses = value;
-              //                 });
-              //                 print(selectedClasses);
-              //               },
-              //               closeButton: (selectedClasses) {
-              //                 return (selectedClasses.isNotEmpty
-              //                     ? "Save ${selectedClasses.length == 1 ? '"' + classItems[selectedClasses.first].value.toString() + '"' : '(' + selectedClasses.length.toString() + ')'}"
-              //                     : "Save without selection");
-              //               },
-              //               isExpanded: true,
-              //             );
-              //           }
-              //         }
-              //       ),
-              // ),
-              Expanded(
-                  child: FutureBuilder(
+        children: <Widget>[
+                  FutureBuilder(
                     future: getUniversitiesFireStore(),
-                    builder: (ctx, snapshot) {
-                      print(snapshot.data);
+                    builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         items.removeRange(0, items.length);
                         snapshot.data.forEach((uni) {                          
@@ -235,10 +195,6 @@ class SearchState extends State<Search> {
                       } 
                     }
                   ),
-                ),
-              Expanded(
-                  child: Row(
-                    children: [                       
                       FutureBuilder(
                         future: selectedUniversity != null ? getFacultyFireStore(selectedUniversity) : null,
                         builder: (context, snapshot) {
@@ -248,6 +204,7 @@ class SearchState extends State<Search> {
                               setState(() {
                                 selectedFaculty = result;
                               });
+                              print('helloworld!!!!!!!');
                               print(selectedFaculty);
                             } ,
                             selectedItemBuilder: (context) {
@@ -271,37 +228,20 @@ class SearchState extends State<Search> {
                             }).toList(),
                           );
                         }
-                      )
-                    ],
-                  ),
-                ),
-              Expanded(
-                child: TextField(
-                  onChanged: (val) {
-                    userList = FirebaseFirestore.instance.collection("users").snapshots();
-                    initiateSearch(val);
-                  },
-                  onSubmitted: (searchWord) {
-                    handleSearch(searchWord);
-                  },
-                ),
-              ),
-            ],
-          ),
-          Flexible(
-            child: Center(
-              child: FutureBuilder(
+                      ),
+                      Expanded(child:
+                      FutureBuilder(
                       // future: getUsersFireStore(selectedUniversity, selectedFaculty),
                       future: selectedUniversity == null || selectedFaculty == null ? null : getUsersFireStore(selectedUniversity, selectedFaculty) ,
                       builder: (context, snapshot) {
-                        print('hello!!!!!');
-                        print(snapshot.data);
+                        // print('hello!!!!!');
+                        // print(snapshot.data);
                             return snapshot.data == null || selectedUniversity == null || selectedFaculty == null  ? 
                               Container()
                               :ListView(
                               children: snapshot.data.docs.map<Widget>((document) {
-                                print(document.data()["university"]);
-                                print(selectedUniversity);
+                                // print(document.data()["university"]);
+                                // print(selectedUniversity);
                                 // if (!universityList.contains(document.data()['university'])) {universityList.add(document.data()['university']);}
                                 // print(universityList);
                                 if (document.data()["university"].contains(selectedUniversity) && document.data()["faculty"].contains(selectedFaculty)) {
@@ -320,9 +260,20 @@ class SearchState extends State<Search> {
                               }).toList() 
                             );
                       }
-                    ),
-            ),
-          ),
+                    ),)
+                    // Expanded(
+                    // child: 
+                    // ListView.builder(
+                    //   itemCount: 50,
+                    //   itemBuilder: (context, index){
+                    //     return Container(
+                    //       height: 50,
+                    //       child: Text(index.toString()),
+                    //       color: Colors.red,
+                    //     );
+                    //   })
+                    // )
+                    // Expanded(child: Container())//)
         ],
       ),
     );
