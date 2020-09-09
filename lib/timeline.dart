@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hikomaryu/widget/input.dart';
-// import 'package:hikomaryu/comment.dart';
+import 'package:hikomaryu/timeline_detail.dart';
 import 'package:hikomaryu/const.dart';
 
 class Timeline extends StatefulWidget {
@@ -90,13 +90,12 @@ class TimelineState extends State<Timeline> {
                 ],
               ),
               onPressed: () {
-                //   Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //           builder: (context) => Post(
-                //                 peerId: document.id,
-                //                 peerAvatar: document.data()['photoUrl'],
-                //               )));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TimelineDetail(
+                              postDocument: document,
+                            )));
               },
               color: greyColor2,
               padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
@@ -111,16 +110,17 @@ class TimelineState extends State<Timeline> {
   }
 
   void onSendMessage(String content, int type) {
-    var documentReference = FirebaseFirestore.instance
-        .collection('posts')
-        .doc(DateTime.now().millisecondsSinceEpoch.toString());
+    String date = DateTime.now().millisecondsSinceEpoch.toString();
+
+    var documentReference =
+        FirebaseFirestore.instance.collection('posts').doc(date);
 
     FirebaseFirestore.instance.runTransaction((transaction) async {
       transaction.set(
         documentReference,
         {
           'post_user_id': widget.currentUserId,
-          'created_at': DateTime.now(),
+          'created_at': date,
           'content': content,
           'type': type
         },
@@ -141,25 +141,15 @@ class TimelineState extends State<Timeline> {
               child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
         } else {
-          return Stack(
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  Flexible(
-                    child: ListView.builder(
-                        padding: EdgeInsets.all(10.0),
-                        itemBuilder: (content, index) => buildItem(
-                            content, postSnapshot.data.documents[index]),
-                        itemCount: postSnapshot.data.documents.length),
-                  ),
-                  // Input content
-                  Input(
-                    peerId: '',
-                    onSendMessage: onSendMessage,
-                  ),
-                ],
-              ),
-            ],
+          return Input(
+            peerId: '',
+            onSendMessage: onSendMessage,
+            listWidget: Flexible(
+                child: ListView.builder(
+                    padding: EdgeInsets.all(10.0),
+                    itemBuilder: (content, index) =>
+                        buildItem(content, postSnapshot.data.documents[index]),
+                    itemCount: postSnapshot.data.documents.length)),
           );
         }
       },

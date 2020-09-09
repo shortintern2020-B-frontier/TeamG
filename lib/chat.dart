@@ -1,36 +1,30 @@
-import 'dart:async';
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/widget/full_photo.dart';
-import 'package:hikomaryu/widget/loading.dart';
 import 'package:hikomaryu/widget/input.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Chat extends StatelessWidget {
-  final String peerId;
-  final String peerAvatar;
+  final DocumentSnapshot peerDoc;
 
-  Chat({Key key, @required this.peerId, @required this.peerAvatar})
-      : super(key: key);
+  Chat({Key key, @required this.peerDoc}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'CHAT',
+          this.peerDoc.data()['nickname'],
           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
       body: ChatScreen(
-        peerId: peerId,
-        peerAvatar: peerAvatar,
+        peerId: this.peerDoc.id,
+        peerAvatar: this.peerDoc.data()['photoUrl'],
       ),
     );
   }
@@ -61,13 +55,7 @@ class ChatScreenState extends State<ChatScreen> {
   String groupChatId;
   SharedPreferences prefs;
 
-  File imageFile;
-  bool isLoading;
-  bool isShowSticker;
-  String imageUrl;
-
   final ScrollController listScrollController = ScrollController();
-  final FocusNode focusNode = FocusNode();
 
   _scrollListener() {
     if (listScrollController.offset >=
@@ -92,25 +80,9 @@ class ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
 
-    groupChatId = '';
-
-    isLoading = false;
-    isShowSticker = false;
-    imageUrl = '';
-
     readLocal();
-  }
-
-  void onFocusChange() {
-    if (focusNode.hasFocus) {
-      // Hide sticker when keyboard appear
-      setState(() {
-        isShowSticker = false;
-      });
-    }
   }
 
   readLocal() async {
@@ -382,48 +354,12 @@ class ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<bool> onBackPress() {
-    if (isShowSticker) {
-      setState(() {
-        isShowSticker = false;
-      });
-    } else {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(id)
-          .update({'chattingWith': null});
-      Navigator.pop(context);
-    }
-
-    return Future.value(false);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      child: Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              // List of messages
-              buildListMessage(),
-
-              // TODO - Sticker
-              // (isShowSticker ? buildSticker() : Container()),
-
-              // Input content
-              Input(
-                peerId: peerId,
-                onSendMessage: onSendMessage,
-              ),
-            ],
-          ),
-
-          // Loading
-          buildLoading()
-        ],
-      ),
-      onWillPop: onBackPress,
+    return Input(
+      peerId: peerId,
+      onSendMessage: onSendMessage,
+      listWidget: buildListMessage(),
     );
   }
 
@@ -448,123 +384,6 @@ class ChatScreenState extends State<ChatScreen> {
     });
     listScrollController.animateTo(0.0,
         duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-  }
-
-  // Widget buildSticker() {
-  //   return Container(
-  //     child: Column(
-  //       children: <Widget>[
-  //         Row(
-  //           children: <Widget>[
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi1', 2),
-  //               child: Image.asset(
-  //                 'images/mimi1.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             ),
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi2', 2),
-  //               child: Image.asset(
-  //                 'images/mimi2.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             ),
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi3', 2),
-  //               child: Image.asset(
-  //                 'images/mimi3.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             )
-  //           ],
-  //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //         ),
-  //         Row(
-  //           children: <Widget>[
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi4', 2),
-  //               child: Image.asset(
-  //                 'images/mimi4.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             ),
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi5', 2),
-  //               child: Image.asset(
-  //                 'images/mimi5.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             ),
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi6', 2),
-  //               child: Image.asset(
-  //                 'images/mimi6.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             )
-  //           ],
-  //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //         ),
-  //         Row(
-  //           children: <Widget>[
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi7', 2),
-  //               child: Image.asset(
-  //                 'images/mimi7.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             ),
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi8', 2),
-  //               child: Image.asset(
-  //                 'images/mimi8.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             ),
-  //             FlatButton(
-  //               onPressed: () => onSendMessage('mimi9', 2),
-  //               child: Image.asset(
-  //                 'images/mimi9.gif',
-  //                 width: 50.0,
-  //                 height: 50.0,
-  //                 fit: BoxFit.cover,
-  //               ),
-  //             )
-  //           ],
-  //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //         )
-  //       ],
-  //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //     ),
-  //     decoration: BoxDecoration(
-  //         border: Border(top: BorderSide(color: greyColor2, width: 0.5)),
-  //         color: Colors.white),
-  //     padding: EdgeInsets.all(5.0),
-  //     height: 180.0,
-  //   );
-  // }
-
-  Widget buildLoading() {
-    return Positioned(
-      child: isLoading ? const Loading() : Container(),
-    );
   }
 
   Widget buildListMessage() {
