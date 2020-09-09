@@ -117,10 +117,7 @@ class ChatListState extends State<ChatList> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => Chat(
-                          peerId: document.id,
-                          peerAvatar: document.data()['photoUrl'],
-                        )));
+                    builder: (context) => Chat(peerDoc: document)));
           },
           color: greyColor2,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
