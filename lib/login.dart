@@ -158,7 +158,7 @@ class LoginScreenState extends State<LoginScreen> {
                               return textFieldMsgs['required'];
                             } else if (!RegExp(r"[\w\-\._]+@[\w\-\._]+\.ac\.jp")
                                 .hasMatch(value)) {
-                              return '大学用メールアドレスを入力してください．';
+                              return textFieldMsgs['uni-email-need'];
                             }
                             return null;
                           },
