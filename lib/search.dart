@@ -45,6 +45,12 @@ class SearchState extends State<Search> {
     super.initState();
   }
 
+  bool checkDamiMenu(List<DropdownMenuItem<String>> snapshotData) {
+    if (snapshotData.length == 1 && snapshotData[0].value.length == 0)
+      return true;
+    return false;
+  }
+
   String makeUserBelongs(DocumentSnapshot document) {
     String userBelongs = '';
     if (document.data()['university'] != null) {
@@ -164,10 +170,11 @@ class SearchState extends State<Search> {
                   onChanged: (value) {
                     setState(() {
                       _selectedUniversity = value;
-                      getDataFromFireStore(
-                          _facultyEvents, apiMode.faculty, _selectedUniversity);
                       _selectedFaculty = null;
                       _selectedDepartment = null;
+                      if (_selectedUniversity != null)
+                        getDataFromFireStore(_facultyEvents, apiMode.faculty,
+                            _selectedUniversity);
                     });
                   },
                   isExpanded: true,
@@ -179,7 +186,8 @@ class SearchState extends State<Search> {
               stream: _facultyEvents.stream,
               builder: (BuildContext context, snapshot) {
                 return AbsorbPointer(
-                    absorbing: _selectedUniversity == null,
+                    absorbing: _selectedUniversity == null ||
+                        checkDamiMenu(snapshot.data),
                     child: SearchChoices.single(
                       items: _selectedUniversity == null
                           ? _emptyItems
@@ -190,12 +198,13 @@ class SearchState extends State<Search> {
                       onChanged: (value) {
                         setState(() {
                           _selectedFaculty = value;
-                          getDataFromFireStore(
-                              _departmentEvents,
-                              apiMode.department,
-                              _selectedUniversity,
-                              _selectedDepartment);
                           _selectedDepartment = null;
+                          if (_selectedFaculty != null)
+                            getDataFromFireStore(
+                                _departmentEvents,
+                                apiMode.department,
+                                _selectedUniversity,
+                                _selectedFaculty);
                         });
                       },
                       isExpanded: true,
@@ -207,8 +216,9 @@ class SearchState extends State<Search> {
               stream: _departmentEvents.stream,
               builder: (BuildContext context, snapshot) {
                 return AbsorbPointer(
-                    absorbing:
-                        _selectedUniversity == null || _selectedFaculty == null,
+                    absorbing: _selectedUniversity == null ||
+                        _selectedFaculty == null ||
+                        checkDamiMenu(snapshot.data),
                     child: SearchChoices.single(
                       items: _selectedUniversity == null ||
                               _selectedFaculty == null

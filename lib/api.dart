@@ -102,6 +102,7 @@ void getDataFromFireStore(
       });
     });
   }
+  if (list.length == 0) list.add('');
   events.add(makeDropdowmMenuFromStringList(list));
 }
 
