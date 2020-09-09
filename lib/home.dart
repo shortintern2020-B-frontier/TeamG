@@ -34,7 +34,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
-    const Choice(title: 'Settings', icon: Icons.settings),
+    // const Choice(title: 'Settings', icon: Icons.settings),
     const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
 
@@ -203,6 +203,9 @@ class HomeScreenState extends State<HomeScreen> {
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
                         Text("Timeline"),
+                        new ChatSettings(
+                          currentUserId: currentUserId, isMyProfile: true
+                        ),
                         Text("Account"),
                       ],
                     );
