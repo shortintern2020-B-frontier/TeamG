@@ -206,7 +206,7 @@ class HomeScreenState extends State<HomeScreen> {
                         new ChatSettings(
                           currentUserId: currentUserId, isMyProfile: true
                         ),
-                        Text("Account"),
+                        //Text("Account"),
                       ],
                     );
                   }
