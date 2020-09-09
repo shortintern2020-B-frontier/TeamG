@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,7 +10,6 @@ import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import 'main.dart';
 
@@ -35,9 +32,10 @@ class HomeScreenState extends State<HomeScreen> {
 
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
-    const Choice(title: 'Settings', icon: Icons.settings),
-    const Choice(title: 'Log out', icon: Icons.exit_to_app),
+    const Choice(title: '設定', icon: Icons.settings),
+    const Choice(title: 'ログアウト', icon: Icons.exit_to_app),
   ];
+  List<String> titles = ['探す', 'トーク', 'タイムライン', 'アカウント'];
 
   PageController _pageController;
   int _page = 0;
@@ -115,7 +113,7 @@ class HomeScreenState extends State<HomeScreen> {
   // }
 
   void onItemMenuPress(Choice choice) {
-    if (choice.title == 'Log out') {
+    if (choice.title == 'ログアウト') {
       handleSignOut();
     } else {
       Navigator.push(
@@ -144,7 +142,7 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'home',
+          titles[_page],
           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -223,19 +221,19 @@ class HomeScreenState extends State<HomeScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            title: Text('Search'),
+            title: Text('探す'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
-            title: Text('Chat'),
+            title: Text('トーク'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.timeline),
-            title: Text('Timeline'),
+            title: Text('タイムライン'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
-            title: Text('Account'),
+            title: Text('アカウント'),
           ),
         ],
         currentIndex: _page,
