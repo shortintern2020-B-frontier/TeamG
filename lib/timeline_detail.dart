@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/widget/full_photo.dart';
 import 'package:hikomaryu/widget/input.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimelineDetail extends StatelessWidget {
@@ -54,7 +55,6 @@ class TimelineDetailScreenState extends State<TimelineDetailScreen> {
   DocumentSnapshot postDocument;
   String postedDate;
   DocumentSnapshot postUser;
-  String id;
 
   List<QueryDocumentSnapshot> listMessage = new List.from([]);
   int _limit = 20;
@@ -104,299 +104,171 @@ class TimelineDetailScreenState extends State<TimelineDetailScreen> {
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {
-    // if (document.data()['idFrom'] == id) {
-    if (false) {
-      // Right (my message)
-      return Row(
-        children: <Widget>[
-          document.data()['type'] == 0
-              // Text
-              ? Container(
-                  child: Text(
-                    document.data()['content'],
-                    style: TextStyle(color: primaryColor),
-                  ),
-                  padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                  width: 200.0,
-                  decoration: BoxDecoration(
-                      color: greyColor2,
-                      borderRadius: BorderRadius.circular(8.0)),
-                  margin: EdgeInsets.only(
-                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                      right: 10.0),
-                )
-              : document.data()['type'] == 1
-                  // Image
-                  ? Container(
-                      child: FlatButton(
-                        child: Material(
-                          child: CachedNetworkImage(
+    return FutureBuilder(
+      future: FirebaseFirestore.instance
+          .collection('users')
+          .doc(document.data()['post_user_id'])
+          .get(),
+      builder: (context, userSnapshot) {
+        if (!userSnapshot.hasData) {
+          return Center(
+              child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+        }
+
+        String postUserAvator = userSnapshot.data.data()['photoUrl'];
+        return Container(
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Material(
+                    child: postUserAvator != null && postUserAvator.isNotEmpty
+                        ? CachedNetworkImage(
                             placeholder: (context, url) => Container(
                               child: CircularProgressIndicator(
+                                strokeWidth: 1.0,
                                 valueColor:
                                     AlwaysStoppedAnimation<Color>(themeColor),
                               ),
-                              width: 200.0,
-                              height: 200.0,
-                              padding: EdgeInsets.all(70.0),
-                              decoration: BoxDecoration(
-                                color: greyColor2,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(8.0),
-                                ),
-                              ),
+                              width: 35.0,
+                              height: 35.0,
+                              padding: EdgeInsets.all(10.0),
                             ),
-                            errorWidget: (context, url, error) => Material(
-                              child: Image.asset(
-                                'images/img_not_available.jpeg',
-                                width: 200.0,
-                                height: 200.0,
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(8.0),
-                              ),
-                              clipBehavior: Clip.hardEdge,
-                            ),
-                            imageUrl: document.data()['content'],
-                            width: 200.0,
-                            height: 200.0,
+                            imageUrl: postUserAvator,
+                            width: 35.0,
+                            height: 35.0,
                             fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                          clipBehavior: Clip.hardEdge,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FullPhoto(
-                                      url: document.data()['content'])));
-                        },
-                        padding: EdgeInsets.all(0),
-                      ),
-                      margin: EdgeInsets.only(
-                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 10.0),
-                    )
-                  // Sticker
-                  : Container(
-                      child: Image.asset(
-                        'images/${document.data()['content']}.gif',
-                        width: 100.0,
-                        height: 100.0,
-                        fit: BoxFit.cover,
-                      ),
-                      margin: EdgeInsets.only(
-                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 10.0),
-                    ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.end,
-      );
-    } else {
-      // Left (peer message)
-      return FutureBuilder(
-        future: FirebaseFirestore.instance
-            .collection('users')
-            .doc(document.data()['post_user_id'])
-            .get(),
-        builder: (context, userSnapshot) {
-          if (!userSnapshot.hasData) {
-            return Center(
-                child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
-          }
-
-          String postUserAvator = userSnapshot.data.data()['photoUrl'];
-          return Container(
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    isLastMessageLeft(index)
-                        ? Material(
-                            child: postUserAvator != null &&
-                                    postUserAvator.isNotEmpty
-                                ? CachedNetworkImage(
-                                    placeholder: (context, url) => Container(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 1.0,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                themeColor),
-                                      ),
-                                      width: 35.0,
-                                      height: 35.0,
-                                      padding: EdgeInsets.all(10.0),
-                                    ),
-                                    imageUrl: postUserAvator,
-                                    width: 35.0,
-                                    height: 35.0,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Icon(
-                                    Icons.account_circle,
-                                    size: 50.0,
-                                    color: greyColor,
-                                  ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(18.0),
-                            ),
-                            clipBehavior: Clip.hardEdge,
                           )
-                        : Container(width: 35.0),
-                    Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            child: Text(
-                              userSnapshot.data.data()['nickname'],
-                              style:
-                                  TextStyle(color: primaryColor, fontSize: 18),
-                            ),
-                            alignment: Alignment.centerLeft,
-                            margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
+                        : Icon(
+                            Icons.account_circle,
+                            size: 50.0,
+                            color: greyColor,
                           ),
-                          document.data()['type'] == 0
-                              ? Container(
-                                  child: Text(
-                                    document.data()['content'],
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  padding: EdgeInsets.fromLTRB(
-                                      15.0, 10.0, 15.0, 10.0),
-                                  width: 200.0,
-                                  decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      borderRadius: BorderRadius.circular(8.0)),
-                                  margin: EdgeInsets.only(left: 10.0),
-                                )
-                              : document.data()['type'] == 1
-                                  ? Container(
-                                      child: FlatButton(
-                                        child: Material(
-                                          child: CachedNetworkImage(
-                                            placeholder: (context, url) =>
-                                                Container(
-                                              child: CircularProgressIndicator(
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                        Color>(themeColor),
-                                              ),
-                                              width: 200.0,
-                                              height: 200.0,
-                                              padding: EdgeInsets.all(70.0),
-                                              decoration: BoxDecoration(
-                                                color: greyColor2,
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(8.0),
-                                                ),
-                                              ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(18.0),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                  ),
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            userSnapshot.data.data()['nickname'],
+                            style: TextStyle(color: primaryColor, fontSize: 18),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
+                        ),
+                        document.data()['type'] == 0
+                            ? Container(
+                                child: Text(
+                                  document.data()['content'],
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                padding:
+                                    EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                                width: 200.0,
+                                decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                margin: EdgeInsets.only(left: 10.0),
+                              )
+                            : document.data()['type'] == 1
+                                ? Container(
+                                    child: FlatButton(
+                                      child: Material(
+                                        child: CachedNetworkImage(
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      themeColor),
                                             ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Material(
-                                              child: Image.asset(
-                                                'images/img_not_available.jpeg',
-                                                width: 200.0,
-                                                height: 200.0,
-                                                fit: BoxFit.cover,
-                                              ),
+                                            width: 200.0,
+                                            height: 200.0,
+                                            padding: EdgeInsets.all(70.0),
+                                            decoration: BoxDecoration(
+                                              color: greyColor2,
                                               borderRadius: BorderRadius.all(
                                                 Radius.circular(8.0),
                                               ),
-                                              clipBehavior: Clip.hardEdge,
                                             ),
-                                            imageUrl:
-                                                document.data()['content'],
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
                                           ),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(8.0)),
-                                          clipBehavior: Clip.hardEdge,
+                                          errorWidget: (context, url, error) =>
+                                              Material(
+                                            child: Image.asset(
+                                              'images/img_not_available.jpeg',
+                                              width: 200.0,
+                                              height: 200.0,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(8.0),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
+                                          ),
+                                          imageUrl: document.data()['content'],
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
                                         ),
-                                        onPressed: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      FullPhoto(
-                                                          url: document.data()[
-                                                              'content'])));
-                                        },
-                                        padding: EdgeInsets.all(0),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8.0)),
+                                        clipBehavior: Clip.hardEdge,
                                       ),
-                                      margin: EdgeInsets.only(left: 10.0),
-                                    )
-                                  : Container(
-                                      child: Image.asset(
-                                        'images/${document.data()['content']}.gif',
-                                        width: 100.0,
-                                        height: 100.0,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      margin: EdgeInsets.only(
-                                          bottom: isLastMessageRight(index)
-                                              ? 20.0
-                                              : 10.0,
-                                          right: 10.0),
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => FullPhoto(
+                                                    url: document
+                                                        .data()['content'])));
+                                      },
+                                      padding: EdgeInsets.all(0),
                                     ),
-                        ],
-                      ),
-                      margin: EdgeInsets.only(left: 20.0),
+                                    margin: EdgeInsets.only(left: 10.0),
+                                  )
+                                : Container(
+                                    child: Image.asset(
+                                      'images/${document.data()['content']}.gif',
+                                      width: 100.0,
+                                      height: 100.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    margin: EdgeInsets.only(
+                                        bottom: 10.0, right: 10.0),
+                                  ),
+                      ],
                     ),
-                  ],
+                    margin: EdgeInsets.only(left: 20.0),
+                  ),
+                ],
+              ),
+
+              // Time
+              Container(
+                child: Text(
+                  DateFormat('MM/dd HH:mm').format(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          int.parse(document.data()['created_at']))),
+                  style: TextStyle(
+                      color: greyColor,
+                      fontSize: 12.0,
+                      fontStyle: FontStyle.italic),
                 ),
-
-                // Time
-                // isLastMessageLeft(index)
-                //     ? Container(
-                //         child: Text(
-                //           DateFormat('dd MMM kk:mm').format(
-                //               DateTime.fromMillisecondsSinceEpoch(
-                //                   int.parse(document.data()['timestamp']))),
-                //           style: TextStyle(
-                //               color: greyColor,
-                //               fontSize: 12.0,
-                //               fontStyle: FontStyle.italic),
-                //         ),
-                //         margin: EdgeInsets.only(left: 50.0, top: 5.0, bottom: 5.0),
-                //       )
-                //     : Container()
-              ],
-              crossAxisAlignment: CrossAxisAlignment.start,
-            ),
-            margin: EdgeInsets.only(bottom: 10.0),
-          );
-        },
-      );
-    }
-  }
-
-  bool isLastMessageLeft(int index) {
-    if ((index > 0 &&
-            listMessage != null &&
-            listMessage[index - 1].data()['idFrom'] == id) ||
-        index == 0) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  bool isLastMessageRight(int index) {
-    if ((index > 0 &&
-            listMessage != null &&
-            listMessage[index - 1].data()['idFrom'] != id) ||
-        index == 0) {
-      return true;
-    } else {
-      return false;
-    }
+                margin: EdgeInsets.only(left: 80.0, top: 5.0, bottom: 5.0),
+              )
+            ],
+            crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          margin: EdgeInsets.only(bottom: 10.0),
+        );
+      },
+    );
   }
 
   @override
@@ -428,8 +300,6 @@ class TimelineDetailScreenState extends State<TimelineDetailScreen> {
         },
       );
     });
-    // listScrollController.animateTo(0.0,
-    //     duration: Duration(milliseconds: 300), curve: Curves.easeOut);
   }
 
   Widget buildListMessage() {
@@ -453,13 +323,89 @@ class TimelineDetailScreenState extends State<TimelineDetailScreen> {
                               AlwaysStoppedAnimation<Color>(themeColor)));
                 } else {
                   listMessage.addAll(snapshot.data.documents);
-                  return ListView.builder(
-                    padding: EdgeInsets.all(10.0),
-                    itemBuilder: (context, index) =>
-                        buildItem(index, snapshot.data.documents[index]),
-                    itemCount: snapshot.data.documents.length,
-                    controller: listScrollController,
-                  );
+                  return Column(children: <Widget>[
+                    // 投稿内容
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          Material(
+                            child: postUser.data()['photoUrl'] != null &&
+                                    postUser.data()['photoUrl'].isNotEmpty
+                                ? CachedNetworkImage(
+                                    placeholder: (context, url) => Container(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 1.0,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                whiteColor),
+                                      ),
+                                      width: 50.0,
+                                      height: 50.0,
+                                      padding: EdgeInsets.all(15.0),
+                                    ),
+                                    imageUrl: postUser.data()['photoUrl'],
+                                    width: 50.0,
+                                    height: 50.0,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Icon(
+                                    Icons.account_circle,
+                                    size: 50.0,
+                                    color: greyColor,
+                                  ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(25.0)),
+                            clipBehavior: Clip.hardEdge,
+                          ),
+                          Flexible(
+                            child: Container(
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    child: Text(
+                                      postUser.data()['nickname'],
+                                      style: TextStyle(
+                                          color: primaryColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    margin:
+                                        EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
+                                  ),
+                                  Container(
+                                    child: Text(
+                                      postDocument.data()['content'],
+                                      style: TextStyle(
+                                          color: primaryColor, fontSize: 18),
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    margin: EdgeInsets.fromLTRB(
+                                        10.0, 0.0, 0.0, 0.0),
+                                  )
+                                ],
+                              ),
+                              margin: EdgeInsets.only(left: 20.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 10.0),
+                    ),
+                    Divider(
+                      color: Colors.black,
+                      thickness: 1,
+                    ),
+                    // コメント一覧
+                    Flexible(
+                        child: ListView.builder(
+                      padding: EdgeInsets.all(10.0),
+                      itemBuilder: (context, index) =>
+                          buildItem(index, snapshot.data.documents[index]),
+                      itemCount: snapshot.data.documents.length,
+                      controller: listScrollController,
+                    ))
+                  ]);
                 }
               },
             ),
