@@ -437,9 +437,6 @@ class SettingsScreenState extends State<SettingsScreen> {
       ),
     ];
 
-
-    print(circle);
-
     if (!widget.isMyProfile) {
       return Stack(
         children: <Widget>[
@@ -530,7 +527,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
-                        height: 45,
+                        height: 60,
                         child: Card(
                           color: orangeColor,
 
@@ -543,9 +540,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 ),
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
-                              Text(
-                                university,
-                                style: TextStyle(fontSize: 17),
+                              Flexible(
+                                child: Text(
+                                  university,
+                                  style: TextStyle(fontSize: 17),
+                                ),
                               ),
                             ],
                           ),
@@ -557,7 +556,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
-                        height: 45,
+                        height: 60,
                         child: Card(
                           color: orangeColor,
 
@@ -570,9 +569,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 ),
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
-                              Text(
-                                faculty,
-                                style: TextStyle(fontSize: 17),
+                              Flexible(
+                                child: Text(
+                                  faculty,
+                                  style: TextStyle(fontSize: 17),
+                                ),
                               ),
                             ],
                           ),
@@ -584,7 +585,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
-                        height: 45,
+                        height: 60,
                         child: Card(
                           color: orangeColor,
 
@@ -597,9 +598,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 ),
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
-                              Text(
-                                department,
-                                style: TextStyle(fontSize: 17),
+                              Flexible(
+                                child: Text(
+                                  department,
+                                  style: TextStyle(fontSize: 17),
+                                ),
                               ),
                             ],
                           ),
@@ -614,31 +617,26 @@ class SettingsScreenState extends State<SettingsScreen> {
                         height: 55,
                         child: Card(
                           color: orangeColor,
-                          child: Column(
+
+                          child: Row(
                             children: <Widget>[
                               Container(
                                 child: Text(
                                   '学年',
                                   style: TextStyle(fontSize: 23),
                                 ),
-                                alignment: Alignment.topLeft,
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
-                              Column(
-                                children: <Widget>[
-                                  Text(
-                                    grade,
-                                    // controllerGrade.text,
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                ],
+                              Flexible(
+                                child: Text(
+                                  grade,
+                                  style: TextStyle(fontSize: 17),
+                                ),
                               ),
                             ],
                           ),
                           margin: EdgeInsets.only(left: 30.0, right: 30.0),
                         ),
-                        width: 500,
-                        //height: 100,
                       ),
                     ),
                     // 基本情報
@@ -807,6 +805,118 @@ class SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                     ),
+                    // グルメ
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        width: 400,
+                        child: Card(
+                          color: orangeColor,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  'グルメ',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                alignment: Alignment.topLeft,
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  for (var i in gourmet) Text(gourmetList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                ],
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
+                    // スポーツ
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        width: 400,
+                        child: Card(
+                          color: orangeColor,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  'スポーツ',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                alignment: Alignment.topLeft,
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  for (var i in sport) Text(sportList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                ],
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
+                    // 音楽
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        width: 400,
+                        child: Card(
+                          color: orangeColor,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  '音楽',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                alignment: Alignment.topLeft,
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  for (var i in music) Text(musicList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                ],
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
+                    // 趣味
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        width: 400,
+                        child: Card(
+                          color: orangeColor,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  '趣味',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                alignment: Alignment.topLeft,
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  for (var i in hobby) Text(hobbyList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                ],
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -923,7 +1033,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
                   child: Container(
-                    height: 45,
+                    height: 60,
                     child: Card(
                       color: orangeColor,
 
@@ -936,9 +1046,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                             ),
                             margin: EdgeInsets.only(left: 10.0, right: 10.0),
                           ),
-                          Text(
-                            university,
-                            style: TextStyle(fontSize: 17),
+                          Flexible(
+                            child: Text(
+                              university,
+                              style: TextStyle(fontSize: 17),
+                            ),
                           ),
                         ],
                       ),
@@ -950,7 +1062,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
                   child: Container(
-                    height: 45,
+                    height: 60,
                     child: Card(
                       color: orangeColor,
 
@@ -963,9 +1075,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                             ),
                             margin: EdgeInsets.only(left: 10.0, right: 10.0),
                           ),
-                          Text(
-                            faculty,
-                            style: TextStyle(fontSize: 17),
+                          Flexible(
+                            child: Text(
+                              faculty,
+                              style: TextStyle(fontSize: 17),
+                            ),
                           ),
                         ],
                       ),
@@ -977,7 +1091,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
                   child: Container(
-                    height: 45,
+                    height: 60,
                     child: Card(
                       color: orangeColor,
 
@@ -990,9 +1104,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                             ),
                             margin: EdgeInsets.only(left: 10.0, right: 10.0),
                           ),
-                          Text(
-                            department,
-                            style: TextStyle(fontSize: 17),
+                          Flexible(
+                            child: Text(
+                              department,
+                              style: TextStyle(fontSize: 17),
+                            ),
                           ),
                         ],
                       ),
@@ -1200,6 +1316,188 @@ class SettingsScreenState extends State<SettingsScreen> {
                             onChanged: (value) {
                               setState(() {
                                 circle = value;
+                              });
+                            },
+                            dialogBox: false,
+                            isExpanded: true,
+                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  ),
+                ),
+                // その他
+                Container(
+                  child: Text(
+                    'その他',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: primaryColor),
+                  ),
+                  margin: EdgeInsets.only(
+                      left: 10.0, bottom: 5.0, top: 10.0),
+                ),
+                // 旅行
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Card(
+                    color: orangeColor,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            '旅行',
+                            style: TextStyle(fontSize: 23),
+                          ),
+                          margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                        ),
+                        Theme(
+                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          child: SearchChoices.multiple(
+                            items: travelList,
+                            selectedItems: travel,
+                            onChanged: (value) {
+                              setState(() {
+                                travel = value;
+                              });
+                            },
+                            dialogBox: false,
+                            isExpanded: true,
+                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  ),
+                ),
+                // グルメ
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Card(
+                    color: orangeColor,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            'グルメ',
+                            style: TextStyle(fontSize: 23),
+                          ),
+                          margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                        ),
+                        Theme(
+                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          child: SearchChoices.multiple(
+                            items: gourmetList,
+                            selectedItems: gourmet,
+                            onChanged: (value) {
+                              setState(() {
+                                gourmet = value;
+                              });
+                            },
+                            dialogBox: false,
+                            isExpanded: true,
+                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  ),
+                ),
+                // スポーツ
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Card(
+                    color: orangeColor,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            'サークル',
+                            style: TextStyle(fontSize: 23),
+                          ),
+                          margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                        ),
+                        Theme(
+                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          child: SearchChoices.multiple(
+                            items: sportList,
+                            selectedItems: sport,
+                            onChanged: (value) {
+                              setState(() {
+                                sport = value;
+                              });
+                            },
+                            dialogBox: false,
+                            isExpanded: true,
+                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  ),
+                ),
+                // 音楽
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Card(
+                    color: orangeColor,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            '音楽',
+                            style: TextStyle(fontSize: 23),
+                          ),
+                          margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                        ),
+                        Theme(
+                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          child: SearchChoices.multiple(
+                            items: musicList,
+                            selectedItems: music,
+                            onChanged: (value) {
+                              setState(() {
+                                music = value;
+                              });
+                            },
+                            dialogBox: false,
+                            isExpanded: true,
+                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  ),
+                ),
+                // 趣味
+                Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Card(
+                    color: orangeColor,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            '趣味',
+                            style: TextStyle(fontSize: 23),
+                          ),
+                          margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                        ),
+                        Theme(
+                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          child: SearchChoices.multiple(
+                            items: hobbyList,
+                            selectedItems: hobby,
+                            onChanged: (value) {
+                              setState(() {
+                                hobby = value;
                               });
                             },
                             dialogBox: false,
