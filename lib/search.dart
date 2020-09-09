@@ -11,38 +11,18 @@ import 'const.dart';
 
 class Search extends StatefulWidget {
   static final navKey = new GlobalKey<NavigatorState>();
-  final String currentUserId;
-  Search({Key navKey, this.title, @required this.currentUserId})
-      : super(key: navKey);
+  Search({Key navKey, this.title}) : super(key: navKey);
 
   final String title;
 
   @override
-  SearchState createState() => SearchState(currentUserId: currentUserId);
+  SearchState createState() => SearchState();
 }
 
 class SearchState extends State<Search> {
-  SearchState({Key navKey, @required this.currentUserId});
-
-  final String currentUserId;
-  final List<String> dropdownList = ["大学", "学部", "専攻", "学年"];
-  final List<String> university = ["東京大学", "京都大学"];
-  String selectedItem = "大学";
-  List<String> dropdownFaculty = [];
   String _selectedUniversity;
   String _selectedFaculty;
   String _selectedDepartment;
-  String selectedSearchWord = "university";
-  List<String> universitesList = [];
-  List<String> classesList = [];
-  List<String> usersList = [];
-  var userList;
-  String inputString = "";
-  TextFormField input;
-  List<DropdownMenuItem> editableItems = [];
-  final _formKey = GlobalKey<FormState>();
-  bool asTabs = false;
-  List<int> selectedItemsMultiDialog = [];
 
   List<DropdownMenuItem<String>> _emptyItems = [];
 
@@ -58,77 +38,11 @@ class SearchState extends State<Search> {
     _facultyEvents = StreamController<List<DropdownMenuItem<String>>>();
     _departmentEvents = StreamController<List<DropdownMenuItem<String>>>();
 
-    // getUniversitiesFireStore(_universityEvents);
     getDataFromFireStore(_universityEvents, apiMode.university);
     _facultyEvents.add(_emptyItems);
     _departmentEvents.add(_emptyItems);
 
     super.initState();
-  }
-
-  Future handleSearch(word) async {
-    userList = await FirebaseFirestore.instance.collection("users").get();
-    final usersList = userList.docs.map((doc) {
-      if (doc.data()[selectedSearchWord].contains(word)) {
-        return doc.data();
-      }
-    });
-    print(usersList);
-  }
-
-  List<Widget> get appBarActions {
-    return ([
-      Center(child: Text("Tabs:")),
-      Switch(
-        activeColor: Colors.white,
-        value: asTabs,
-        onChanged: (value) {
-          setState(() {
-            asTabs = value;
-          });
-        },
-      )
-    ]);
-  }
-
-  addItemDialog() async {
-    return await showDialog(
-      context: Search.navKey.currentState.overlay.context,
-      builder: (BuildContext alertContext) {
-        return (AlertDialog(
-          title: Text("Add an item"),
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                input,
-                FlatButton(
-                  onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      setState(() {
-                        editableItems.add(DropdownMenuItem(
-                          child: Text(inputString),
-                          value: inputString,
-                        ));
-                      });
-                      Navigator.pop(alertContext, inputString);
-                    }
-                  },
-                  child: Text("Ok"),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    Navigator.pop(alertContext, null);
-                  },
-                  child: Text("Cancel"),
-                ),
-              ],
-            ),
-          ),
-        ));
-      },
-    );
   }
 
   Widget buildLabel(String textValue) {
