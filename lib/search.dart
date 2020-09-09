@@ -143,75 +143,79 @@ class SearchState extends State<Search> {
   }
 
   Widget buildListItem(BuildContext context, DocumentSnapshot document) {
-    return FlatButton(
-      child: Row(
-        children: <Widget>[
-          Material(
-            child: document.data()['photoUrl'] != null &&
-                    document.data()['photoUrl'].isNotEmpty
-                ? CachedNetworkImage(
-                    placeholder: (context, url) => Container(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.0,
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+    return Container(
+      child: FlatButton(
+        child: Row(
+          children: <Widget>[
+            Material(
+              child: document.data()['photoUrl'] != null &&
+                      document.data()['photoUrl'].isNotEmpty
+                  ? CachedNetworkImage(
+                      placeholder: (context, url) => Container(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.0,
+                          valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                        ),
+                        width: 50.0,
+                        height: 50.0,
+                        padding: EdgeInsets.all(15.0),
                       ),
+                      imageUrl: document.data()['photoUrl'],
                       width: 50.0,
                       height: 50.0,
-                      padding: EdgeInsets.all(15.0),
+                      fit: BoxFit.cover,
+                    )
+                  : Icon(
+                      Icons.account_circle,
+                      size: 50.0,
+                      color: greyColor,
                     ),
-                    imageUrl: document.data()['photoUrl'],
-                    width: 50.0,
-                    height: 50.0,
-                    fit: BoxFit.cover,
-                  )
-                : Icon(
-                    Icons.account_circle,
-                    size: 50.0,
-                    color: greyColor,
-                  ),
-            borderRadius: BorderRadius.all(Radius.circular(25.0)),
-            clipBehavior: Clip.hardEdge,
-          ),
-          Flexible(
-            child: Container(
-              alignment: Alignment.centerLeft,
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    child: Text(
-                      document.data()['nickname'],
-                      style: TextStyle(color: primaryColor, fontSize: 18),
-                    ),
-                    alignment: Alignment.centerLeft,
-                    margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
-                  ),
-                  Container(
-                    child: Text(
-                      document.data()['university'] +
-                          document.data()["faculty"] +
-                          document.data()["department"] +
-                          " " +
-                          document.data()["grade"].toString() +
-                          "年",
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                    alignment: Alignment.centerLeft,
-                    margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                  ),
-                ],
-              ),
-              margin: EdgeInsets.only(left: 20.0),
+              borderRadius: BorderRadius.all(Radius.circular(25.0)),
+              clipBehavior: Clip.hardEdge,
             ),
-          ),
-        ],
+            Flexible(
+              child: Container(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: Text(
+                        document.data()['nickname'],
+                        style: TextStyle(color: primaryColor, fontSize: 18),
+                      ),
+                      alignment: Alignment.centerLeft,
+                      margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
+                    ),
+                    Container(
+                      child: Text(
+                        document.data()['university'] +
+                            document.data()["faculty"] +
+                            document.data()["department"] +
+                            " " +
+                            document.data()["grade"].toString() +
+                            "年",
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                      alignment: Alignment.centerLeft,
+                      margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                    ),
+                  ],
+                ),
+                margin: EdgeInsets.only(left: 20.0),
+              ),
+            ),
+          ],
+        ),
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => Chat(peerDoc: document)));
+        },
+        color: greyColor2,
+        padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       ),
-      onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => Chat(peerDoc: document)));
-      },
-      color: greyColor2,
-      padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
     );
   }
 
