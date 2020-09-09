@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hikomaryu/const.dart';
+import 'package:hikomaryu/settings.dart';
 import 'package:hikomaryu/widget/full_photo.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -306,7 +307,10 @@ class ChatScreenState extends State<ChatScreen> {
             Row(
               children: <Widget>[
                 isLastMessageLeft(index)
-                    ? Material(
+                    ?
+                    FlatButton(
+                      child:
+                Material(
                         child: peerAvatar != null && peerAvatar.isNotEmpty
                             ? CachedNetworkImage(
                                 placeholder: (context, url) => Container(
@@ -333,7 +337,13 @@ class ChatScreenState extends State<ChatScreen> {
                           Radius.circular(18.0),
                         ),
                         clipBehavior: Clip.hardEdge,
-                      )
+                      ),
+                      onPressed: () {
+                        print('doc:::' + document.data()['idFrom']);
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: document.data()['idFrom'], isMyProfile: false)));
+                      },
+                    )
                     : Container(width: 35.0),
                 document.data()['type'] == 0
                     ? Container(
