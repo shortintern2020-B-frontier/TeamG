@@ -32,6 +32,7 @@ class Classes extends StatelessWidget {
       ),
       body: ClassesScreen(
         currentUserId: currentUserId,
+        university: university,
       ),
     );
   }
@@ -64,9 +65,10 @@ class ClassesScreenState extends State<ClassesScreen> {
     DropdownMenuItem(child: Text('経済学'), value: '経済学'),
     DropdownMenuItem(child: Text('マクロ経済学'), value: 'マクロ経済学'),
     DropdownMenuItem(child: Text('線形代数'), value: '線形代数'),
+    DropdownMenuItem(child: Text('複素関数'), value: '複素関数'),
     DropdownMenuItem(child: Text('熱力学'), value: '熱力学'),
     DropdownMenuItem(child: Text('プログラミング工学'), value: 'プログラミング工学'),
-    DropdownMenuItem(child: Text('AcademicCmmunication'), value: 'プログラミング工学'),
+    DropdownMenuItem(child: Text('English1'), value: 'English1'),
   ];
   List<int> circle = [];
   static const String appTitle = "Search Choices demo";
@@ -146,14 +148,38 @@ class ClassesScreenState extends State<ClassesScreen> {
                               items: circleList,
                               selectedItems: circle,
                               onChanged: (value) {
-                                setState(() {
-                                  circle = value;
-                                  FirebaseFirestore.instance
-                                      .collection('classes')
-                                      .doc("$university-$value")
-                                      .update({
-                                    'uids':
-                                        FieldValue.arrayUnion([currentUserId])
+                                print(university);
+                                print(value);
+                                value.forEach((int index) {
+                                  setState(() {
+                                    circle = value;
+
+                                    DocumentReference lesson = FirebaseFirestore
+                                        .instance
+                                        .collection('classes')
+                                        .doc(
+                                            "$university-${circleList[index].value}");
+                                    lesson.get().then((snapshot) => {
+                                          if (snapshot.data() == null)
+                                            {
+                                              lesson.set({
+                                                'uids': FieldValue.arrayUnion(
+                                                    [currentUserId])
+                                              })
+                                            }
+                                          else
+                                            {
+                                              lesson.update({
+                                                'uids': FieldValue.arrayUnion(
+                                                    [currentUserId])
+                                              })
+                                            }
+                                        });
+
+                                    //     .update({
+                                    //   'uids':
+                                    //       FieldValue.arrayUnion([currentUserId])
+                                    // });
                                   });
                                 });
                               },

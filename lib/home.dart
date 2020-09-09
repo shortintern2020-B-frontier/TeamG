@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:hikomaryu/chat_list.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
-import 'package:hikomaryu/tags.dart';
 import 'package:hikomaryu/classes.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -37,7 +36,6 @@ class HomeScreenState extends State<HomeScreen> {
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
     const Choice(title: 'Settings', icon: Icons.settings),
-    const Choice(title: 'Tags', icon: Icons.tag_faces),
     const Choice(title: 'Classes', icon: Icons.school),
     const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
@@ -100,9 +98,6 @@ class HomeScreenState extends State<HomeScreen> {
   void onItemMenuPress(Choice choice) {
     if (choice.title == 'Log out') {
       handleSignOut();
-    } else if (choice.title == 'Tags') {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChatTags()));
     } else if (choice.title == 'Classes') {
       Navigator.push(
           context,
