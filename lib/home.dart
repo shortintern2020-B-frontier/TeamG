@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hikomaryu/chat_list.dart';
+import 'package:hikomaryu/timeline.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
 import 'package:hikomaryu/widget/loading.dart';
@@ -202,7 +203,7 @@ class HomeScreenState extends State<HomeScreen> {
                         Text("Search"),
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
-                        Text("Timeline"),
+                        new Timeline(currentUserId: currentUserId),
                         Text("Account"),
                       ],
                     );
