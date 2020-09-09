@@ -3,6 +3,7 @@ import 'dart:convert' as convert;
 
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'const.dart';
 
@@ -53,4 +54,70 @@ void makeDropdownMenu(StreamController<List<DropdownMenuItem<String>>> events,
       await getList(mode, prefectures[prefecture], university, faculty);
   List<DropdownMenuItem<String>> menu = makeDropdowmMenuFromStringList(list);
   events.add(menu);
+}
+
+// この関数は一旦放置
+// Future<void> getClassesFireStore() async {
+//   QuerySnapshot classSnapShot =
+//       await FirebaseFirestore.instance.collection("classes").get();
+//   for (var i = 0; i < classSnapShot.docs.length; i++) {
+//     if (!classesList.contains(classSnapShot.docs[i].data()["class"]))
+//       classesList.add(classSnapShot.docs[i].data()["class"]);
+//   }
+//   return classesList;
+// }
+
+// 大学一覧はこの関数でfirebaseから取得する
+void getUniversitiesFireStore(
+    StreamController<List<DropdownMenuItem<String>>> events) async {
+  List<String> universitesList = [];
+  QuerySnapshot universitySnapShot =
+      await FirebaseFirestore.instance.collection("users").get();
+  universitySnapShot.docs.forEach((doc) {
+    if (!universitesList.contains(doc.data()["university"]) &&
+        doc.data()["university"] != null) {
+      universitesList.add(doc.data()["university"]);
+    }
+  });
+  events.add(makeDropdowmMenuFromStringList(universitesList));
+}
+
+// 学科一覧はこの関数でfirebaseから取得する
+void getFacultyFireStore(
+    StreamController<List<DropdownMenuItem<String>>> events,
+    String universityName) async {
+  print("wwww");
+  List<String> facultiesList = [];
+  print(universityName);
+  await FirebaseFirestore.instance
+      .collection("users")
+      .where("university", isEqualTo: universityName)
+      .get()
+      .then((contents) {
+    print(contents);
+    contents.docs.forEach((doc) {
+      if (!facultiesList.contains(doc.data()["university"]) &&
+          doc.data()["faculty"] != null) facultiesList.add(doc.data()["faculty"]);
+    });
+  });
+  print(facultiesList);
+  events.add(makeDropdowmMenuFromStringList(facultiesList));
+}
+
+// この関数は一旦放置
+Future<QuerySnapshot> getUsersFireStore(selectUni, selectFac) async {
+  if (selectFac == null) {
+    QuerySnapshot userSnapShot = await FirebaseFirestore.instance
+        .collection("users")
+        .where("university", isEqualTo: selectUni)
+        .get();
+    return userSnapShot;
+  } else {
+    QuerySnapshot userSnapShot = await FirebaseFirestore.instance
+        .collection("users")
+        .where("university", isEqualTo: selectUni)
+        .where("faculty", isEqualTo: selectFac)
+        .get();
+    return userSnapShot;
+  }
 }

@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:search_choices/search_choices.dart';
 
+import 'api.dart';
+import 'const.dart';
 
 class Search extends StatefulWidget {
   static final navKey = new GlobalKey<NavigatorState>();
   Search({Key navKey, this.title}) : super(key: navKey);
-  
+
   final String title;
 
   @override
@@ -14,22 +18,21 @@ class Search extends StatefulWidget {
 }
 
 class SearchState extends State<Search> {
-
   List<String> dropdownList = ["大学", "学部", "専攻", "学年"];
   String selectedItem = "大学";
   String searchWord;
   List<String> dropdownFaculty = [];
-  String selectedUniversity;
-  List<int> selectedClasses;
-  String selectedFaculty;
+  String _selectedUniversity;
+  // List<int> selectedClasses;
+  String _selectedFaculty;
   List<String> selectedDepartment;
   String selectedSearchWord = "university";
   List<String> universitesList = [];
   List<String> classesList = [];
   List<String> usersList = [];
   var userList;
-  List<DropdownMenuItem> items = [];
-  List<DropdownMenuItem> classItems = [];
+  // List<DropdownMenuItem> items = [];
+  // List<DropdownMenuItem> classItems = [];
   String inputString = "";
   TextFormField input;
   List<DropdownMenuItem> editableItems = [];
@@ -37,6 +40,25 @@ class SearchState extends State<Search> {
   bool asTabs = false;
   final List<String> university = ["東京大学", "京都大学"];
   List<int> selectedItemsMultiDialog = [];
+
+  List<DropdownMenuItem<String>> _emptyItems = [];
+
+  StreamController<List<DropdownMenuItem<String>>> _universityEvents;
+  StreamController<List<DropdownMenuItem<String>>> _facultyEvents;
+
+  @override
+  void initState() {
+    _emptyItems = makeDropdowmMenuFromStringList(['']);
+
+    _universityEvents = StreamController<List<DropdownMenuItem<String>>>();
+    _facultyEvents = StreamController<List<DropdownMenuItem<String>>>();
+
+    // _universityEvents.add(_emptyItems);
+    getUniversitiesFireStore(_universityEvents);
+    _facultyEvents.add(_emptyItems);
+
+    super.initState();
+  }
 
   Future handleSearch(word) async {
     userList = await FirebaseFirestore.instance.collection("users").get();
@@ -109,171 +131,126 @@ class SearchState extends State<Search> {
     });
   }
 
-  Future<void> getUniversitiesFireStore() async {
-    QuerySnapshot  universitySnapShot = await FirebaseFirestore.instance.collection("users").get();
-    universitesList.removeRange(0, universitesList.length);
-    universitySnapShot.docs.forEach((doc) {
-      if (!universitesList.contains(doc.data()["university"]) && doc.data()["university"] != null){
-        universitesList.add(doc.data()["university"]);
-      }
-    });
-    return universitesList;
-  }
-
-  Future<void> getClassesFireStore() async {
-    QuerySnapshot  classSnapShot = await FirebaseFirestore.instance.collection("classes").get();
-    for (var i = 0; i < classSnapShot.docs.length; i++) {
-      if (!classesList.contains(classSnapShot.docs[i].data()["class"]))
-      classesList.add(classSnapShot.docs[i].data()["class"]);
-    }
-    return classesList;
-  }
-
-  Future<void> getFacultyFireStore(universityName) async {
-    print("wwww");
-    dropdownFaculty.removeRange(0, dropdownFaculty.length);
-
-    // var resultFaculty = 
-    await FirebaseFirestore.instance.collection("users").where("university", isEqualTo: universityName).get()
-                              .then((contents) {
-                                print(contents);
-                                contents.docs.forEach((e) {
-                                  dropdownFaculty.add(e.data()["faculty"]);
-                                  });
-                                // .then((resp) {
-                                //   print(resp.docs[0].data()["name"]);
-                                //   return resp.docs[0].data()["name"];
-                                // });
-                              });     
-       print(dropdownFaculty);
-    return dropdownFaculty;
-
-    // resultFaculty.docs.forEach((e) {
-    //   dropdownFaculty.add(e.data()["name"]);
-    // });
-  }
-
-  Future<QuerySnapshot> getUsersFireStore(selectUni, selectFac) async {
-    if (selectFac == null) {
-      QuerySnapshot  userSnapShot = await FirebaseFirestore.instance.collection("users").where("university", isEqualTo: selectUni).get();
-      return userSnapShot;
-    } else {
-      QuerySnapshot  userSnapShot = await FirebaseFirestore.instance.collection("users").where("university", isEqualTo: selectUni).where("faculty", isEqualTo: selectFac).get();
-      return userSnapShot;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.all(20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-                  FutureBuilder(
-                    future: getUniversitiesFireStore(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        items.removeRange(0, items.length);
-                        snapshot.data.forEach((uni) {                          
-                            items.add(DropdownMenuItem(
-                              child: Text(uni),
-                              value: uni,
-                            ));
+          Container(
+            padding: EdgeInsets.all(8),
+            child: const Text('大学名'),
+            decoration: BoxDecoration(
+              color: greyColor2,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          StreamBuilder(
+              // future: getUniversitiesFireStore(),
+              stream: _universityEvents.stream,
+              builder: (BuildContext context, snapshot) {
+                return SearchChoices.single(
+                  items: snapshot.data,
+                  value: _selectedUniversity,
+                  hint: "選択してください",
+                  searchHint: "選択してください",
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedUniversity = value;
+                      // getFacultyFireStore(value);
+                      getFacultyFireStore(_facultyEvents, _selectedUniversity);
+                      // if (_selectedUniversity == null) {
+                      // _facultyEvents.add(_emptyItems);
+                      _selectedFaculty = null;
+                      // }
+                    });
+                  },
+                  isExpanded: true,
+                );
+              }),
+          SizedBox(height: 20),
+          Container(
+            padding: EdgeInsets.all(8),
+            child: const Text('学部名'),
+            decoration: BoxDecoration(
+              color: greyColor2,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          StreamBuilder(
+              // future: getFacultyFireStore(_selectedUniversity),
+              stream: _facultyEvents.stream,
+              builder: (BuildContext context, snapshot) {
+                return AbsorbPointer(
+                    absorbing: _selectedUniversity == null,
+                    child: SearchChoices.single(
+                      items: _selectedUniversity == null
+                          ? _emptyItems
+                          : snapshot.data,
+                      // items: makeDropdowmMenuFromStringList(
+                      //     snapshot.hasData ? dropdownFaculty : ['東京']),
+                      value: _selectedFaculty,
+                      hint: "選択してください",
+                      searchHint: "選択してください",
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedFaculty = value;
                         });
-                        return SearchChoices.single(
-                          items: items,
-                          value: selectedUniversity,
-                          hint: "Select one",
-                          searchHint: "Select one",
-                          onChanged: (value) {
-                            setState(() {
-                              selectedUniversity = value;
-                            });
-                            getFacultyFireStore(value);
-                          },
-                          isExpanded: true,
-                        );
-                      } 
-                    }
-                  ),
-                      FutureBuilder(
-                        future: selectedUniversity != null ? getFacultyFireStore(selectedUniversity) : null,
-                        builder: (context, snapshot) {
-                          return DropdownButton(
-                            value: selectedFaculty,
-                            onChanged: (result) {
-                              setState(() {
-                                selectedFaculty = result;
-                              });
-                              print('helloworld!!!!!!!');
-                              print(selectedFaculty);
-                            } ,
-                            selectedItemBuilder: (context) {
-                              return dropdownFaculty.map((String item) {
-                                return Text(
-                                  item,
-                                  style: TextStyle(color: Colors.black),
-                                );
-                              }).toList();
-                            },
-                            items: dropdownFaculty.map((item) {
-                              return DropdownMenuItem(
-                                value: item,
-                                child: Text(
-                                  item,
-                                  style: item == selectedFaculty
-                                    ? TextStyle(fontWeight: FontWeight.bold)
-                                    : TextStyle(fontWeight: FontWeight.normal),
-                                )
-                              );
-                            }).toList(),
-                          );
-                        }
-                      ),
-                      Expanded(child:
-                      FutureBuilder(
-                      // future: getUsersFireStore(selectedUniversity, selectedFaculty),
-                      future: selectedUniversity == null || selectedFaculty == null ? null : getUsersFireStore(selectedUniversity, selectedFaculty) ,
-                      builder: (context, snapshot) {
-                        // print('hello!!!!!');
-                        // print(snapshot.data);
-                            return snapshot.data == null || selectedUniversity == null || selectedFaculty == null  ? 
-                              Container()
-                              :ListView(
-                              children: snapshot.data.docs.map<Widget>((document) {
-                                // print(document.data()["university"]);
-                                // print(selectedUniversity);
-                                // if (!universityList.contains(document.data()['university'])) {universityList.add(document.data()['university']);}
-                                // print(universityList);
-                                if (document.data()["university"].contains(selectedUniversity) && document.data()["faculty"].contains(selectedFaculty)) {
-                                  return ListTile(
-                                    title: Text(document.data()['nickname']),
-                                    subtitle: Text(document.data()['university'] + document.data()["faculty"] + document.data()["department"] + " " + document.data()["grade"].toString() + "年"),
-                                  );
-                                } else if (searchWord == null) {
-                                  return ListTile(
-                                    title: Text(document.data()['nickname']),
-                                    subtitle: Text(document.data()['university'] + document.data()["faculty"] + document.data()["department"] + " " + document.data()["grade"].toString() + "年"),
-                                  );
-                                } else {
-                                  return SizedBox.shrink();
-                                }
-                              }).toList() 
+                      },
+                      isExpanded: true,
+                    ));
+              }),
+          Expanded(
+            child: FutureBuilder(
+                // future: getUsersFireStore(_selectedUniversity, _selectedFaculty),
+                future: _selectedUniversity == null || _selectedFaculty == null
+                    ? null
+                    : getUsersFireStore(_selectedUniversity, _selectedFaculty),
+                builder: (BuildContext context, snapshot) {
+                  // print('hello!!!!!');
+                  // print(snapshot.data);
+                  return snapshot.data == null ||
+                          _selectedUniversity == null ||
+                          _selectedFaculty == null
+                      ? Container()
+                      : ListView(
+                          children: snapshot.data.docs.map<Widget>((document) {
+                          // print(document.data()["university"]);
+                          // print(_selectedUniversity);
+                          // if (!universityList.contains(document.data()['university'])) {universityList.add(document.data()['university']);}
+                          // print(universityList);
+                          if (document
+                                  .data()["university"]
+                                  .contains(_selectedUniversity) &&
+                              document
+                                  .data()["faculty"]
+                                  .contains(_selectedFaculty)) {
+                            return ListTile(
+                              title: Text(document.data()['nickname']),
+                              subtitle: Text(document.data()['university'] +
+                                  document.data()["faculty"] +
+                                  document.data()["department"] +
+                                  " " +
+                                  document.data()["grade"].toString() +
+                                  "年"),
                             );
-                      }
-                    ),)
-                    // Expanded(
-                    // child: 
-                    // ListView.builder(
-                    //   itemCount: 50,
-                    //   itemBuilder: (context, index){
-                    //     return Container(
-                    //       height: 50,
-                    //       child: Text(index.toString()),
-                    //       color: Colors.red,
-                    //     );
-                    //   })
-                    // )
-                    // Expanded(child: Container())//)
+                          } else if (searchWord == null) {
+                            return ListTile(
+                              title: Text(document.data()['nickname']),
+                              subtitle: Text(document.data()['university'] +
+                                  document.data()["faculty"] +
+                                  document.data()["department"] +
+                                  " " +
+                                  document.data()["grade"].toString() +
+                                  "年"),
+                            );
+                          } else {
+                            return SizedBox.shrink();
+                          }
+                        }).toList());
+                }),
+          )
         ],
       ),
     );
