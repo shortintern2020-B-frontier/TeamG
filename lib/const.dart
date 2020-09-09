@@ -10,7 +10,10 @@ final baseApiUrl =
     'http://webservice.recruit.co.jp/shingaku/school/v1/?key=$apiKey&format=json';
 enum apiMode { university, faculty, department }
 
-final textFieldMsgs = {'required': 'Please enter some text'};
+final textFieldMsgs = {
+  'required': 'Please enter some text',
+  'uni-email-need': 'Please enter your university email address'
+};
 
 final signUpMsgs = {
   'success': 'Sign up success',

@@ -168,11 +168,18 @@ class SignUpScreenState extends State<SignUpScreen> {
                     child: Column(
                       children: <Widget>[
                         TextFormField(
-                            controller: _emailController,
-                            decoration:
-                                const InputDecoration(labelText: 'Email'),
-                            validator: (String value) =>
-                                isEmptyValidator(value)),
+                          controller: _emailController,
+                          decoration: const InputDecoration(labelText: 'Email'),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return textFieldMsgs['required'];
+                            } else if (!RegExp(r"[\w\-\._]+@[\w\-\._]+\.ac\.jp")
+                                .hasMatch(value)) {
+                              return textFieldMsgs['uni-email-need'];
+                            }
+                            return null;
+                          },
+                        ),
                         TextFormField(
                             obscureText: true,
                             controller: _passwordController,
