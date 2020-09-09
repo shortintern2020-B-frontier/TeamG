@@ -23,6 +23,7 @@ class ChatSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -37,6 +38,7 @@ class ChatSettings extends StatelessWidget {
 }
 
 class SettingsScreen extends StatefulWidget {
+
   final String currentUserId;
   final bool isMyProfile;
   SettingsScreen({this.currentUserId, this.isMyProfile});
@@ -46,6 +48,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class SettingsScreenState extends State<SettingsScreen> {
+
   TextEditingController controllerNickname;
   // TextEditingController controllerAffiliation;
   TextEditingController controllerGrade;
@@ -89,10 +92,12 @@ class SettingsScreenState extends State<SettingsScreen> {
   void readLocal() async {
 
     prefs = await SharedPreferences.getInstance();
+    /*
     age = prefs.getString('age');
     residence = prefs.getString('residence');
     birthplace = prefs.getString('birthplace');
     // circle = conv_to_intList(prefs.getStringList('circle'));
+    */
     controllerNickname = TextEditingController(text: nickname);
     // controllerAffiliation = TextEditingController(text: affiliation);
     controllerGrade = TextEditingController(text: grade);
@@ -121,7 +126,9 @@ class SettingsScreenState extends State<SettingsScreen> {
         controllerAge.text = data['age'];
         controllerResidence.text = data['residence'];
         controllerBirthplace.text = data['birthplace'];
-        circle = conv_to_intList(data['circle'].cast<String>());
+        if (data['circle'] != null) {
+          circle = conv_to_intList(data['circle'].cast<String>());
+        }
         photoUrl = data['photoUrl'];
       });
   }
@@ -208,7 +215,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       'photoUrl': photoUrl
     }).then((data) async {
       await prefs.setString('nickname', nickname);
-      //await prefs.setString('affiliation', affiliation);
+      // await prefs.setString('affiliation', affiliation);
       await prefs.setString('university', university);
       await prefs.setString('faculty', faculty);
       await prefs.setString('department', department);
@@ -251,6 +258,8 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //controllerNickname.text = 'hoge';
+    //print('build::nickname: ' + controllerNickname.text);
     List<DropdownMenuItem> circleList = [
       DropdownMenuItem(
           child: Text('サッカー'),
@@ -335,7 +344,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                     Container(
                       child: Text(
-                        controllerNickname.text,
+                        nickname,
+                        // controllerNickname.text,
                         style: TextStyle(fontSize: 23),
                       ),
                       width: 200,
@@ -461,7 +471,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                               Column(
                                 children: <Widget>[
                                   Text(
-                                    controllerGrade.text,
+                                    grade,
+                                    // controllerGrade.text,
                                     style: TextStyle(fontSize: 15),
                                   ),
                                 ],
@@ -505,7 +516,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
-                                controllerAge.text,
+                                age,
+                                // controllerAge.text,
                                 style: TextStyle(fontSize: 17),
                               ),
                             ],
@@ -532,7 +544,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                               margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
-                                controllerResidence.text,
+                                residence,
+                                // controllerResidence.text,
                                 style: TextStyle(fontSize: 17),
                                 ),
                             ],
@@ -559,7 +572,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 margin: EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
-                                controllerBirthplace.text,
+                                birthplace,
+                                // controllerBirthplace.text,
                                 style: TextStyle(fontSize: 17),
                               ),
                             ],
