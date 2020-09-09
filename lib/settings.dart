@@ -13,10 +13,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hikomaryu/classes.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:hikomaryu/classes.dart';
+import 'package:hikomaryu/classes.dart';
 
 
 class ChatSettings extends StatelessWidget {
@@ -921,7 +920,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     // 授業をみる
-                    /*
                     Container(
                       child: FlatButton(
                         color: Colors.blue,
@@ -941,7 +939,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                         },
                       ),
                     ),
-                     */
                   ],
                 ),
               ],
@@ -1552,27 +1549,25 @@ class SettingsScreenState extends State<SettingsScreen> {
                   margin: EdgeInsets.only(top: 50.0, bottom: 50.0),
                 ),
                 // 授業をみる
-                /*
-                    Container(
-                      child: FlatButton(
-                        color: Colors.blue,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0)
-                        ),
-                        child: Text(
-                          '授業情報を見る',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) => Classes(currentUserId: widget.currentUserId, university: university, isMyProfile: true)));
-                        },
+                Container(
+                  child: FlatButton(
+                    color: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0)
+                    ),
+                    child: Text(
+                      '授業情報を見る',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
                       ),
                     ),
-                     */
+                    onPressed: () {
+                      Navigator.push(
+                          context, MaterialPageRoute(builder: (context) => Classes(currentUserId: widget.currentUserId, university: university, isMyProfile: true)));
+                    },
+                  ),
+                ),
               ],
             ),
             padding: EdgeInsets.only(left: 15.0, right: 15.0),
