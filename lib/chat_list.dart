@@ -21,16 +21,26 @@ class ChatListState extends State<ChatList> {
     super.initState();
   }
 
+  String getGroupChatId(String otherId) {
+    String id = widget.currentUserId;
+    if (id.hashCode <= otherId.hashCode) {
+      return '$id-$otherId';
+    }
+    return '$otherId-$id';
+  }
+
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
     if (document.data()['id'] == widget.currentUserId) {
       return Container();
     } else {
+      String groupChatId = getGroupChatId(document.data()['id']);
       return Container(
         child: FlatButton(
           child: Row(
             children: <Widget>[
               Material(
-                child: document.data()['photoUrl'] != null
+                child: document.data()['photoUrl'] != null &&
+                        document.data()['photoUrl'].isNotEmpty
                     ? CachedNetworkImage(
                         placeholder: (context, url) => Container(
                           child: CircularProgressIndicator(
@@ -61,16 +71,37 @@ class ChatListState extends State<ChatList> {
                     children: <Widget>[
                       Container(
                         child: Text(
-                          'Nickname: ${document.data()['nickname']}',
-                          style: TextStyle(color: primaryColor),
+                          document.data()['nickname'],
+                          style: TextStyle(color: primaryColor, fontSize: 18),
                         ),
                         alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                        margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
                       ),
                       Container(
-                        child: Text(
-                          'About me: ${document.data()['aboutMe'] ?? 'Not available'}',
-                          style: TextStyle(color: primaryColor),
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection('messages')
+                              .doc(groupChatId)
+                              .collection(groupChatId)
+                              .orderBy('timestamp', descending: true)
+                              .limit(1)
+                              .snapshots(),
+                          builder: (context, messageSnapshot) {
+                            if (!messageSnapshot.hasData) {
+                              return Center(
+                                  child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          themeColor)));
+                            } else {
+                              return Text(
+                                messageSnapshot.data.documents.length == 0
+                                    ? ''
+                                    : messageSnapshot.data.documents[0]
+                                        .data()['content'],
+                                style: TextStyle(color: Colors.grey[700]),
+                              );
+                            }
+                          },
                         ),
                         alignment: Alignment.centerLeft,
                         margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),

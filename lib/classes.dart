@@ -17,8 +17,8 @@ import 'main.dart';
 class Classes extends StatelessWidget {
   final String currentUserId;
   final String university;
-
-  Classes(this.currentUserId, this.university);
+  final bool isMyProfile;
+  Classes(this.currentUserId, this.university, this.isMyProfile);
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +32,8 @@ class Classes extends StatelessWidget {
       ),
       body: ClassesScreen(
         currentUserId: currentUserId,
+        university: university,
+        isMyProfile: isMyProfile,
       ),
     );
   }
@@ -40,14 +42,15 @@ class Classes extends StatelessWidget {
 class ClassesScreen extends StatefulWidget {
   final String currentUserId;
   final String university;
+  final bool isMyProfile;
   static final navKey = new GlobalKey<NavigatorState>();
 
-  const ClassesScreen({Key key, @required this.currentUserId, this.university})
+  const ClassesScreen({Key key, @required this.currentUserId, this.university, this.isMyProfile})
       : super(key: key);
 
   @override
   State createState() =>
-      ClassesScreenState(currentUserId: currentUserId, university: university);
+      ClassesScreenState(currentUserId: currentUserId, university: university, isMyProfile: isMyProfile);
 }
 
 class ClassesScreenState extends State<ClassesScreen> {
@@ -75,10 +78,11 @@ class ClassesScreenState extends State<ClassesScreen> {
 //ここまで
   final FocusNode focusNodeClassName = FocusNode();
 
-  ClassesScreenState({Key key, @required this.currentUserId, this.university});
+  ClassesScreenState({Key key, @required this.currentUserId, this.university, this.isMyProfile});
 
   final String university;
   final String currentUserId;
+  final bool isMyProfile;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -97,89 +101,93 @@ class ClassesScreenState extends State<ClassesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
-        children: <Widget>[
-          // List
-          Container(
-            child: StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection('users').snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                    ),
-                  );
-                } else {
-                  return Column(
-                    children: <Widget>[
-                      //ClassName
-                      Text(
-                        //title
-                        '履修授業',
-                        style: TextStyle(color: primaryColor, fontSize: 30),
+    if (!isMyProfile) {
+      return Container();
+    } else {
+      return Container(
+        child: Stack(
+          children: <Widget>[
+            // List
+            Container(
+              child: StreamBuilder(
+                stream:
+                FirebaseFirestore.instance.collection('users').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                       ),
-                      Row(
-                        children: <Widget>[
-                          Container(
-                            //content1_title
-                            width: 80,
-                            height: 35,
-                            margin: EdgeInsets.only(top: 15.0),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.orangeAccent[100]),
-                            child: Text(
-                              '授業名',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
+                    );
+                  } else {
+                    return Column(
+                      children: <Widget>[
+                        //ClassName
+                        Text(
+                          //title
+                          '履修授業',
+                          style: TextStyle(color: primaryColor, fontSize: 30),
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              //content1_title
+                              width: 80,
+                              height: 35,
+                              margin: EdgeInsets.only(top: 15.0),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.orangeAccent[100]),
+                              child: Text(
+                                '授業名',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            width: 250,
-                            child: SearchChoices.multiple(
-                              items: circleList,
-                              selectedItems: circle,
-                              onChanged: (value) {
-                                setState(() {
-                                  circle = value;
-                                  FirebaseFirestore.instance
-                                      .collection('classes')
-                                      .doc("$university-$value")
-                                      .update({
-                                    'uids':
-                                        FieldValue.arrayUnion([currentUserId])
+                            Container(
+                              width: 250,
+                              child: SearchChoices.multiple(
+                                items: circleList,
+                                selectedItems: circle,
+                                onChanged: (value) {
+                                  setState(() {
+                                    circle = value;
+                                    FirebaseFirestore.instance
+                                        .collection('classes')
+                                        .doc("$university-$value")
+                                        .update({
+                                      'uids':
+                                      FieldValue.arrayUnion([currentUserId])
+                                    });
                                   });
-                                });
-                              },
-                              dialogBox: false,
-                              isExpanded: true,
-                              menuConstraints:
-                                  BoxConstraints.tight(Size.fromHeight(350)),
+                                },
+                                dialogBox: false,
+                                isExpanded: true,
+                                menuConstraints:
+                                BoxConstraints.tight(Size.fromHeight(350)),
+                              ),
+                              margin: EdgeInsets.only(left: 30.0, right: 30.0),
                             ),
-                            margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                          ),
-                        ],
-                      ),
-                    ],
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                  );
-                }
-              },
+                          ],
+                        ),
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    );
+                  }
+                },
+              ),
             ),
-          ),
 
-          // Loading
-          Positioned(
-            child: isLoading ? const Loading() : Container(),
-          )
-        ],
-      ),
-    );
+            // Loading
+            Positioned(
+              child: isLoading ? const Loading() : Container(),
+            )
+          ],
+        ),
+      );
+    }
   }
 }
