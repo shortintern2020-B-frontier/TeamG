@@ -71,8 +71,10 @@ class TimelineState extends State<Timeline> {
                           Container(
                             child: Text(
                               userSnapshot.data.data()['nickname'],
-                              style:
-                                TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  color: primaryColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold),
                             ),
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
@@ -81,8 +83,8 @@ class TimelineState extends State<Timeline> {
                             child: Text(
                               document.data()['content'],
                               style:
-                                TextStyle(color: primaryColor, fontSize: 18),
-                              ),
+                                  TextStyle(color: primaryColor, fontSize: 18),
+                            ),
                             alignment: Alignment.centerLeft,
                             margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
                           )
@@ -103,7 +105,8 @@ class TimelineState extends State<Timeline> {
               },
               color: whiteColor,
               padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-              shape: UnderlineInputBorder(borderSide: BorderSide(color: greyColor2)),
+              shape: UnderlineInputBorder(
+                  borderSide: BorderSide(color: greyColor2)),
             ),
             margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
           );
@@ -147,6 +150,7 @@ class TimelineState extends State<Timeline> {
           return Input(
             peerId: '',
             onSendMessage: onSendMessage,
+            isTimeline: true,
             listWidget: Flexible(
                 child: ListView.builder(
                     padding: EdgeInsets.all(10.0),
