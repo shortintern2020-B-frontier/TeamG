@@ -23,17 +23,24 @@ class ChatSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'プロフィール',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+    if (!isMyProfile) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'プロフィール',
+            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: SettingsScreen(currentUserId: currentUserId, isMyProfile: isMyProfile),
-    );
+        body: SettingsScreen(
+            currentUserId: currentUserId, isMyProfile: isMyProfile),
+      );
+    } else {
+      return Scaffold(
+        body: SettingsScreen(
+            currentUserId: currentUserId, isMyProfile: isMyProfile),
+      );
+    }
   }
 }
 
@@ -68,6 +75,11 @@ class SettingsScreenState extends State<SettingsScreen> {
   String residence = '';
   String birthplace = '';
   List<int> circle = [];
+  List<int> travel = [];
+  List<int> gourmet= [];
+  List<int> sport = [];
+  List<int> music = [];
+  List<int> hobby = [];
   String photoUrl = '';
   // List<String> selectedItems = [];
 
@@ -81,6 +93,11 @@ class SettingsScreenState extends State<SettingsScreen> {
   final FocusNode focusNodeResidence = FocusNode();
   final FocusNode focusNodeBirthplace = FocusNode();
   final FocusNode focusNodeCircle = FocusNode();
+  final FocusNode focusNodeTravel = FocusNode();
+  final FocusNode focusNodeGrourmet = FocusNode();
+  final FocusNode focusNodeSport = FocusNode();
+  final FocusNode focusNodeMusic = FocusNode();
+  final FocusNode focusNodeHobby = FocusNode();
 
   @override
   void initState() {
@@ -116,19 +133,25 @@ class SettingsScreenState extends State<SettingsScreen> {
           .get();
       final data = setting.data();
       setState(() {
-        controllerNickname.text = data['nickname'];
-        nickname = data['nickname'];
-        university = data['university'];
-        faculty = data['faculty'];
-        department = data['department'];
-        grade = data['grade'];
-        controllerGrade.text = data['grade'];
-        controllerAge.text = data['age'];
-        controllerResidence.text = data['residence'];
-        controllerBirthplace.text = data['birthplace'];
-        if (data['circle'] != null) {
-          circle = conv_to_intList(data['circle'].cast<String>());
-        }
+        controllerNickname.text = (data['nickname'] != null) ? data['nickname'] : '';
+        nickname = (data['nickname'] != null) ? data['nickname'] : '';
+        university = (data['university'] != null) ? data['university'] : '';
+        faculty = (data['faculty'] != null) ? data['faculty'] : '';
+        department = (data['department'] != null) ? data['department'] : '';
+        grade = (data['grade'] != null) ? data['grade'] : '';
+        age = (data['age'] != null) ? data['age'] : '';
+        residence = (data['residence'] != null) ? data['residence'] : '';
+        birthplace = (data['birthplace'] != null) ? data['birthplace'] : '';
+        controllerGrade.text = (data['grade'] != null) ? data['grade'] : '';
+        controllerAge.text = (data['age'] != null) ? data['age'] : '';
+        controllerResidence.text = (data['residence'] != null) ? data['residence'] : '';
+        controllerBirthplace.text = (data['birthplace'] != null) ? data['birthplace'] : '';
+        circle = (data['circle'] != null) ? conv_to_intList(data['circle'].cast<String>()) : [];
+        travel = (data['travel'] != null) ? conv_to_intList(data['travel'].cast<String>()) : [];
+        gourmet = (data['gourmet'] != null) ? conv_to_intList(data['gourmet'].cast<String>()) : [];
+        sport = (data['sport'] != null) ? conv_to_intList(data['sport'].cast<String>()) : [];
+        music = (data['music'] != null) ? conv_to_intList(data['music'].cast<String>()) : [];
+        hobby = (data['hobby'] != null) ? conv_to_intList(data['hobby'].cast<String>()) : [];
         photoUrl = data['photoUrl'];
       });
   }
@@ -201,6 +224,11 @@ class SettingsScreenState extends State<SettingsScreen> {
     focusNodeGrade.unfocus();
     focusNodeResidence.unfocus();
     focusNodeCircle.unfocus();
+    focusNodeTravel.unfocus();
+    focusNodeGrourmet.unfocus();
+    focusNodeSport.unfocus();
+    focusNodeMusic.unfocus();
+    focusNodeHobby.unfocus();
     setState(() {
       isLoading = true;
     });
@@ -208,10 +236,15 @@ class SettingsScreenState extends State<SettingsScreen> {
     FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
       'nickname': nickname,
       'grade': grade,
-      'age': age,
-      'residence': residence,
-      'birthplace': birthplace,
+      'age': controllerAge.text,
+      'residence': controllerResidence.text,
+      'birthplace': controllerBirthplace.text,
       'circle': conv_to_stringList(circle),
+      'travel': conv_to_stringList(travel),
+      'gourmet': conv_to_stringList(gourmet),
+      'sport': conv_to_stringList(sport),
+      'music': conv_to_stringList(music),
+      'hobby': conv_to_stringList(hobby),
       'photoUrl': photoUrl
     }).then((data) async {
       await prefs.setString('nickname', nickname);
@@ -224,8 +257,14 @@ class SettingsScreenState extends State<SettingsScreen> {
       await prefs.setString('residence', residence);
       await prefs.setString('birthplace', birthplace);
       await prefs.setStringList('circle', conv_to_stringList(circle));
+      /*
+      await prefs.setStringList('circle', conv_to_stringList());
+      await prefs.setStringList('circle', conv_to_stringList(circle));
+      await prefs.setStringList('circle', conv_to_stringList(circle));
+      await prefs.setStringList('circle', conv_to_stringList(circle));
+      await prefs.setStringList('circle', conv_to_stringList(circle));
       await prefs.setString('photoUrl', photoUrl);
-
+*/
       setState(() {
         isLoading = false;
       });
@@ -283,8 +322,125 @@ class SettingsScreenState extends State<SettingsScreen> {
       ),
     ];
 
+    List<DropdownMenuItem> travelList = [
+      DropdownMenuItem(
+          child: Text('東京'),
+          value: '東京'
+      ),
+      DropdownMenuItem(
+          child: Text('京都'),
+          value: '京都'
+      ),
+      DropdownMenuItem(
+          child: Text('イスタンブール'),
+          value: 'イスタンブール'
+      ),
+      DropdownMenuItem(
+          child: Text('パリ'),
+          value: 'パリ'
+      ),
+      DropdownMenuItem(
+          child: Text('マドリード'),
+          value: 'マドリード'
+      ),
+    ];
 
-     if (!widget.isMyProfile) {
+    List<DropdownMenuItem> gourmetList = [
+      DropdownMenuItem(
+          child: Text('寿司'),
+          value: '寿司'
+      ),
+      DropdownMenuItem(
+          child: Text('焼肉'),
+          value: '焼肉'
+      ),
+      DropdownMenuItem(
+          child: Text('ハンバーグ'),
+          value: 'ハンバーグ'
+      ),
+      DropdownMenuItem(
+          child: Text('うどん'),
+          value: 'うどん'
+      ),
+      DropdownMenuItem(
+          child: Text('ラーメン'),
+          value: 'ラーメン'
+      ),
+    ];
+
+    List<DropdownMenuItem> sportList = [
+      DropdownMenuItem(
+          child: Text('野球'),
+          value: '野球'
+      ),
+      DropdownMenuItem(
+          child: Text('サッカー'),
+          value: 'サッカー'
+      ),
+      DropdownMenuItem(
+          child: Text('バスケットボール'),
+          value: 'バスケットボール'
+      ),
+      DropdownMenuItem(
+          child: Text('テニス'),
+          value: 'テニス'
+      ),
+      DropdownMenuItem(
+          child: Text('ホッケー'),
+          value: 'ホッケー'
+      ),
+    ];
+
+    List<DropdownMenuItem> musicList = [
+      DropdownMenuItem(
+          child: Text('J-POP'),
+          value: 'J-POP'
+      ),
+      DropdownMenuItem(
+          child: Text('K-POP'),
+          value: 'K-POP'
+      ),
+      DropdownMenuItem(
+          child: Text('レゲエ'),
+          value: 'レゲエ'
+      ),
+      DropdownMenuItem(
+          child: Text('R&B'),
+          value: 'R&B'
+      ),
+      DropdownMenuItem(
+          child: Text('クラシック'),
+          value: 'クラシック'
+      ),
+    ];
+
+    List<DropdownMenuItem> hobbyList = [
+      DropdownMenuItem(
+          child: Text('ランニング'),
+          value: 'ランニング'
+      ),
+      DropdownMenuItem(
+          child: Text('サイクリング'),
+          value: 'サイクリング'
+      ),
+      DropdownMenuItem(
+          child: Text('キャンプ'),
+          value: 'キャンプ'
+      ),
+      DropdownMenuItem(
+          child: Text('手芸'),
+          value: '手芸'
+      ),
+      DropdownMenuItem(
+          child: Text('読書'),
+          value: '読書'
+      ),
+    ];
+
+
+    print(circle);
+
+    if (!widget.isMyProfile) {
       return Stack(
         children: <Widget>[
           SingleChildScrollView(
@@ -297,7 +453,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       child: Stack(
                         children: <Widget>[
                           (avatarImageFile == null)
-                              ? (photoUrl != ''
+                              ? (photoUrl != null && photoUrl != ''
                               ? Material(
                             child: CachedNetworkImage(
                               placeholder: (context, url) =>
@@ -602,6 +758,47 @@ class SettingsScreenState extends State<SettingsScreen> {
                               Column(
                                 children: <Widget>[
                                   for (var i in circle) Text(circleList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                ],
+                              ),
+                            ],
+                          ),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                        ),
+                      ),
+                    ),
+                    // その他
+                    Container(
+                      child: Text(
+                        'その他',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            color: primaryColor),
+                      ),
+                      alignment: Alignment.topLeft,
+                      margin: EdgeInsets.only(
+                          left: 10.0, bottom: 5.0, top: 10.0),
+                    ),
+                    // 旅行
+                    Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: Container(
+                        width: 400,
+                        child: Card(
+                          color: orangeColor,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  '旅行',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                alignment: Alignment.topLeft,
+                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  for (var i in travel) Text(travelList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
                                 ],
                               ),
                             ],
