@@ -1668,7 +1668,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         borderRadius: BorderRadius.circular(20.0)
                     ),
                     child: Text(
-                      '授業情報を見る',
+                      '授業情報を編集する',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
