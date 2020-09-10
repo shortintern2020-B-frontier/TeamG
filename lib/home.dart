@@ -208,7 +208,7 @@ class HomeScreenState extends State<HomeScreen> {
                         });
                       },
                       children: [
-                        new Search(currentUserId: currentUserId),
+                        new SearchScreen(currentUserId: currentUserId),
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
                         new Timeline(currentUserId: currentUserId),
