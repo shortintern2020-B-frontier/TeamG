@@ -208,7 +208,11 @@ class HomeScreenState extends State<HomeScreen> {
                         });
                       },
                       children: [
-                        new SearchScreen(currentUserId: currentUserId),
+                        new SearchScreen(
+                            currentUserId: currentUserId,
+                            university: snapshot.data.docs
+                                .firstWhere((doc) => doc.id == currentUserId)
+                                .data()["university"]),
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
                         new Timeline(currentUserId: currentUserId),
