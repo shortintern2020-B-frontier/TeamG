@@ -18,6 +18,7 @@ class Chat extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: primaryColor),
         shape: UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
         title: Text(
           this.peerDoc.data()['nickname'],
