@@ -158,31 +158,31 @@ class ClassesScreenState extends State<ClassesScreen> {
                       }
                     });
 
-                    value.forEach((int index) {
-                      setState(() {
-                        lessonSelectedItems = value;
+                    // value.forEach((int index) {
+                    //   setState(() {
+                    //     lessonSelectedItems = value;
 
-                        DocumentReference lesson = FirebaseFirestore.instance
-                            .collection('classes')
-                            .doc("$university-${lessonItems[index].value}");
-                        lesson.get().then((snapshot) => {
-                              if (snapshot.data() == null)
-                                {
-                                  lesson.set({
-                                    'uids':
-                                        FieldValue.arrayUnion([currentUserId])
-                                  })
-                                }
-                              else
-                                {
-                                  lesson.update({
-                                    'uids':
-                                        FieldValue.arrayUnion([currentUserId])
-                                  })
-                                }
-                            });
-                      });
-                    });
+                    //     DocumentReference lesson = FirebaseFirestore.instance
+                    //         .collection('classes')
+                    //         .doc("$university-${lessonItems[index].value}");
+                    //     lesson.get().then((snapshot) => {
+                    //           if (snapshot.data() == null)
+                    //             {
+                    //               lesson.set({
+                    //                 'uids':
+                    //                     FieldValue.arrayUnion([currentUserId])
+                    //               })
+                    //             }
+                    //           else
+                    //             {
+                    //               lesson.update({
+                    //                 'uids':
+                    //                     FieldValue.arrayUnion([currentUserId])
+                    //               })
+                    //             }
+                    //         });
+                    //   });
+                    // });
                   },
                   child: Text("Add and select item"),
                 ));
