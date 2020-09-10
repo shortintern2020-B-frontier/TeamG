@@ -72,9 +72,11 @@ void getUserUniversityAndClasses(String userId, String uni,
       .get()
       .then((doc) {
     uni = doc.data()["university"];
-    print(doc.data()["classes"].runtimeType);
-    print(doc.data()["classes"]);
-    print(userId);
+    // print('getUserUniversityAndClasses');
+    // print(doc.data()["classes"].runtimeType);
+    // print(doc.data()["classes"]);
+    // print(uni);
+    // print(userId);
     classesList = makeDropdowmMenuFromStringList(
         doc.data()["classes"].cast<String>() as List<String>);
   });
@@ -120,6 +122,40 @@ void getDataFromFireStore(
   }
   if (list.length == 0) list.add('');
   events.add(makeDropdowmMenuFromStringList(list));
+}
+
+Future<QuerySnapshot> getUsersClassesFromFireStore(
+    String currentUserId, String university, List<String> classesList) async {
+  if (classesList == null || classesList.length == 0) {
+    return null;
+  } else {
+    List<String> userIds = [];
+    await Future.forEach(classesList, (classItem) async {
+      await FirebaseFirestore.instance
+          .collection('classes')
+          .doc("$university-$classItem")
+          .get()
+          .then((content) {
+        if (content.data()["uids"] != null &&
+            content.data()["uids"].length != 0) {
+          for (String uid in content.data()["uids"]) {
+            // if (!userIds.contains(uid) && uid != currentUserId) {
+            userIds.add(uid);
+            // }
+          }
+        }
+      });
+    });
+    // print('getUsersClassesFromFireStore');
+    // print(userIds);
+    if (userIds.length == 0) return null;
+    QuerySnapshot userSnapShot = await FirebaseFirestore.instance
+        .collection("users")
+        .where('id', whereIn: userIds)
+        .get();
+    // print(userSnapShot);
+    return userSnapShot;
+  }
 }
 
 Future<QuerySnapshot> getUsersFromFireStore(

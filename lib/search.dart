@@ -9,17 +9,17 @@ import 'api.dart';
 import 'chat.dart';
 import 'const.dart';
 
-class Search extends StatefulWidget {
+class SearchScreen extends StatefulWidget {
   static final navKey = new GlobalKey<NavigatorState>();
   final String currentUserId;
 
-  Search({Key key, @required this.currentUserId}) : super(key: key);
+  SearchScreen({Key key, @required this.currentUserId}) : super(key: key);
 
   @override
-  SearchState createState() => SearchState();
+  SearchScreenState createState() => SearchScreenState();
 }
 
-class SearchState extends State<Search> {
+class SearchScreenState extends State<SearchScreen> {
   String _selectedUniversity;
   String _selectedFaculty;
   String _selectedDepartment;
@@ -44,7 +44,11 @@ class SearchState extends State<Search> {
     // DropdownMenuItem(child: Text('English1'), value: 'English1'),
   ];
   List<int> _classes = [];
-  String _university;
+  String university;
+
+  List<DropdownMenuItem> lessonItems = [];
+  List<int> lessonSelectedItems = [];
+  List<String> stringLessonSelectedItems = [];
 
   @override
   void initState() {
@@ -59,8 +63,10 @@ class SearchState extends State<Search> {
     _facultyEvents.add(_emptyItems);
     _departmentEvents.add(_emptyItems);
 
-    getUserUniversityAndClasses(
-        widget.currentUserId, _university, _classesList);
+    getUserUniversityAndClasses(widget.currentUserId, university, _classesList);
+    print('initState university');
+    print(university); // todo:なぜかnull
+    university = '大阪大学';
     _classesEvents.add(_classesList);
 
     super.initState();
@@ -174,10 +180,10 @@ class SearchState extends State<Search> {
 
   addItemDialog() async {
     return await showDialog(
-      context: Search.navKey.currentState.overlay.context,
+      context: SearchScreen.navKey.currentState.overlay.context,
       builder: (BuildContext alertContext) {
         return (AlertDialog(
-          title: Text("授業を追加してください"),
+          title: Text("授業を追加"),
           content: Form(
             key: _formKey,
             child: Column(
@@ -188,7 +194,7 @@ class SearchState extends State<Search> {
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
                       setState(() {
-                        _classesList.add(DropdownMenuItem(
+                        lessonItems.add(DropdownMenuItem(
                           child: Text(inputString),
                           value: inputString,
                         ));
@@ -210,6 +216,109 @@ class SearchState extends State<Search> {
         ));
       },
     );
+  }
+
+  Widget test() {
+    return FutureBuilder(
+        future: FirebaseFirestore.instance
+            .collection('classes')
+            .orderBy(FieldPath.documentId)
+            .startAt([university]).endAt([university + '\uf8ff']).get(),
+        builder: (context, lessonSnapshot) {
+          if (!lessonSnapshot.hasData) {
+            return Center(
+                child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+          }
+
+          lessonItems = [];
+          lessonSnapshot.data.docs.forEach((document) {
+            String lesson = document.id.split('-')[1];
+            lessonItems
+                .add(DropdownMenuItem(child: Text(lesson), value: lesson));
+          });
+
+          return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: <Widget>[
+                SearchChoices.multiple(
+                  items: lessonItems,
+                  selectedItems: lessonSelectedItems,
+                  hint: "選択してください",
+                  searchHint: "選択してください",
+                  disabledHint: (Function updateParent) {
+                    return (FlatButton(
+                      onPressed: () {
+                        addItemDialog().then((value) async {
+                          if (value != null) {
+                            lessonSelectedItems = [0];
+                            updateParent(lessonSelectedItems);
+                          }
+                        });
+                      },
+                      child: Text("選択してください"),
+                    ));
+                  },
+                  onChanged: (values) {
+                    setState(() {
+                      if (!(values is NotGiven)) {
+                        lessonSelectedItems = values;
+                        print('lessonSelectedItems');
+                        print(values);
+                        stringLessonSelectedItems = [];
+                        for (int i in lessonSelectedItems) {
+                          stringLessonSelectedItems.add(lessonItems[i].value);
+                        }
+                        print(stringLessonSelectedItems);
+                        // getUsersClassesFromFireStore(widget.currentUserId,
+                        //     university, stringLessonSelectedItems);
+                      }
+                    });
+                  },
+                  displayItem: (item, selected, Function updateParent) {
+                    return (Row(children: <Widget>[
+                      selected
+                          ? Icon(
+                              Icons.check_box,
+                              color: Colors.black,
+                            )
+                          : Icon(
+                              Icons.check_box_outline_blank,
+                              color: Colors.black,
+                            ),
+                      SizedBox(width: 7),
+                      Expanded(
+                        child: item,
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                        ),
+                        onPressed: () {
+                          int indexOfItem = lessonItems.indexOf(item);
+                          lessonItems.removeWhere((element) => item == element);
+                          lessonSelectedItems
+                              .removeWhere((element) => element == indexOfItem);
+                          for (int i = 0; i < lessonSelectedItems.length; i++) {
+                            if (lessonSelectedItems[i] > indexOfItem) {
+                              lessonSelectedItems[i]--;
+                            }
+                          }
+                          updateParent(lessonSelectedItems);
+                          setState(() {});
+                        },
+                      ),
+                    ]));
+                  },
+                  dialogBox: true,
+                  isExpanded: true,
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
@@ -324,58 +433,8 @@ class SearchState extends State<Search> {
             children: <Widget>[
               buildLabel('授業名'),
               Flexible(
-                child: StreamBuilder(
-                    stream: _classesEvents.stream,
-                    builder: (BuildContext context, snapshot) {
-                      return SearchChoices.multiple(
-                        icon: Icon(Icons.edit),
-                        items:
-                            snapshot.data == null ? _emptyItems : snapshot.data,
-                        selectedItems: _classes,
-                        onChanged: (value) {
-                          addItemDialog().then((value) async {
-                            if (value != null) {
-                              _classes = [0];
-                              // UpdateParent(_classes); // 何のためにあるのか？
-                            }
-                          });
-                          /* // ここはデータアップデートなのでいらない？
-                            value.forEach((int index) {
-                              setState(() {
-                                _classes = value;
-
-                                DocumentReference lesson = FirebaseFirestore
-                                    .instance
-                                    .collection('classes')
-                                    .doc(
-                                        "$_university-${_classesList[index].value}");
-                                lesson.get().then((snapshot) => {
-                                      if (snapshot.data() == null)
-                                        {
-                                          lesson.set({
-                                            'uids': FieldValue.arrayUnion(
-                                                [widget.currentUserId])
-                                          })
-                                        }
-                                      else
-                                        {
-                                          lesson.update({
-                                            'uids': FieldValue.arrayUnion(
-                                                [widget.currentUserId])
-                                          })
-                                        }
-                                    });
-                              });
-                            });*/
-                        },
-                        dialogBox: false,
-                        isExpanded: true,
-                        menuConstraints:
-                            BoxConstraints.tight(Size.fromHeight(300)),
-                        // ),
-                      );
-                    }),
-              )
+                child: test(),
+              ),
             ],
           ),
           Expanded(
@@ -392,13 +451,24 @@ class SearchState extends State<Search> {
                           itemCount: snapshot.data.documents.length,
                         );
                 }),
-          )
+          ),
+          Expanded(
+            child: FutureBuilder(
+                future: getUsersClassesFromFireStore(widget.currentUserId,
+                    university, stringLessonSelectedItems),
+                builder: (BuildContext context, snapshot) {
+                  return snapshot.data == null
+                      ? Container()
+                      : ListView.builder(
+                          padding: EdgeInsets.all(10.0),
+                          itemBuilder: (context, index) => buildListItem(
+                              context, snapshot.data.documents[index]),
+                          itemCount: snapshot.data.documents.length,
+                        );
+                }),
+          ),
         ],
       ),
     );
   }
 }
-
-// class UpdateParent {
-//   UpdateParent(List<int> _classes);
-// }
