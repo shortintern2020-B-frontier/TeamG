@@ -53,35 +53,6 @@ void makeDropdownMenu(StreamController<List<DropdownMenuItem<String>>> events,
   events.add(makeDropdowmMenuFromStringList(list));
 }
 
-// この関数は一旦放置
-// Future<void> getClassesFireStore() async {
-//   QuerySnapshot classSnapShot =
-//       await FirebaseFirestore.instance.collection("classes").get();
-//   for (var i = 0; i < classSnapShot.docs.length; i++) {
-//     if (!classesList.contains(classSnapShot.docs[i].data()["class"]))
-//       classesList.add(classSnapShot.docs[i].data()["class"]);
-//   }
-//   return classesList;
-// }
-
-void getUserUniversityAndClasses(String userId, String uni,
-    List<DropdownMenuItem<String>> classesList) async {
-  await FirebaseFirestore.instance
-      .collection("users")
-      .doc(userId)
-      .get()
-      .then((doc) {
-    uni = doc.data()["university"];
-    // print('getUserUniversityAndClasses');
-    // print(doc.data()["classes"].runtimeType);
-    // print(doc.data()["classes"]);
-    // print(uni);
-    // print(userId);
-    classesList = makeDropdowmMenuFromStringList(
-        doc.data()["classes"].cast<String>() as List<String>);
-  });
-}
-
 void getDataFromFireStore(
     StreamController<List<DropdownMenuItem<String>>> events, apiMode mode,
     [String universityName = '', String faculityName = '']) async {
@@ -139,21 +110,18 @@ Future<QuerySnapshot> getUsersClassesFromFireStore(
         if (content.data()["uids"] != null &&
             content.data()["uids"].length != 0) {
           for (String uid in content.data()["uids"]) {
-            // if (!userIds.contains(uid) && uid != currentUserId) {
-            userIds.add(uid);
-            // }
+            if (!userIds.contains(uid) && uid != currentUserId) {
+              userIds.add(uid);
+            }
           }
         }
       });
     });
-    // print('getUsersClassesFromFireStore');
-    // print(userIds);
     if (userIds.length == 0) return null;
     QuerySnapshot userSnapShot = await FirebaseFirestore.instance
         .collection("users")
         .where('id', whereIn: userIds)
         .get();
-    // print(userSnapShot);
     return userSnapShot;
   }
 }
