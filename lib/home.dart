@@ -102,7 +102,7 @@ class HomeScreenState extends State<HomeScreen> {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => Classes(currentUserId, "琉球大学")));
+              builder: (context) => Classes(currentUserId, "早稲田大学")));
     } else {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => ChatSettings()));
