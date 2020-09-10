@@ -25,9 +25,20 @@ class ChatSettings extends StatelessWidget {
     if (!isMyProfile) {
       return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: primaryColor),
+          shape:
+              UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
           title: Text(
             'プロフィール',
-            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+            style: TextStyle(color: themeColor, fontSize: 23,
+                // fontWeight: FontWeight.bold,
+                shadows: <Shadow>[
+                  Shadow(
+                      offset: Offset(0, 2.0),
+                      blurRadius: 3.0,
+                      color: Color.fromARGB(125, 0, 0, 0))
+                ]),
           ),
           centerTitle: true,
         ),
@@ -440,10 +451,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     Container(
                       child: Text(
                         '大学情報',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 25,
-                            color: primaryColor),
                       ),
                       alignment: Alignment.topLeft,
                       margin:
@@ -882,7 +889,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     // 授業をみる
                     Container(
                       child: FlatButton(
-                        color: Colors.blue,
+                        color: themeColor,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0)),
                         child: Text(
@@ -1145,7 +1152,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 grade = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'grade': grade,
                               }).then((data) async {
                                 setState(() {
@@ -1206,7 +1216,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerAge,
                               onChanged: (value) {
                                 age = value;
-                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(widget.currentUserId)
+                                    .update({
                                   'age': age,
                                 }).then((data) async {
                                   setState(() {
@@ -1254,7 +1267,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerResidence,
                               onChanged: (value) {
                                 residence = value;
-                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(widget.currentUserId)
+                                    .update({
                                   'residence': residence,
                                 }).then((data) async {
                                   setState(() {
@@ -1302,7 +1318,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerBirthplace,
                               onChanged: (value) {
                                 birthplace = value;
-                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(widget.currentUserId)
+                                    .update({
                                   'birthplace': birthplace,
                                 }).then((data) async {
                                   setState(() {
@@ -1347,7 +1366,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 circle = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'circle': conv_to_stringList(circle),
                               }).then((data) async {
                                 setState(() {
@@ -1405,7 +1427,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 travel = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'travel': conv_to_stringList(travel),
                               }).then((data) async {
                                 setState(() {
@@ -1452,7 +1477,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 gourmet = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'gourmet': conv_to_stringList(gourmet),
                               }).then((data) async {
                                 setState(() {
@@ -1499,7 +1527,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 sport = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'sport': conv_to_stringList(sport),
                               }).then((data) async {
                                 setState(() {
@@ -1546,7 +1577,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 music = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'music': conv_to_stringList(music),
                               }).then((data) async {
                                 setState(() {
@@ -1593,7 +1627,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 hobby = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'hobby': conv_to_stringList(hobby),
                               }).then((data) async {
                                 setState(() {
@@ -1637,7 +1674,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 // 授業をみる
                 Container(
                   child: FlatButton(
-                    color: Colors.blue,
+                    color: themeColor,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0)),
                     child: Text(

@@ -9,7 +9,7 @@ import 'login.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  debugPaintSizeEnabled=false;
+  debugPaintSizeEnabled = false;
   runApp(MyApp());
 }
 

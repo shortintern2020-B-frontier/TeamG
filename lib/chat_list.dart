@@ -142,7 +142,7 @@ class ChatListState extends State<ChatList> {
                       MaterialPageRoute(
                           builder: (context) => Chat(peerDoc: document)));
                 },
-                color: greyColor2,
+                color: Colors.white,
                 padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)),
