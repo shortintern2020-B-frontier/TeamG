@@ -67,9 +67,10 @@ class ClassesScreenState extends State<ClassesScreen> {
     DropdownMenuItem(child: Text('経済学'), value: '経済学'),
     DropdownMenuItem(child: Text('マクロ経済学'), value: 'マクロ経済学'),
     DropdownMenuItem(child: Text('線形代数'), value: '線形代数'),
+    DropdownMenuItem(child: Text('複素関数'), value: '複素関数'),
     DropdownMenuItem(child: Text('熱力学'), value: '熱力学'),
     DropdownMenuItem(child: Text('プログラミング工学'), value: 'プログラミング工学'),
-    DropdownMenuItem(child: Text('AcademicCmmunication'), value: 'プログラミング工学'),
+    DropdownMenuItem(child: Text('English1'), value: 'English1'),
   ];
   List<int> circle = [];
   static const String appTitle = "Search Choices demo";
@@ -92,6 +93,21 @@ class ClassesScreenState extends State<ClassesScreen> {
   @override
   void initState() {
     super.initState();
+    readClasses();
+  }
+
+  void readClasses() async {
+    print('This is ::' + widget.currentUserId);
+    final setting = await FirebaseFirestore.instance.collection('users')
+        .doc(widget.currentUserId)
+        .get();
+    final data = setting.data();
+    //print('This is ::' + data['classes'][0]);
+    setState(() {
+      // print(data['classes'].cast<int>() is List<int>);
+      circle = (data['classes'] != null) ? data['classes'].cast<int>() : [];
+      //print(circle.length);
+    });
   }
 
   @override
@@ -102,7 +118,46 @@ class ClassesScreenState extends State<ClassesScreen> {
   @override
   Widget build(BuildContext context) {
     if (!isMyProfile) {
-      return Container();
+      return SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              // 履修授業
+              Text(
+                //title
+                '履修授業',
+                style: TextStyle(color: primaryColor, fontSize: 30),
+              ),
+              Container(
+              //content1_title
+                width: 80,
+                height: 35,
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.orangeAccent[100]),
+                child: Text(
+                  '授業名',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+                  // ),
+
+              Container(
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                child: Column(
+                  children: <Widget>[
+                    for (var i in circle) Text(circleList[i].value, style: TextStyle(fontSize: 17))
+                  ],
+                ),
+              ),
+            ],
+      ),
+        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+      );
     } else {
       return Container(
         child: Stack(
@@ -125,9 +180,9 @@ class ClassesScreenState extends State<ClassesScreen> {
                       children: <Widget>[
                         //ClassName
                         Text(
-                          //title
-                          '履修授業',
-                          style: TextStyle(color: primaryColor, fontSize: 30),
+                        //title
+                        '履修授業',
+                        style: TextStyle(color: primaryColor, fontSize: 30),
                         ),
                         Row(
                           children: <Widget>[
@@ -149,22 +204,46 @@ class ClassesScreenState extends State<ClassesScreen> {
                                 ),
                               ),
                             ),
-                            // search_choices
-                            Container(
-                              width: 220,
-                              child: SearchChoices.multiple(
-                                items: circleList,
-                                selectedItems: circle,
-                                onChanged: (value) {
+                          // ),
+                          Container(
+                            width: 220,
+                            child: SearchChoices.multiple(
+                              items: circleList,
+                              selectedItems: circle,
+                              onChanged: (value) {
+                                print(university);
+                                print(value);
+                                value.forEach((int index) {
                                   setState(() {
                                     circle = value;
-                                    FirebaseFirestore.instance
+
+                                    DocumentReference lesson = FirebaseFirestore
+                                        .instance
                                         .collection('classes')
-                                        .doc("$university-$value")
-                                        .update({
-                                      'uids':
-                                      FieldValue.arrayUnion([currentUserId])
+                                        .doc(
+                                        "$university-${circleList[index]
+                                            .value}");
+                                    FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                      'classes': circle
                                     });
+                                    lesson.get().then((snapshot) =>
+                                    {
+                                      if (snapshot.data() == null)
+                                        {
+                                          lesson.set({
+                                            'uids': FieldValue.arrayUnion(
+                                                [currentUserId])
+                                          })
+                                        }
+                                      else
+                                        {
+                                          lesson.update({
+                                            'uids': FieldValue.arrayUnion(
+                                                [currentUserId])
+                                          })
+                                        }
+                                    });
+                                  });
                                   });
                                 },
                                 dialogBox: false,

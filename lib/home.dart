@@ -10,7 +10,6 @@ import 'package:hikomaryu/chat_list.dart';
 import 'package:hikomaryu/timeline.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
-import 'package:hikomaryu/tags.dart';
 import 'package:hikomaryu/classes.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -119,20 +118,6 @@ class HomeScreenState extends State<HomeScreen> {
     if (choice.title == 'Log out') {
       handleSignOut();
     }
-    /*
-    else if (choice.title == 'Tags') {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChatTags()));
-    } else if (choice.title == 'Classes') {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => Classes(currentUserId, "琉球大学", false)));
-    } else {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: currentUserId, isMyProfile: true)));
-    }
-     */
   }
 
   Future<Null> handleSignOut() async {

@@ -64,7 +64,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   TextEditingController controllerAge;
   TextEditingController controllerResidence;
   TextEditingController controllerBirthplace;
-  TextEditingController controllerCircle;
+  //TextEditingController controllerCircle;
 
   SharedPreferences prefs;
 
@@ -94,7 +94,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   final FocusNode focusNodeAge = FocusNode();
   final FocusNode focusNodeResidence = FocusNode();
   final FocusNode focusNodeBirthplace = FocusNode();
-  final FocusNode focusNodeCircle = FocusNode();
+  //final FocusNode focusNodeCircle = FocusNode();
   final FocusNode focusNodeTravel = FocusNode();
   final FocusNode focusNodeGrourmet = FocusNode();
   final FocusNode focusNodeSport = FocusNode();
@@ -225,7 +225,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     // focusNodeAffiliation.unfocus();
     focusNodeGrade.unfocus();
     focusNodeResidence.unfocus();
-    focusNodeCircle.unfocus();
+    //focusNodeCircle.unfocus();
     focusNodeTravel.unfocus();
     focusNodeGrourmet.unfocus();
     focusNodeSport.unfocus();
@@ -258,7 +258,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       await prefs.setString('age', age);
       await prefs.setString('residence', residence);
       await prefs.setString('birthplace', birthplace);
-      await prefs.setStringList('circle', conv_to_stringList(circle));
+      //await prefs.setStringList('circle', conv_to_stringList(circle));
       /*
       await prefs.setStringList('circle', conv_to_stringList());
       await prefs.setStringList('circle', conv_to_stringList(circle));
@@ -757,7 +757,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in circle) Text(circleList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                  for (var i in circle) Text(circleList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
                                 ],
                               ),
                             ],
@@ -798,7 +798,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in travel) Text(travelList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                  for (var i in travel) Text(travelList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
                                 ],
                               ),
                             ],
@@ -826,7 +826,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in gourmet) Text(gourmetList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                  for (var i in gourmet) Text(gourmetList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
                                 ],
                               ),
                             ],
@@ -854,7 +854,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in sport) Text(sportList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                  for (var i in sport) Text(sportList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
                                 ],
                               ),
                             ],
@@ -882,7 +882,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in music) Text(musicList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                  for (var i in music) Text(musicList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
                                 ],
                               ),
                             ],
@@ -910,7 +910,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in hobby) Text(hobbyList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 15),)
+                                  for (var i in hobby) Text(hobbyList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
                                 ],
                               ),
                             ],
