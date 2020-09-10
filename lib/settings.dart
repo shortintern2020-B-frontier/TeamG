@@ -509,7 +509,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
 
-                // Input
+                // Cardのリスト
                 Column(
                   children: <Widget>[
                     // 大学情報
@@ -1185,6 +1185,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 grade = value;
                               });
+                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                'grade': grade,
+                              }).then((data) async {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }).catchError((err) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
                             },
                             dialogBox: false,
                             isExpanded: true,
@@ -1234,6 +1245,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerAge,
                               onChanged: (value) {
                                 age = value;
+                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                  'age': age,
+                                }).then((data) async {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }).catchError((err) {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                });
                               },
                               focusNode: focusNodeAge,
                             ),
@@ -1270,6 +1292,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerResidence,
                               onChanged: (value) {
                                 residence = value;
+                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                  'residence': residence,
+                                }).then((data) async {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }).catchError((err) {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                });
                               },
                               focusNode: focusNodeResidence,
                             ),
@@ -1306,6 +1339,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerBirthplace,
                               onChanged: (value) {
                                 birthplace = value;
+                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                  'birthplace': birthplace,
+                                }).then((data) async {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }).catchError((err) {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                });
                               },
                               focusNode: focusNodeBirthplace,
                             ),
@@ -1338,6 +1382,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                             onChanged: (value) {
                               setState(() {
                                 circle = value;
+                              });
+                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                'circle': conv_to_stringList(circle),
+                              }).then((data) async {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }).catchError((err) {
+                                setState(() {
+                                  isLoading = false;
+                                });
                               });
                             },
                             dialogBox: false,
@@ -1385,6 +1440,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 travel = value;
                               });
+                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                'travel': conv_to_stringList(travel),
+                              }).then((data) async {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }).catchError((err) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
                             },
                             dialogBox: false,
                             isExpanded: true,
@@ -1419,6 +1485,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 gourmet = value;
                               });
+                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                'gourmet': conv_to_stringList(gourmet),
+                              }).then((data) async {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }).catchError((err) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
                             },
                             dialogBox: false,
                             isExpanded: true,
@@ -1439,7 +1516,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       children: <Widget>[
                         Container(
                           child: Text(
-                            'サークル',
+                            'スポーツ',
                             style: TextStyle(fontSize: 23),
                           ),
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
@@ -1452,6 +1529,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                             onChanged: (value) {
                               setState(() {
                                 sport = value;
+                              });
+                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                'sport': conv_to_stringList(sport),
+                              }).then((data) async {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }).catchError((err) {
+                                setState(() {
+                                  isLoading = false;
+                                });
                               });
                             },
                             dialogBox: false,
@@ -1487,6 +1575,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 music = value;
                               });
+                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                'music': conv_to_stringList(music),
+                              }).then((data) async {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }).catchError((err) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
                             },
                             dialogBox: false,
                             isExpanded: true,
@@ -1521,6 +1620,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 hobby = value;
                               });
+                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                'hobby': conv_to_stringList(hobby),
+                              }).then((data) async {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }).catchError((err) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              });
                             },
                             dialogBox: false,
                             isExpanded: true,
@@ -1533,6 +1643,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 // Button
+                /*
                 Container(
                   child: FlatButton(
                     onPressed: handleUpdateData,
@@ -1548,6 +1659,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ),
                   margin: EdgeInsets.only(top: 50.0, bottom: 50.0),
                 ),
+                 */
                 // 授業をみる
                 Container(
                   child: FlatButton(
