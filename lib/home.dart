@@ -35,12 +35,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
-    // const Choice(title: '設定', icon: Icons.settings),
-    // const Choice(title: 'ログアウト', icon: Icons.exit_to_app),
-    const Choice(title: 'Settings', icon: Icons.settings),
-    const Choice(title: 'Classes', icon: Icons.school),
-    const Choice(title: 'Log out', icon: Icons.exit_to_app),
-
+    const Choice(title: 'ログアウト', icon: Icons.exit_to_app),
   ];
   List<String> titles = ['探す', 'トーク', 'タイムライン', 'アカウント'];
 
@@ -211,8 +206,7 @@ class HomeScreenState extends State<HomeScreen> {
                             currentUserId: currentUserId, snapshot: snapshot),
                         new Timeline(currentUserId: currentUserId),
                         new ChatSettings(
-                          currentUserId: currentUserId, isMyProfile: true
-                        ),
+                            currentUserId: currentUserId, isMyProfile: true),
                       ],
                     );
                   }
