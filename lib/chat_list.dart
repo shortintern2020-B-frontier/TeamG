@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hikomaryu/chat.dart';
 import 'package:hikomaryu/const.dart';
+import 'package:hikomaryu/settings.dart';
 
 class ChatList extends StatefulWidget {
   final String currentUserId;
@@ -55,32 +56,40 @@ class ChatListState extends State<ChatList> {
         child: FlatButton(
           child: Row(
             children: <Widget>[
-              Material(
-                child: document.data()['photoUrl'] != null &&
-                        document.data()['photoUrl'].isNotEmpty
-                    ? CachedNetworkImage(
-                        placeholder: (context, url) => Container(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.0,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(themeColor),
+              InkWell(
+                child:
+                Material(
+                  child: document.data()['photoUrl'] != null &&
+                          document.data()['photoUrl'].isNotEmpty
+                      ? CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.0,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(themeColor),
+                            ),
+                            width: 50.0,
+                            height: 50.0,
+                            padding: EdgeInsets.all(15.0),
                           ),
+                          imageUrl: document.data()['photoUrl'],
                           width: 50.0,
                           height: 50.0,
-                          padding: EdgeInsets.all(15.0),
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.account_circle,
+                          size: 50.0,
+                          color: greyColor,
                         ),
-                        imageUrl: document.data()['photoUrl'],
-                        width: 50.0,
-                        height: 50.0,
-                        fit: BoxFit.cover,
-                      )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 50.0,
-                        color: greyColor,
-                      ),
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                clipBehavior: Clip.hardEdge,
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  clipBehavior: Clip.hardEdge,
+                ),
+                onTap: () {
+                  print(widget.currentUserId);
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: document.data()['id'], isMyProfile: false)));
+                },
               ),
               Flexible(
                 child: Container(
