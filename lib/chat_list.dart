@@ -52,109 +52,104 @@ class ChatListState extends State<ChatList> {
       return Container();
     } else {
       String groupChatId = getGroupChatId(document.data()['id']);
-      return Container(
-        child: FlatButton(
-          child: Row(
-            children: <Widget>[
-              InkWell(
-                child: Material(
-                  child: document.data()['photoUrl'] != null &&
-                          document.data()['photoUrl'].isNotEmpty
-                      ? CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 1.0,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(themeColor),
+      return StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('messages')
+              .doc(groupChatId)
+              .collection(groupChatId)
+              .orderBy('timestamp', descending: true)
+              .limit(1)
+              .snapshots(),
+          builder: (context, messageSnapshot) {
+            if (!messageSnapshot.hasData ||
+                messageSnapshot.data.documents.length == 0) {
+              return Container();
+            }
+
+            return Container(
+              child: FlatButton(
+                child: Row(
+                  children: <Widget>[
+                    InkWell(
+                      child: Material(
+                        child: document.data()['photoUrl'] != null &&
+                                document.data()['photoUrl'].isNotEmpty
+                            ? CachedNetworkImage(
+                                placeholder: (context, url) => Container(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1.0,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        themeColor),
+                                  ),
+                                  width: 50.0,
+                                  height: 50.0,
+                                  padding: EdgeInsets.all(15.0),
+                                ),
+                                imageUrl: document.data()['photoUrl'],
+                                width: 50.0,
+                                height: 50.0,
+                                fit: BoxFit.cover,
+                              )
+                            : Icon(
+                                Icons.account_circle,
+                                size: 50.0,
+                                color: greyColor,
+                              ),
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                        clipBehavior: Clip.hardEdge,
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChatSettings(
+                                    currentUserId: document.data()['id'],
+                                    isMyProfile: false)));
+                      },
+                    ),
+                    Flexible(
+                      child: Container(
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              child: Text(
+                                document.data()['nickname'],
+                                style: TextStyle(
+                                    color: primaryColor, fontSize: 18),
+                              ),
+                              alignment: Alignment.centerLeft,
+                              margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
                             ),
-                            width: 50.0,
-                            height: 50.0,
-                            padding: EdgeInsets.all(15.0),
-                          ),
-                          imageUrl: document.data()['photoUrl'],
-                          width: 50.0,
-                          height: 50.0,
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(
-                          Icons.account_circle,
-                          size: 50.0,
-                          color: greyColor,
+                            Container(
+                              child: Text(
+                                convertMessage(
+                                    messageSnapshot.data.documents[0].data()),
+                                style: TextStyle(color: Colors.grey[700]),
+                              ),
+                              alignment: Alignment.centerLeft,
+                              margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                            )
+                          ],
                         ),
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  clipBehavior: Clip.hardEdge,
+                        margin: EdgeInsets.only(left: 20.0),
+                      ),
+                    ),
+                  ],
                 ),
-                onTap: () {
+                onPressed: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ChatSettings(
-                              currentUserId: document.data()['id'],
-                              isMyProfile: false)));
+                          builder: (context) => Chat(peerDoc: document)));
                 },
+                color: Colors.white,
+                padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
               ),
-              Flexible(
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        child: Text(
-                          document.data()['nickname'],
-                          style: TextStyle(color: primaryColor, fontSize: 18),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 5.0),
-                      ),
-                      Container(
-                        child: StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('messages')
-                              .doc(groupChatId)
-                              .collection(groupChatId)
-                              .orderBy('timestamp', descending: true)
-                              .limit(1)
-                              .snapshots(),
-                          builder: (context, messageSnapshot) {
-                            if (!messageSnapshot.hasData) {
-                              return Center(
-                                  child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          themeColor)));
-                            } else {
-                              return Text(
-                                messageSnapshot.data.documents.length == 0
-                                    ? ''
-                                    : convertMessage(messageSnapshot
-                                        .data.documents[0]
-                                        .data()),
-                                style: TextStyle(color: Colors.grey[700]),
-                              );
-                            }
-                          },
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                      )
-                    ],
-                  ),
-                  margin: EdgeInsets.only(left: 20.0),
-                ),
-              ),
-            ],
-          ),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Chat(peerDoc: document)));
-          },
-          color: Colors.white,
-          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        ),
-        margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
-      );
+              margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
+            );
+          });
     }
   }
 

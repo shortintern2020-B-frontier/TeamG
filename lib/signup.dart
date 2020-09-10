@@ -32,15 +32,17 @@ class SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nicknameController = TextEditingController();
 
-  String _gradeValue = '1';
   bool _isLoading = false;
-
+  bool _signupButtonPressed = false;
+  bool _cannotSelectFaculty = false;
+  bool _cannotSelectDepartment = false;
+  String _gradeValue = '1';
   String _prefecturesValue;
   String _universityValue;
   String _facultyValue;
   String _departmentValue;
   List<DropdownMenuItem<String>> _prefecturesItems = [];
-  List<DropdownMenuItem<String>> _emptyItems = [];
+  List<DropdownMenuItem<String>> _dummyItems = [];
 
   StreamController<List<DropdownMenuItem<String>>> _universityEvents;
   StreamController<List<DropdownMenuItem<String>>> _facultyEvents;
@@ -52,15 +54,15 @@ class SignUpScreenState extends State<SignUpScreen> {
     prefectures.forEach((k, _) => prefecturesKeys.add(k));
 
     _prefecturesItems = makeDropdowmMenuFromStringList(prefecturesKeys);
-    _emptyItems = makeDropdowmMenuFromStringList(['']);
+    _dummyItems = makeDropdowmMenuFromStringList(['']);
 
     _universityEvents = StreamController<List<DropdownMenuItem<String>>>();
     _facultyEvents = StreamController<List<DropdownMenuItem<String>>>();
     _departmentEvents = StreamController<List<DropdownMenuItem<String>>>();
 
-    _universityEvents.add(_emptyItems);
-    _facultyEvents.add(_emptyItems);
-    _departmentEvents.add(_emptyItems);
+    _universityEvents.add(_dummyItems);
+    _facultyEvents.add(_dummyItems);
+    _departmentEvents.add(_dummyItems);
 
     super.initState();
   }
@@ -78,6 +80,12 @@ class SignUpScreenState extends State<SignUpScreen> {
       return textFieldMsgs['required'];
     }
     return null;
+  }
+
+  bool checkDummyMenu(List<DropdownMenuItem<String>> snapshotData) {
+    if (snapshotData.length == 1 && snapshotData[0].value.length == 0)
+      return true;
+    return false;
   }
 
   Future<Null> _handleSingUp() async {
@@ -192,45 +200,50 @@ class SignUpScreenState extends State<SignUpScreen> {
                             controller: _nicknameController,
                             decoration:
                                 const InputDecoration(labelText: 'ニックネーム'),
-
                             validator: (String value) =>
                                 isEmptyValidator(value)),
                         SizedBox(height: 50.0),
                         Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: const Text('都道府県'),
-                                decoration: BoxDecoration(
-                                  color: greyColor2,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              child: const Text('都道府県'),
+                              decoration: BoxDecoration(
+                                color: greyColor2,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              SearchChoices.single(
-                                hint: choiceMsgs['ph'],
-                                searchHint: choiceMsgs['psh'],
-                                items: _prefecturesItems,
-                                value: _prefecturesValue,
-                                dialogBox: false,
-                                isExpanded: true,
-                                menuConstraints:
-                                    BoxConstraints.tight(Size.fromHeight(350)),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _prefecturesValue = value;
-                                    makeDropdownMenu(_universityEvents,
-                                        apiMode.university, _prefecturesValue);
-                                    _universityEvents.add(_emptyItems);
-                                    _facultyEvents.add(_emptyItems);
-                                    _departmentEvents.add(_emptyItems);
-                                    _universityValue = null;
-                                    _facultyValue = null;
-                                    _departmentValue = null;
-                                  });
-                                },
-                              ),
-                            ]),
+                            ),
+                            SearchChoices.single(
+                              hint: choiceMsgs['ph'],
+                              searchHint: choiceMsgs['psh'],
+                              items: _prefecturesItems,
+                              value: _prefecturesValue,
+                              dialogBox: false,
+                              isExpanded: true,
+                              menuConstraints:
+                                  BoxConstraints.tight(Size.fromHeight(350)),
+                              onChanged: (value) {
+                                setState(() {
+                                  _prefecturesValue = value;
+                                  makeDropdownMenu(_universityEvents,
+                                      apiMode.university, _prefecturesValue);
+                                  _universityEvents.add(_dummyItems);
+                                  _facultyEvents.add(_dummyItems);
+                                  _departmentEvents.add(_dummyItems);
+                                  _universityValue = null;
+                                  _facultyValue = null;
+                                  _departmentValue = null;
+                                });
+                              },
+                              validator: (String value) {
+                                if (value == null && _signupButtonPressed)
+                                  return textFieldMsgs['required'];
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
                         SizedBox(height: 20.0),
                         Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,10 +262,12 @@ class SignUpScreenState extends State<SignUpScreen> {
                                   return AbsorbPointer(
                                     absorbing: _prefecturesValue == null,
                                     child: SearchChoices.single(
-                                      hint: choiceMsgs['uh'],
+                                      hint: _prefecturesValue == null
+                                          ? '先に都道府県を入力してください'
+                                          : choiceMsgs['uh'],
                                       searchHint: choiceMsgs['ush'],
                                       items: _prefecturesValue == null
-                                          ? _emptyItems
+                                          ? _dummyItems
                                           : snapshot.data,
                                       value: _universityValue,
                                       dialogBox: false,
@@ -262,19 +277,22 @@ class SignUpScreenState extends State<SignUpScreen> {
                                       onChanged: (value) {
                                         setState(() {
                                           _universityValue = value;
-                                          if (_universityValue == null) {
-                                            _facultyEvents.add(_emptyItems);
-                                            _departmentEvents.add(_emptyItems);
-                                            _facultyValue = null;
-                                            _departmentValue = null;
-                                          } else {
-                                            makeDropdownMenu(
-                                                _facultyEvents,
-                                                apiMode.faculty,
-                                                _prefecturesValue,
-                                                _universityValue);
-                                          }
+                                          _facultyEvents.add(_dummyItems);
+                                          _departmentEvents.add(_dummyItems);
+                                          _facultyValue = null;
+                                          _departmentValue = null;
+                                          makeDropdownMenu(
+                                              _facultyEvents,
+                                              apiMode.faculty,
+                                              _prefecturesValue,
+                                              _universityValue);
                                         });
+                                      },
+                                      validator: (String value) {
+                                        if (value == null &&
+                                            _signupButtonPressed)
+                                          return textFieldMsgs['required'];
+                                        return null;
                                       },
                                     ),
                                   );
@@ -296,15 +314,25 @@ class SignUpScreenState extends State<SignUpScreen> {
                               StreamBuilder(
                                   stream: _facultyEvents.stream,
                                   builder: (BuildContext context, snapshot) {
+                                    _cannotSelectFaculty =
+                                        checkDummyMenu(snapshot.data);
                                     return AbsorbPointer(
                                       absorbing: _prefecturesValue == null ||
-                                          _universityValue == null,
+                                          _universityValue == null ||
+                                          _cannotSelectFaculty,
                                       child: SearchChoices.single(
-                                        hint: choiceMsgs['fh'],
+                                        hint: _prefecturesValue == null
+                                            ? '先に都道府県を入力してください'
+                                            : (_universityValue == null
+                                                ? '先に大学を入力してください'
+                                                : (_cannotSelectFaculty
+                                                    ? '項目がないため選択できません'
+                                                    : choiceMsgs['fh'])),
                                         searchHint: choiceMsgs['fsh'],
                                         items: _prefecturesValue == null ||
-                                                _universityValue == null
-                                            ? _emptyItems
+                                                _universityValue == null ||
+                                                _cannotSelectFaculty
+                                            ? _dummyItems
                                             : snapshot.data,
                                         value: _facultyValue,
                                         dialogBox: false,
@@ -314,14 +342,15 @@ class SignUpScreenState extends State<SignUpScreen> {
                                         onChanged: (value) {
                                           setState(() {
                                             _facultyValue = value;
-                                            makeDropdownMenu(
-                                                _departmentEvents,
-                                                apiMode.department,
-                                                _prefecturesValue,
-                                                _universityValue,
-                                                _facultyValue);
-                                            _departmentEvents.add(_emptyItems);
                                             _departmentValue = null;
+                                            if (_facultyValue != null)
+                                              makeDropdownMenu(
+                                                  _departmentEvents,
+                                                  apiMode.department,
+                                                  _prefecturesValue,
+                                                  _universityValue,
+                                                  _facultyValue);
+                                            // _departmentEvents.add(_dummyItems);
                                           });
                                         },
                                       ),
@@ -335,7 +364,6 @@ class SignUpScreenState extends State<SignUpScreen> {
                               Container(
                                 padding: EdgeInsets.all(8),
                                 child: const Text('学科'),
-
                                 decoration: BoxDecoration(
                                   color: greyColor2,
                                   borderRadius: BorderRadius.circular(8),
@@ -344,17 +372,36 @@ class SignUpScreenState extends State<SignUpScreen> {
                               StreamBuilder(
                                 stream: _departmentEvents.stream,
                                 builder: (BuildContext context, snapshot) {
+                                  // print(snapshot.data);
+                                  _cannotSelectDepartment =
+                                      checkDummyMenu(snapshot.data);
+                                  print('debug');
+                                  print(_cannotSelectFaculty);
+                                  print(_cannotSelectDepartment);
                                   return AbsorbPointer(
                                     absorbing: _prefecturesValue == null ||
                                         _universityValue == null ||
-                                        _facultyValue == null,
+                                        _facultyValue == null ||
+                                        _cannotSelectFaculty ||
+                                        _cannotSelectDepartment,
                                     child: SearchChoices.single(
-                                      hint: choiceMsgs['dh'],
+                                      hint: _prefecturesValue == null
+                                          ? '先に都道府県を入力してください'
+                                          : (_universityValue == null
+                                              ? '先に大学を入力してください'
+                                              : (_facultyValue == null
+                                                  ? '先に学部を入力してください'
+                                                  : (_cannotSelectFaculty ||
+                                                          _cannotSelectDepartment
+                                                      ? '項目がないため選択できません'
+                                                      : choiceMsgs['dh']))),
                                       searchHint: choiceMsgs['dsh'],
                                       items: _prefecturesValue == null ||
                                               _universityValue == null ||
-                                              _facultyValue == null
-                                          ? _emptyItems
+                                              _facultyValue == null ||
+                                              _cannotSelectFaculty ||
+                                              _cannotSelectDepartment
+                                          ? _dummyItems
                                           : snapshot.data,
                                       value: _departmentValue,
                                       dialogBox: false,
@@ -418,7 +465,11 @@ class SignUpScreenState extends State<SignUpScreen> {
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     onPressed: () async {
-                      if (_formKey.currentState.validate()) {
+                      setState(() {
+                        _signupButtonPressed = true;
+                      });
+                      if (_formKey.currentState.validate() &&
+                          _universityValue != null) {
                         _handleSingUp();
                       }
                     },
