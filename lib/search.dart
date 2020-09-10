@@ -158,83 +158,105 @@ class SearchState extends State<Search> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          buildLabel('大学名'),
-          StreamBuilder(
-              stream: _universityEvents.stream,
-              builder: (BuildContext context, snapshot) {
-                return SearchChoices.single(
-                  items: snapshot.data == null ? _emptyItems : snapshot.data,
-                  value: _selectedUniversity,
-                  hint: "選択してください",
-                  searchHint: "選択してください",
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedUniversity = value;
-                      _selectedFaculty = null;
-                      _selectedDepartment = null;
-                      if (_selectedUniversity != null)
-                        getDataFromFireStore(_facultyEvents, apiMode.faculty,
-                            _selectedUniversity);
-                    });
-                  },
-                  isExpanded: true,
-                );
-              }),
-          SizedBox(height: 20),
-          buildLabel('学部名'),
-          StreamBuilder(
-              stream: _facultyEvents.stream,
-              builder: (BuildContext context, snapshot) {
-                return AbsorbPointer(
-                    absorbing: _selectedUniversity == null ||
-                        checkDamiMenu(snapshot.data),
-                    child: SearchChoices.single(
-                      items: _selectedUniversity == null
-                          ? _emptyItems
-                          : snapshot.data,
-                      value: _selectedFaculty,
-                      hint: "選択してください",
-                      searchHint: "選択してください",
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedFaculty = value;
-                          _selectedDepartment = null;
-                          if (_selectedFaculty != null)
-                            getDataFromFireStore(
-                                _departmentEvents,
-                                apiMode.department,
-                                _selectedUniversity,
-                                _selectedFaculty);
-                        });
-                      },
-                      isExpanded: true,
-                    ));
-              }),
-          SizedBox(height: 20),
-          buildLabel('学科名'),
-          StreamBuilder(
-              stream: _departmentEvents.stream,
-              builder: (BuildContext context, snapshot) {
-                return AbsorbPointer(
-                    absorbing: _selectedUniversity == null ||
-                        _selectedFaculty == null ||
-                        checkDamiMenu(snapshot.data),
-                    child: SearchChoices.single(
-                      items: _selectedUniversity == null ||
-                              _selectedFaculty == null
-                          ? _emptyItems
-                          : snapshot.data,
-                      value: _selectedDepartment,
-                      hint: "選択してください",
-                      searchHint: "選択してください",
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedDepartment = value;
-                        });
-                      },
-                      isExpanded: true,
-                    ));
-              }),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              buildLabel('大学名'),
+              Flexible(
+                child: StreamBuilder(
+                    stream: _universityEvents.stream,
+                    builder: (BuildContext context, snapshot) {
+                      return SearchChoices.single(
+                        items:
+                            snapshot.data == null ? _emptyItems : snapshot.data,
+                        value: _selectedUniversity,
+                        hint: "選択してください",
+                        searchHint: "選択してください",
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedUniversity = value;
+                            _selectedFaculty = null;
+                            _selectedDepartment = null;
+                            if (_selectedUniversity != null)
+                              getDataFromFireStore(_facultyEvents,
+                                  apiMode.faculty, _selectedUniversity);
+                          });
+                        },
+                        isExpanded: true,
+                      );
+                    }),
+              ),
+            ],
+          ),
+          SizedBox(height: 5),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              buildLabel('学部名'),
+              Flexible(
+                child: StreamBuilder(
+                    stream: _facultyEvents.stream,
+                    builder: (BuildContext context, snapshot) {
+                      return AbsorbPointer(
+                          absorbing: _selectedUniversity == null ||
+                              checkDamiMenu(snapshot.data),
+                          child: SearchChoices.single(
+                            items: _selectedUniversity == null
+                                ? _emptyItems
+                                : snapshot.data,
+                            value: _selectedFaculty,
+                            hint: "選択してください",
+                            searchHint: "選択してください",
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedFaculty = value;
+                                _selectedDepartment = null;
+                                if (_selectedFaculty != null)
+                                  getDataFromFireStore(
+                                      _departmentEvents,
+                                      apiMode.department,
+                                      _selectedUniversity,
+                                      _selectedFaculty);
+                              });
+                            },
+                            isExpanded: true,
+                          ));
+                    }),
+              ),
+            ],
+          ),
+          SizedBox(height: 5),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              buildLabel('学科名'),
+              Flexible(
+                child: StreamBuilder(
+                    stream: _departmentEvents.stream,
+                    builder: (BuildContext context, snapshot) {
+                      return AbsorbPointer(
+                          absorbing: _selectedUniversity == null ||
+                              _selectedFaculty == null ||
+                              checkDamiMenu(snapshot.data),
+                          child: SearchChoices.single(
+                            items: _selectedUniversity == null ||
+                                    _selectedFaculty == null
+                                ? _emptyItems
+                                : snapshot.data,
+                            value: _selectedDepartment,
+                            hint: "選択してください",
+                            searchHint: "選択してください",
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedDepartment = value;
+                              });
+                            },
+                            isExpanded: true,
+                          ));
+                    }),
+              )
+            ],
+          ),
           Expanded(
             child: FutureBuilder(
                 future: getUsersFromFireStore(
