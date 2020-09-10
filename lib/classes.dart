@@ -16,9 +16,19 @@ class Classes extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: primaryColor),
+        shape: UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
         title: Text(
           '授業登録',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          style: TextStyle(color: themeColor, fontSize: 23, letterSpacing: 2.0,
+              // fontWeight: FontWeight.bold,
+              shadows: <Shadow>[
+                Shadow(
+                    offset: Offset(0, 2.0),
+                    blurRadius: 3.0,
+                    color: Color.fromARGB(125, 0, 0, 0))
+              ]),
         ),
         centerTitle: true,
       ),
