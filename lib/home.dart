@@ -35,7 +35,7 @@ class HomeScreenState extends State<HomeScreen> {
   List<Choice> choices = const <Choice>[
     const Choice(title: 'ログアウト', icon: Icons.exit_to_app),
   ];
-  List<String> titles = ['探す', 'トーク', 'タイムライン', 'アカウント'];
+  List<String> titles = ['探す', 'トーク一覧', 'タイムライン', 'アカウント'];
 
   PageController _pageController;
   int _page = 0;
