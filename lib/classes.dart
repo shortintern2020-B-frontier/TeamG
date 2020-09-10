@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hikomaryu/const.dart';
+import 'package:hikomaryu/widget/loading.dart';
 import 'package:search_choices/search_choices.dart';
 
 class Classes extends StatelessWidget {
@@ -52,19 +52,7 @@ class ClassesScreen extends StatefulWidget {
 }
 
 class ClassesScreenState extends State<ClassesScreen> {
-  bool asTabs = false;
-
   List<DropdownMenuItem> lessonItems = [];
-  // List<DropdownMenuItem> lessonItems = [
-  //   DropdownMenuItem(child: Text('経済学'), value: '経済学'),
-  //   DropdownMenuItem(child: Text('マクロ経済学'), value: 'マクロ経済学'),
-  //   DropdownMenuItem(child: Text('線形代数'), value: '線形代数'),
-  //   DropdownMenuItem(child: Text('複素関数'), value: '複素関数'),
-  //   DropdownMenuItem(child: Text('熱力学'), value: '熱力学'),
-  //   DropdownMenuItem(child: Text('プログラミング工学'), value: 'プログラミング工学'),
-  //   DropdownMenuItem(child: Text('English1'), value: 'English1'),
-  // ];
-
   List<int> lessonSelectedItems = [];
   final _formKey = GlobalKey<FormState>();
   String inputString = "";
@@ -82,11 +70,9 @@ class ClassesScreenState extends State<ClassesScreen> {
 
   @override
   void initState() {
-    super.initState();
-
     input = TextFormField(
       validator: (value) {
-        return (value.length < 4 ? "must be at least 4 characters long" : null);
+        return (value.length == 0 ? "授業名が未入力です" : null);
       },
       initialValue: inputString,
       onChanged: (value) {
@@ -95,26 +81,7 @@ class ClassesScreenState extends State<ClassesScreen> {
       autofocus: true,
     );
 
-    loadClasses();
-  }
-
-  void loadClasses() async {
-    // await FirebaseFirestore.instance
-    //     .collection('classes')
-    //     .orderBy(FieldPath.documentId)
-    //     .startAt([university])
-    //     .endAt([university + '\uf8ff'])
-    //     .get()
-    //     .then((value) => {
-    //           value.docs.forEach((document) {
-    //             String lesson = document.id.split('-')[1];
-    //             lessonItems
-    //                 .add(DropdownMenuItem(child: Text(lesson), value: lesson));
-    //           })
-    //         });
-    // await FirebaseFirestore.instance.collection('users').doc(currentUserId).get().then((value) => {
-    //   lessonSelectedItems =
-    // });
+    super.initState();
   }
 
   addItemDialog() async {
@@ -162,73 +129,102 @@ class ClassesScreenState extends State<ClassesScreen> {
       "授業を登録": SearchChoices.multiple(
         items: lessonItems,
         selectedItems: lessonSelectedItems,
+        readOnly: !isMyProfile,
+        displayClearIcon: false,
         hint: "授業を選択してください",
         searchHint: "授業を選択してください",
         disabledHint: (Function updateParent) {
-          return (FlatButton(
-            onPressed: () {
-              addItemDialog().then((value) async {
-                if (value != null) {
-                  lessonSelectedItems = [0];
-                  updateParent(lessonSelectedItems);
-                }
-              });
-            },
-            child: Text("授業を選択してください"),
-          ));
-        },
-        closeButton: (List<int> values, BuildContext closeContext,
-            Function updateParent) {
-          return (lessonItems.length >= 100
-              ? "Close"
-              : FlatButton(
+          return isMyProfile
+              ? FlatButton(
                   onPressed: () {
                     addItemDialog().then((value) async {
                       if (value != null) {
-                        int itemIndex = lessonItems
-                            .indexWhere((element) => element.value == value);
-                        if (itemIndex != -1) {
-                          lessonSelectedItems.add(itemIndex);
-                          Navigator.pop(ClassesScreen
-                              .navKey.currentState.overlay.context);
-                          updateParent(lessonSelectedItems);
-                        }
+                        lessonSelectedItems = [0];
+                        updateParent(lessonSelectedItems);
                       }
                     });
                   },
-                  child: Text("授業を追加"),
-                ));
+                  child: Text("授業を選択してください"),
+                )
+              : Text("授業が登録されていません");
         },
-        onChanged: (values) {
-          setState(() {
-            if (!(values is NotGiven)) {
-              lessonSelectedItems = values;
-            }
-          });
-          values.forEach((int index) {
-            setState(() {
-              lessonSelectedItems = values;
+        closeButton: (List<int> values, BuildContext closeContext,
+            Function updateParent) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              RaisedButton(
+                onPressed: () {
+                  addItemDialog().then((value) async {
+                    if (value == null) return;
 
-              DocumentReference lesson = FirebaseFirestore.instance
-                  .collection('classes')
-                  .doc("$university-${lessonItems[index].value}");
-              lesson.get().then((snapshot) => {
-                    if (snapshot.data() == null)
-                      {
+                    DocumentReference lesson = FirebaseFirestore.instance
+                        .collection('classes')
+                        .doc("$university-$value");
+                    lesson.get().then((snapshot) {
+                      if (snapshot.data() == null) {
                         lesson.set({
                           'uids': FieldValue.arrayUnion([currentUserId])
-                        })
-                      }
-                    else
-                      {
+                        });
+                      } else {
                         lesson.update({
                           'uids': FieldValue.arrayUnion([currentUserId])
-                        })
+                        });
                       }
+                    });
+
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(currentUserId)
+                        .update({
+                      'classes': FieldValue.arrayUnion([value])
+                    });
+
+                    Navigator.pop(closeContext);
                   });
-            });
-          });
+                },
+                child: Text("授業を追加"),
+              ),
+              RaisedButton(
+                  onPressed: () {
+                    setState(() {
+                      lessonSelectedItems = values;
+                    });
+
+                    List<String> selectedLessonNames = [];
+                    values.forEach((int index) {
+                      selectedLessonNames.add(lessonItems[index].value);
+                    });
+
+                    lessonItems.forEach((lessonItem) {
+                      DocumentReference lesson = FirebaseFirestore.instance
+                          .collection('classes')
+                          .doc("$university-${lessonItem.value}");
+
+                      if (selectedLessonNames.contains(lessonItem.value)) {
+                        lesson.update({
+                          'uids': FieldValue.arrayUnion([currentUserId])
+                        });
+                      } else {
+                        lesson.update({
+                          'uids': FieldValue.arrayRemove([currentUserId])
+                        });
+                      }
+                    });
+
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(currentUserId)
+                        .update({'classes': selectedLessonNames});
+
+                    Navigator.pop(closeContext);
+                    setState(() {});
+                  },
+                  child: Text("保存"))
+            ],
+          );
         },
+        onChanged: (values) {},
         displayItem: (item, selected, Function updateParent) {
           return (Row(children: [
             selected
@@ -244,150 +240,150 @@ class ClassesScreenState extends State<ClassesScreen> {
             Expanded(
               child: item,
             ),
-            IconButton(
-              icon: Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
-              onPressed: () {
-                int indexOfItem = lessonItems.indexOf(item);
-                lessonItems.removeWhere((element) => item == element);
-                lessonSelectedItems
-                    .removeWhere((element) => element == indexOfItem);
-                for (int i = 0; i < lessonSelectedItems.length; i++) {
-                  if (lessonSelectedItems[i] > indexOfItem) {
-                    lessonSelectedItems[i]--;
-                  }
-                }
-                updateParent(lessonSelectedItems);
-                setState(() {});
-              },
-            ),
+            // 削除はしない
+            // IconButton(
+            //   icon: Icon(
+            //     Icons.delete,
+            //     color: Colors.red,
+            //   ),
+            //   onPressed: () {
+            //     int indexOfItem = lessonItems.indexOf(item);
+            //     lessonItems.removeWhere((element) => item == element);
+            //     lessonSelectedItems
+            //         .removeWhere((element) => element == indexOfItem);
+            //     for (int i = 0; i < lessonSelectedItems.length; i++) {
+            //       if (lessonSelectedItems[i] > indexOfItem) {
+            //         lessonSelectedItems[i]--;
+            //       }
+            //     }
+            //     updateParent(lessonSelectedItems);
+            //     setState(() {});
+            //   },
+            // ),
           ]));
         },
         dialogBox: true,
         isExpanded: true,
-        doneButton: "Done",
+        doneButton: (selectedItemsDone, doneContext) {
+          return FlatButton(
+              onPressed: () {
+                Navigator.pop(doneContext);
+                setState(() {});
+              },
+              child: Icon(Icons.close));
+        },
       )
     };
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: FirebaseFirestore.instance
+    return StreamBuilder(
+        stream: FirebaseFirestore.instance
             .collection('classes')
             .orderBy(FieldPath.documentId)
-            .startAt([university]).endAt([university + '\uf8ff']).get(),
+            .startAt([university]).endAt([university + '\uf8ff']).snapshots(),
         builder: (context, lessonSnapshot) {
           if (!lessonSnapshot.hasData) {
-            return Center(
-                child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
+            return Loading();
           }
 
-          lessonItems = [];
-          lessonSnapshot.data.docs.forEach((document) {
-            String lesson = document.id.split('-')[1];
-            lessonItems
-                .add(DropdownMenuItem(child: Text(lesson), value: lesson));
-          });
+          return StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(currentUserId)
+                  .snapshots(),
+              builder: (context, userSnapshot) {
+                if (!userSnapshot.hasData) {
+                  return Loading();
+                }
 
-          Map<String, Widget> widgets = getWidgets();
-          return asTabs
-              ? DefaultTabController(
-                  length: widgets.length,
-                  child: Scaffold(
-                    body: Container(
-                      padding: EdgeInsets.all(20),
-                      child: TabBarView(
-                        children: widgets
-                            .map((k, v) {
-                              return (MapEntry(
-                                  k,
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child: Column(children: [
-                                      Text(k),
-                                      SizedBox(
-                                        height: 20,
-                                      ),
-                                      v,
-                                    ]),
-                                  )));
-                            })
-                            .values
-                            .toList(),
-                      ),
-                    ),
-                  ),
-                )
-              : Scaffold(
-                  body: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(top: 15.0),
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 2.0,
-                                offset: Offset(0, 4),
+                lessonItems = [];
+                lessonSelectedItems = [];
+                var docs = lessonSnapshot.data.docs;
+                for (var i = 0; i < docs.length; i++) {
+                  String lesson = docs[i].id.split('-')[1];
+                  lessonItems.add(
+                      DropdownMenuItem(child: Text(lesson), value: lesson));
+                  if (userSnapshot.data.data()['classes'].contains(lesson)) {
+                    lessonSelectedItems.add(i);
+                  }
+                }
+
+                Map<String, Widget> widgets = getWidgets();
+                return MaterialApp(
+                    navigatorKey: ClassesScreen.navKey,
+                    debugShowCheckedModeBanner: false,
+                    home: Scaffold(
+                      body: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(top: 15.0),
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 2.0,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Container(
-                              width: 220,
-                              height: 60,
-                              color: orangeColor,
-                              child: Center(
-                                child: Text(
-                                  //title
-                                  '履修授業登録',
-                                  style: TextStyle(
-                                    color: primaryColor,
-                                    backgroundColor: orangeColor,
-                                    fontSize: 30,
+                              child: Container(
+                                width: 220,
+                                height: 60,
+                                color: orangeColor,
+                                child: Center(
+                                  child: Text(
+                                    //title
+                                    '履修授業登録',
+                                    style: TextStyle(
+                                      color: primaryColor,
+                                      backgroundColor: orangeColor,
+                                      fontSize: 30,
+                                    ),
                                   ),
                                 ),
-                              )),
-                        ),
-                        Column(
-                          children: widgets
-                              .map((k, v) {
-                                return (MapEntry(
-                                    k,
-                                    Center(
+                              ),
+                            ),
+                            Column(
+                              children: widgets
+                                  .map((k, v) {
+                                    return (MapEntry(
+                                      k,
+                                      Center(
                                         child: Card(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              side: BorderSide(
-                                                color: Colors.grey,
-                                                width: 1.0,
-                                              ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            side: BorderSide(
+                                              color: Colors.grey,
+                                              width: 1.0,
                                             ),
-                                            margin: EdgeInsets.all(20),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(20.0),
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Text("$k:"),
-                                                  v,
-                                                ],
-                                              ),
-                                            )))));
-                              })
-                              .values
-                              .toList(),
+                                          ),
+                                          margin: EdgeInsets.all(20),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Text("$k:"),
+                                                v,
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ));
+                                  })
+                                  .values
+                                  .toList(),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                );
+                      ),
+                    ));
+              });
         });
   }
 }
