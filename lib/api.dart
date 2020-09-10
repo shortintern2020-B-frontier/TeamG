@@ -67,6 +67,7 @@ void makeDropdownMenu(StreamController<List<DropdownMenuItem<String>>> events,
     [String university = '', String faculty = '']) async {
   List<String> list =
       await getList(mode, prefectures[prefecture], university, faculty);
+  if (list.length == 0) list.add('');
   events.add(makeDropdowmMenuFromStringList(list));
 }
 
