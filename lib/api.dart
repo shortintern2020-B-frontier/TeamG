@@ -70,17 +70,6 @@ void makeDropdownMenu(StreamController<List<DropdownMenuItem<String>>> events,
   events.add(makeDropdowmMenuFromStringList(list));
 }
 
-// この関数は一旦放置
-// Future<void> getClassesFireStore() async {
-//   QuerySnapshot classSnapShot =
-//       await FirebaseFirestore.instance.collection("classes").get();
-//   for (var i = 0; i < classSnapShot.docs.length; i++) {
-//     if (!classesList.contains(classSnapShot.docs[i].data()["class"]))
-//       classesList.add(classSnapShot.docs[i].data()["class"]);
-//   }
-//   return classesList;
-// }
-
 void getDataFromFireStore(
     StreamController<List<DropdownMenuItem<String>>> events, apiMode mode,
     [String universityName = '', String faculityName = '']) async {
@@ -121,6 +110,37 @@ void getDataFromFireStore(
   }
   if (list.length == 0) list.add('');
   events.add(makeDropdowmMenuFromStringList(list));
+}
+
+Future<QuerySnapshot> getUsersClassesFromFireStore(
+    String currentUserId, String university, List<String> classesList) async {
+  if (classesList == null || classesList.length == 0) {
+    return null;
+  } else {
+    List<String> userIds = [];
+    await Future.forEach(classesList, (classItem) async {
+      await FirebaseFirestore.instance
+          .collection('classes')
+          .doc("$university-$classItem")
+          .get()
+          .then((content) {
+        if (content.data()["uids"] != null &&
+            content.data()["uids"].length != 0) {
+          for (String uid in content.data()["uids"]) {
+            if (!userIds.contains(uid) && uid != currentUserId) {
+              userIds.add(uid);
+            }
+          }
+        }
+      });
+    });
+    if (userIds.length == 0) return null;
+    QuerySnapshot userSnapShot = await FirebaseFirestore.instance
+        .collection("users")
+        .where('id', whereIn: userIds)
+        .get();
+    return userSnapShot;
+  }
 }
 
 Future<QuerySnapshot> getUsersFromFireStore(
