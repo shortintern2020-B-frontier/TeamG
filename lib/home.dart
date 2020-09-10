@@ -9,6 +9,7 @@ import 'package:hikomaryu/timeline.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
 import 'package:hikomaryu/search.dart';
+import 'package:hikomaryu/classes2.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -195,7 +196,11 @@ class HomeScreenState extends State<HomeScreen> {
                         });
                       },
                       children: [
-                        new Search(),
+                        new SearchScreen(
+                            currentUserId: currentUserId,
+                            university: snapshot.data.docs
+                                .firstWhere((doc) => doc.id == currentUserId)
+                                .data()["university"]),
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
                         new Timeline(currentUserId: currentUserId),
