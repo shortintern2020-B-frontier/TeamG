@@ -78,12 +78,12 @@ class LoginScreenState extends State<LoginScreen> {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: _emailController.text, password: _passwordController.text);
 
-      Fluttertoast.showToast(
-          msg: loginMsgs['success'], backgroundColor: themeColor);
+      // 成功した場合は表示させない
+      // Fluttertoast.showToast(
+      //     msg: loginMsgs['success'], backgroundColor: themeColor);
       this.setState(() {
         _isLoading = false;
       });
-      // print('ログイン成功!!!!!!');
 
       final QuerySnapshot result = await FirebaseFirestore.instance
           .collection('users')
@@ -97,8 +97,6 @@ class LoginScreenState extends State<LoginScreen> {
       await _prefs.setString('photoUrl', documents[0].data()['photoUrl']);
       await _prefs.setString('aboutMe', documents[0].data()['aboutMe']);
 
-      Fluttertoast.showToast(
-          msg: loginMsgs['success'], backgroundColor: themeColor);
       this.setState(() {
         _isLoading = false;
       });
@@ -151,7 +149,8 @@ class LoginScreenState extends State<LoginScreen> {
                       children: <Widget>[
                         TextFormField(
                           controller: _emailController,
-                          decoration: const InputDecoration(labelText: 'Email'),
+                          decoration:
+                              const InputDecoration(labelText: 'メールアドレス'),
                           validator: (String value) {
                             if (value.isEmpty) {
                               return textFieldMsgs['required'];
@@ -165,8 +164,7 @@ class LoginScreenState extends State<LoginScreen> {
                         TextFormField(
                           obscureText: true,
                           controller: _passwordController,
-                          decoration:
-                              const InputDecoration(labelText: 'Password'),
+                          decoration: const InputDecoration(labelText: 'パスワード'),
                           validator: (String value) {
                             if (value.isEmpty) {
                               return textFieldMsgs['required'];
@@ -181,7 +179,7 @@ class LoginScreenState extends State<LoginScreen> {
                 Container(
                   alignment: Alignment.center,
                   child: MaterialButton(
-                    child: const Text('Log in'),
+                    child: const Text('ログイン'),
                     minWidth: 200,
                     color: themeColor,
                     textColor: Colors.white,
@@ -198,7 +196,7 @@ class LoginScreenState extends State<LoginScreen> {
                 Container(
                   alignment: Alignment.center,
                   child: MaterialButton(
-                    child: const Text('Sign up'),
+                    child: const Text('新規登録'),
                     minWidth: 200,
                     textColor: themeColor,
                     shape: OutlineInputBorder(

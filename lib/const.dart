@@ -12,35 +12,63 @@ final baseApiUrl =
     'http://webservice.recruit.co.jp/shingaku/school/v1/?key=$apiKey&format=json';
 enum apiMode { university, faculty, department }
 
+// final textFieldMsgs = {
+//   'required': 'Please enter some text',
+//   'uni-email-need': 'Please enter your university email address'
+// };
 final textFieldMsgs = {
-  'required': 'Please enter some text',
-  'uni-email-need': 'Please enter your university email address'
+  'required': '必須項目です',
+  'uni-email-need': '大学のメールアドレスを登録してください'
 };
 
+// final signUpMsgs = {
+//   'success': 'Sign up success',
+//   'weak-password': 'The password provided is too weak',
+//   'email-already-in-use': 'The account already exists for that email',
+//   'invalid-email': 'Invalid format for an e-mail address',
+//   'other': 'Sign up failed'
+// };
 final signUpMsgs = {
-  'success': 'Sign up success',
-  'weak-password': 'The password provided is too weak',
-  'email-already-in-use': 'The account already exists for that email',
-  'invalid-email': 'Invalid format for an e-mail address',
-  'other': 'Sign up failed'
+  'success': '新規登録に成功しました',
+  'weak-password': 'パスワードが短すぎます',
+  'email-already-in-use': 'そのメールアドレスは既に使用されています',
+  'invalid-email': 'メールアドレスの形式が異なります',
+  'other': '新規登録に失敗しました'
 };
 
+// final loginMsgs = {
+//   'success': 'Login success',
+//   'user-not-found': 'No user found for that email',
+//   'wrong-password': 'Wrong password provided for that user',
+//   'invalid-email': 'Invalid format for an e-mail address',
+//   'other': 'Login failed'
+// };
 final loginMsgs = {
-  'success': 'Login success',
-  'user-not-found': 'No user found for that email',
-  'wrong-password': 'Wrong password provided for that user',
-  'invalid-email': 'Invalid format for an e-mail address',
-  'other': 'Login failed'
+  'success': 'ログインに成功しました',
+  'user-not-found': 'そのユーザーは登録されていません',
+  'wrong-password': 'パスワードが間違っています',
+  'invalid-email': 'メールアドレスの形式が異なります',
+  'other': 'ログインに失敗しました'
 };
 
+// final choiceMsgs = {
+//   'ph': 'Please select',
+//   'psh': null, //'都道府県名を入力してください',
+//   'uh': 'Please select',
+//   'ush': null, //'大学名を入力してください',
+//   'fh': 'Please select',
+//   'fsh': null, //'学部名を入力してください',
+//   'dh': 'Please select',
+//   'dsh': null, //'学科名を入力してください'
+// };
 final choiceMsgs = {
-  'ph': 'Please select',
+  'ph': '選択してください',
   'psh': null, //'都道府県名を入力してください',
-  'uh': 'Please select',
+  'uh': '選択してください',
   'ush': null, //'大学名を入力してください',
-  'fh': 'Please select',
+  'fh': '選択してください',
   'fsh': null, //'学部名を入力してください',
-  'dh': 'Please select',
+  'dh': '選択してください',
   'dsh': null, //'学科名を入力してください'
 };
 
