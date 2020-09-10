@@ -10,6 +10,7 @@ import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
 import 'package:hikomaryu/classes.dart';
 import 'package:hikomaryu/search.dart';
+import 'package:hikomaryu/classes2.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -34,7 +35,12 @@ class HomeScreenState extends State<HomeScreen> {
 
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
-    const Choice(title: 'ログアウト', icon: Icons.exit_to_app),
+    // const Choice(title: '設定', icon: Icons.settings),
+    // const Choice(title: 'ログアウト', icon: Icons.exit_to_app),
+    const Choice(title: 'Settings', icon: Icons.settings),
+    const Choice(title: 'Classes', icon: Icons.school),
+    const Choice(title: 'Log out', icon: Icons.exit_to_app),
+
   ];
   List<String> titles = ['探す', 'トーク', 'タイムライン', 'アカウント'];
 
