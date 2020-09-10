@@ -19,31 +19,6 @@ List<DropdownMenuItem<String>> makeDropdowmMenuFromStringList(
   return menu;
 }
 
-<<<<<<< HEAD
-Future<List<String>> getList(
-    apiMode mode, String prefCd, String university, String faculty) async {
-  String url =
-      baseApiUrl + '&pref_cd=$prefCd&name=$university&faculty=$faculty';
-  List<String> list = [];
-  var res = await http.get(url);
-  if (res.statusCode == 200) {
-    var jsRes = convert.jsonDecode(res.body);
-    if (mode == apiMode.university) {
-      var jsRes = convert.jsonDecode(res.body);
-      jsRes['results']['school'].forEach((item) => list.add(item['name']));
-    } else if (mode == apiMode.faculty) {
-      if (res.statusCode == 200) {
-        var jsRes = convert.jsonDecode(res.body);
-        jsRes['results']['school'][0]['faculty']
-            .forEach((item) => list.add(item['name']));
-      }
-    } else if (mode == apiMode.department) {
-      jsRes['results']['school'][0]['faculty'].forEach((item) {
-        if (item['name'] == faculty) {
-          list = item['department'].cast<String>() as List<String>;
-        }
-      });
-=======
 void getItem(apiMode mode, Response res, String faculty, List<String> list) {
   if (res.statusCode != 200) return;
 
@@ -81,7 +56,6 @@ Future<List<String>> getList(
       String requestUrl = url + '&start=${i * 100}';
       res = await http.get(requestUrl);
       getItem(mode, res, faculty, list);
->>>>>>> develop
     }
   }
   return list;
