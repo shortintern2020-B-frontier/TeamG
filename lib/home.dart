@@ -9,7 +9,6 @@ import 'package:hikomaryu/timeline.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
 import 'package:hikomaryu/search.dart';
-import 'package:hikomaryu/classes2.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
