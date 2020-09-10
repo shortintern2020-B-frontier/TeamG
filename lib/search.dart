@@ -11,9 +11,9 @@ import 'const.dart';
 
 class Search extends StatefulWidget {
   static final navKey = new GlobalKey<NavigatorState>();
-  Search({Key navKey, this.title}) : super(key: navKey);
+  final String currentUserId;
 
-  final String title;
+  Search({Key key, @required this.currentUserId}) : super(key: key);
 
   @override
   SearchState createState() => SearchState();
@@ -29,6 +29,22 @@ class SearchState extends State<Search> {
   StreamController<List<DropdownMenuItem<String>>> _universityEvents;
   StreamController<List<DropdownMenuItem<String>>> _facultyEvents;
   StreamController<List<DropdownMenuItem<String>>> _departmentEvents;
+  StreamController<List<DropdownMenuItem<String>>> _classesEvents;
+
+  final _formKey = GlobalKey<FormState>();
+  String inputString = "";
+  TextFormField input;
+  List<DropdownMenuItem<String>> _classesList = [
+    // DropdownMenuItem(child: Text('経済学'), value: '経済学'),
+    // DropdownMenuItem(child: Text('マクロ経済学'), value: 'マクロ経済学'),
+    // DropdownMenuItem(child: Text('線形代数'), value: '線形代数'),
+    // DropdownMenuItem(child: Text('複素関数'), value: '複素関数'),
+    // DropdownMenuItem(child: Text('熱力学'), value: '熱力学'),
+    // DropdownMenuItem(child: Text('プログラミング工学'), value: 'プログラミング工学'),
+    // DropdownMenuItem(child: Text('English1'), value: 'English1'),
+  ];
+  List<int> _classes = [];
+  String _university;
 
   @override
   void initState() {
@@ -37,15 +53,20 @@ class SearchState extends State<Search> {
     _universityEvents = StreamController<List<DropdownMenuItem<String>>>();
     _facultyEvents = StreamController<List<DropdownMenuItem<String>>>();
     _departmentEvents = StreamController<List<DropdownMenuItem<String>>>();
+    _classesEvents = StreamController<List<DropdownMenuItem<String>>>();
 
     getDataFromFireStore(_universityEvents, apiMode.university);
     _facultyEvents.add(_emptyItems);
     _departmentEvents.add(_emptyItems);
 
+    getUserUniversityAndClasses(
+        widget.currentUserId, _university, _classesList);
+    _classesEvents.add(_classesList);
+
     super.initState();
   }
 
-  bool checkDamiMenu(List<DropdownMenuItem<String>> snapshotData) {
+  bool checkDummyMenu(List<DropdownMenuItem<String>> snapshotData) {
     if (snapshotData.length == 1 && snapshotData[0].value.length == 0)
       return true;
     return false;
@@ -151,6 +172,46 @@ class SearchState extends State<Search> {
     );
   }
 
+  addItemDialog() async {
+    return await showDialog(
+      context: Search.navKey.currentState.overlay.context,
+      builder: (BuildContext alertContext) {
+        return (AlertDialog(
+          title: Text("授業を追加してください"),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                input,
+                FlatButton(
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      setState(() {
+                        _classesList.add(DropdownMenuItem(
+                          child: Text(inputString),
+                          value: inputString,
+                        ));
+                      });
+                      Navigator.pop(alertContext, inputString);
+                    }
+                  },
+                  child: Text("Ok"),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(alertContext, null);
+                  },
+                  child: Text("Cancel"),
+                ),
+              ],
+            ),
+          ),
+        ));
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -199,7 +260,7 @@ class SearchState extends State<Search> {
                     builder: (BuildContext context, snapshot) {
                       return AbsorbPointer(
                           absorbing: _selectedUniversity == null ||
-                              checkDamiMenu(snapshot.data),
+                              checkDummyMenu(snapshot.data),
                           child: SearchChoices.single(
                             items: _selectedUniversity == null
                                 ? _emptyItems
@@ -237,7 +298,7 @@ class SearchState extends State<Search> {
                       return AbsorbPointer(
                           absorbing: _selectedUniversity == null ||
                               _selectedFaculty == null ||
-                              checkDamiMenu(snapshot.data),
+                              checkDummyMenu(snapshot.data),
                           child: SearchChoices.single(
                             items: _selectedUniversity == null ||
                                     _selectedFaculty == null
@@ -253,6 +314,66 @@ class SearchState extends State<Search> {
                             },
                             isExpanded: true,
                           ));
+                    }),
+              )
+            ],
+          ),
+          SizedBox(height: 5),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              buildLabel('授業名'),
+              Flexible(
+                child: StreamBuilder(
+                    stream: _classesEvents.stream,
+                    builder: (BuildContext context, snapshot) {
+                      return SearchChoices.multiple(
+                        icon: Icon(Icons.edit),
+                        items:
+                            snapshot.data == null ? _emptyItems : snapshot.data,
+                        selectedItems: _classes,
+                        onChanged: (value) {
+                          addItemDialog().then((value) async {
+                            if (value != null) {
+                              _classes = [0];
+                              // UpdateParent(_classes); // 何のためにあるのか？
+                            }
+                          });
+                          /* // ここはデータアップデートなのでいらない？
+                            value.forEach((int index) {
+                              setState(() {
+                                _classes = value;
+
+                                DocumentReference lesson = FirebaseFirestore
+                                    .instance
+                                    .collection('classes')
+                                    .doc(
+                                        "$_university-${_classesList[index].value}");
+                                lesson.get().then((snapshot) => {
+                                      if (snapshot.data() == null)
+                                        {
+                                          lesson.set({
+                                            'uids': FieldValue.arrayUnion(
+                                                [widget.currentUserId])
+                                          })
+                                        }
+                                      else
+                                        {
+                                          lesson.update({
+                                            'uids': FieldValue.arrayUnion(
+                                                [widget.currentUserId])
+                                          })
+                                        }
+                                    });
+                              });
+                            });*/
+                        },
+                        dialogBox: false,
+                        isExpanded: true,
+                        menuConstraints:
+                            BoxConstraints.tight(Size.fromHeight(300)),
+                        // ),
+                      );
                     }),
               )
             ],
@@ -277,3 +398,7 @@ class SearchState extends State<Search> {
     );
   }
 }
+
+// class UpdateParent {
+//   UpdateParent(List<int> _classes);
+// }

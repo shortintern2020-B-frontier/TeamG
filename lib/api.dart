@@ -64,6 +64,22 @@ void makeDropdownMenu(StreamController<List<DropdownMenuItem<String>>> events,
 //   return classesList;
 // }
 
+void getUserUniversityAndClasses(String userId, String uni,
+    List<DropdownMenuItem<String>> classesList) async {
+  await FirebaseFirestore.instance
+      .collection("users")
+      .doc(userId)
+      .get()
+      .then((doc) {
+    uni = doc.data()["university"];
+    print(doc.data()["classes"].runtimeType);
+    print(doc.data()["classes"]);
+    print(userId);
+    classesList = makeDropdowmMenuFromStringList(
+        doc.data()["classes"].cast<String>() as List<String>);
+  });
+}
+
 void getDataFromFireStore(
     StreamController<List<DropdownMenuItem<String>>> events, apiMode mode,
     [String universityName = '', String faculityName = '']) async {
