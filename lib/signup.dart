@@ -192,7 +192,6 @@ class SignUpScreenState extends State<SignUpScreen> {
                             controller: _nicknameController,
                             decoration:
                                 const InputDecoration(labelText: 'ニックネーム'),
-
                             validator: (String value) =>
                                 isEmptyValidator(value)),
                         SizedBox(height: 50.0),
@@ -216,6 +215,12 @@ class SignUpScreenState extends State<SignUpScreen> {
                                 isExpanded: true,
                                 menuConstraints:
                                     BoxConstraints.tight(Size.fromHeight(350)),
+                                validator: (String value) {
+                                  if (value == null) {
+                                    return textFieldMsgs['required'];
+                                  }
+                                  return null;
+                                },
                                 onChanged: (value) {
                                   setState(() {
                                     _prefecturesValue = value;
@@ -259,9 +264,16 @@ class SignUpScreenState extends State<SignUpScreen> {
                                       isExpanded: true,
                                       menuConstraints: BoxConstraints.tight(
                                           Size.fromHeight(350)),
+                                      validator: (String value) {
+                                        if (value == null) {
+                                          return textFieldMsgs['required'];
+                                        }
+                                        return null;
+                                      },
                                       onChanged: (value) {
                                         setState(() {
                                           _universityValue = value;
+
                                           if (_universityValue == null) {
                                             _facultyEvents.add(_emptyItems);
                                             _departmentEvents.add(_emptyItems);
@@ -274,6 +286,12 @@ class SignUpScreenState extends State<SignUpScreen> {
                                                 _prefecturesValue,
                                                 _universityValue);
                                           }
+                                          ;
+                                          if (_formKey.currentState
+                                              .validate()) {
+                                            return textFieldMsgs['required'];
+                                          }
+                                          ;
                                         });
                                       },
                                     ),
@@ -335,7 +353,6 @@ class SignUpScreenState extends State<SignUpScreen> {
                               Container(
                                 padding: EdgeInsets.all(8),
                                 child: const Text('学科'),
-
                                 decoration: BoxDecoration(
                                   color: greyColor2,
                                   borderRadius: BorderRadius.circular(8),
