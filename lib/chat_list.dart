@@ -86,7 +86,6 @@ class ChatListState extends State<ChatList> {
                   clipBehavior: Clip.hardEdge,
                 ),
                 onTap: () {
-                  print(widget.currentUserId);
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: document.data()['id'], isMyProfile: false)));
                 },
