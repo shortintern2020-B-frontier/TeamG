@@ -201,43 +201,44 @@ class ChatScreenState extends State<ChatScreen> {
             Row(
               children: <Widget>[
                 isLastMessageLeft(index)
-                    ?
-                    FlatButton(
-                      child:
-                Material(
-                        child: peerAvatar != null && peerAvatar.isNotEmpty
-                            ? CachedNetworkImage(
-                                placeholder: (context, url) => Container(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 1.0,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        themeColor),
+                    ? FlatButton(
+                        child: Material(
+                          child: peerAvatar != null && peerAvatar.isNotEmpty
+                              ? CachedNetworkImage(
+                                  placeholder: (context, url) => Container(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.0,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          themeColor),
+                                    ),
+                                    width: 35.0,
+                                    height: 35.0,
+                                    padding: EdgeInsets.all(10.0),
                                   ),
+                                  imageUrl: peerAvatar,
                                   width: 35.0,
                                   height: 35.0,
-                                  padding: EdgeInsets.all(10.0),
+                                  fit: BoxFit.cover,
+                                )
+                              : Icon(
+                                  Icons.account_circle,
+                                  size: 50.0,
+                                  color: greyColor,
                                 ),
-                                imageUrl: peerAvatar,
-                                width: 35.0,
-                                height: 35.0,
-                                fit: BoxFit.cover,
-                              )
-                            : Icon(
-                                Icons.account_circle,
-                                size: 50.0,
-                                color: greyColor,
-                              ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(18.0),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(18.0),
+                          ),
+                          clipBehavior: Clip.hardEdge,
                         ),
-                        clipBehavior: Clip.hardEdge,
-                      ),
-                      onPressed: () {
-                        print('doc:::' + document.data()['idFrom']);
-                        Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: document.data()['idFrom'], isMyProfile: false)));
-                      },
-                    )
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ChatSettings(
+                                      currentUserId: document.data()['idFrom'],
+                                      isMyProfile: false)));
+                        },
+                      )
                     : Container(width: 35.0),
                 document.data()['type'] == 0
                     ? Container(
@@ -323,7 +324,7 @@ class ChatScreenState extends State<ChatScreen> {
             isLastMessageLeft(index)
                 ? Container(
                     child: Text(
-                      DateFormat('dd MMM kk:mm').format(
+                      DateFormat('MM/dd HH:mm').format(
                           DateTime.fromMillisecondsSinceEpoch(
                               int.parse(document.data()['timestamp']))),
                       style: TextStyle(
