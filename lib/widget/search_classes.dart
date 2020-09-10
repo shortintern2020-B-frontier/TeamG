@@ -24,35 +24,30 @@ class ClassesSearchScreen extends StatefulWidget {
 }
 
 class ClassesSearchScreenState extends State<ClassesSearchScreen> {
-  String _selectedUniversity;
-  String _selectedFaculty;
-  String _selectedDepartment;
-
-  List<DropdownMenuItem<String>> _emptyItems = [];
-
   StreamController<List<DropdownMenuItem<String>>> _universityEvents;
   StreamController<List<DropdownMenuItem<String>>> _facultyEvents;
   StreamController<List<DropdownMenuItem<String>>> _departmentEvents;
 
   final _formKey = GlobalKey<FormState>();
-  String inputString = "";
+  String inputString = '';
   TextFormField input;
 
-  List<DropdownMenuItem> lessonItems = [];
   List<int> lessonSelectedItems = [];
   List<String> stringLessonSelectedItems = [];
+  List<DropdownMenuItem<String>> _dummyItems = [];
+  List<DropdownMenuItem<String>> _lessonItems = [];
 
   @override
   void initState() {
-    _emptyItems = makeDropdowmMenuFromStringList(['']);
+    _dummyItems = makeDropdowmMenuFromStringList(['']);
 
     _universityEvents = StreamController<List<DropdownMenuItem<String>>>();
     _facultyEvents = StreamController<List<DropdownMenuItem<String>>>();
     _departmentEvents = StreamController<List<DropdownMenuItem<String>>>();
 
     getDataFromFireStore(_universityEvents, apiMode.university);
-    _facultyEvents.add(_emptyItems);
-    _departmentEvents.add(_emptyItems);
+    _facultyEvents.add(_dummyItems);
+    _departmentEvents.add(_dummyItems);
 
     super.initState();
   }
@@ -75,7 +70,7 @@ class ClassesSearchScreenState extends State<ClassesSearchScreen> {
       userBelongs += document.data()['department'];
     }
     if (document.data()['grade'] != null) {
-      userBelongs += '   ' + document.data()["grade"].toString() + "年";
+      userBelongs += '   ' + document.data()['grade'].toString() + '年';
     }
     return userBelongs;
   }
@@ -168,7 +163,7 @@ class ClassesSearchScreenState extends State<ClassesSearchScreen> {
       context: ClassesSearchScreen.navKey.currentState.overlay.context,
       builder: (BuildContext alertContext) {
         return (AlertDialog(
-          title: Text("授業を追加"),
+          title: Text('授業を追加'),
           content: Form(
             key: _formKey,
             child: Column(
@@ -179,21 +174,23 @@ class ClassesSearchScreenState extends State<ClassesSearchScreen> {
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
                       setState(() {
-                        lessonItems.add(DropdownMenuItem(
+                        _lessonItems.add(DropdownMenuItem(
                           child: Text(inputString),
                           value: inputString,
                         ));
+                        if (_lessonItems.length == 0)
+                          _lessonItems = _dummyItems;
                       });
                       Navigator.pop(alertContext, inputString);
                     }
                   },
-                  child: Text("Ok"),
+                  child: Text('Ok'),
                 ),
                 FlatButton(
                   onPressed: () {
                     Navigator.pop(alertContext, null);
                   },
-                  child: Text("Cancel"),
+                  child: Text('Cancel'),
                 ),
               ],
             ),
@@ -203,7 +200,7 @@ class ClassesSearchScreenState extends State<ClassesSearchScreen> {
     );
   }
 
-  Widget multiMenu() {
+  Widget buildMultiMenu() {
     return FutureBuilder(
         future: FirebaseFirestore.instance
             .collection('classes')
@@ -217,67 +214,66 @@ class ClassesSearchScreenState extends State<ClassesSearchScreen> {
                     valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
           }
 
-          lessonItems = [];
+          _lessonItems = [];
           lessonSnapshot.data.docs.forEach((document) {
             String lesson = document.id.split('-')[1];
-            lessonItems
+            _lessonItems
                 .add(DropdownMenuItem(child: Text(lesson), value: lesson));
           });
-
+          if (_lessonItems.length == 0) _lessonItems = _dummyItems;
           return SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            child: Column(
-              children: <Widget>[
-                SearchChoices.multiple(
-                  items: lessonItems,
-                  selectedItems: lessonSelectedItems,
-                  hint: "選択してください",
-                  searchHint: "選択してください",
-                  disabledHint: (Function updateParent) {
-                    return (FlatButton(
-                      onPressed: () {
-                        addItemDialog().then((value) async {
-                          if (value != null) {
-                            lessonSelectedItems = [0];
-                            updateParent(lessonSelectedItems);
-                          }
-                        });
-                      },
-                      child: Text("選択してください"),
-                    ));
-                  },
-                  onChanged: (values) {
-                    setState(() {
-                      if (!(values is NotGiven)) {
-                        lessonSelectedItems = values;
-                        stringLessonSelectedItems = [];
-                        for (int i in lessonSelectedItems) {
-                          stringLessonSelectedItems.add(lessonItems[i].value);
+            child: AbsorbPointer(
+              absorbing: checkDummyMenu(_lessonItems),
+              child: SearchChoices.multiple(
+                items: _lessonItems,
+                selectedItems: lessonSelectedItems,
+                hint: checkDummyMenu(_lessonItems) ? '選択できません' : '選択してください',
+                searchHint: '選択してください',
+                disabledHint: (Function updateParent) {
+                  return (FlatButton(
+                    onPressed: () {
+                      addItemDialog().then((value) async {
+                        if (value != null) {
+                          lessonSelectedItems = [0];
+                          updateParent(lessonSelectedItems);
                         }
+                      });
+                    },
+                    child: Text('選択してください'),
+                  ));
+                },
+                onChanged: (values) {
+                  setState(() {
+                    if (!(values is NotGiven)) {
+                      lessonSelectedItems = values;
+                      stringLessonSelectedItems = [];
+                      for (int i in lessonSelectedItems) {
+                        stringLessonSelectedItems.add(_lessonItems[i].value);
                       }
-                    });
-                  },
-                  displayItem: (item, selected, Function updateParent) {
-                    return (Row(children: <Widget>[
-                      selected
-                          ? Icon(
-                              Icons.check_box,
-                              color: Colors.black,
-                            )
-                          : Icon(
-                              Icons.check_box_outline_blank,
-                              color: Colors.black,
-                            ),
-                      SizedBox(width: 7),
-                      Expanded(
-                        child: item,
-                      ),
-                    ]));
-                  },
-                  dialogBox: true,
-                  isExpanded: true,
-                )
-              ],
+                    }
+                  });
+                },
+                displayItem: (item, selected, Function updateParent) {
+                  return (Row(children: <Widget>[
+                    selected
+                        ? Icon(
+                            Icons.check_box,
+                            color: Colors.black,
+                          )
+                        : Icon(
+                            Icons.check_box_outline_blank,
+                            color: Colors.black,
+                          ),
+                    SizedBox(width: 7),
+                    Expanded(
+                      child: item,
+                    ),
+                  ]));
+                },
+                dialogBox: true,
+                isExpanded: true,
+              ),
             ),
           );
         });
@@ -295,7 +291,7 @@ class ClassesSearchScreenState extends State<ClassesSearchScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 buildLabel('授業名'),
-                Flexible(child: multiMenu()),
+                Flexible(child: buildMultiMenu()),
               ],
             ),
           ),
@@ -305,14 +301,16 @@ class ClassesSearchScreenState extends State<ClassesSearchScreen> {
                 future: getUsersClassesFromFireStore(widget.currentUserId,
                     widget.university, stringLessonSelectedItems),
                 builder: (BuildContext context, snapshot) {
-                  return snapshot.data == null
-                      ? NothingDisplay()
-                      : ListView.builder(
-                          padding: EdgeInsets.all(10.0),
-                          itemBuilder: (context, index) => buildListItem(
-                              context, snapshot.data.documents[index]),
-                          itemCount: snapshot.data.documents.length,
-                        );
+                  return checkDummyMenu(_lessonItems)
+                      ? CannotSelect()
+                      : (snapshot.data == null
+                          ? NothingDisplay()
+                          : ListView.builder(
+                              padding: EdgeInsets.all(10.0),
+                              itemBuilder: (context, index) => buildListItem(
+                                  context, snapshot.data.documents[index]),
+                              itemCount: snapshot.data.documents.length,
+                            ));
                 }),
           ),
         ],
