@@ -4,6 +4,7 @@ import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart';
 
 import 'const.dart';
 
@@ -19,27 +20,43 @@ List<DropdownMenuItem<String>> makeDropdowmMenuFromStringList(
   return menu;
 }
 
+void getItem(apiMode mode, Response res, String faculty, List<String> list) {
+  if (res.statusCode != 200) return;
+
+  var jsRes = convert.jsonDecode(res.body);
+  if (mode == apiMode.university) {
+    jsRes['results']['school'].forEach((item) => list.add(item['name']));
+  } else if (mode == apiMode.faculty) {
+    jsRes['results']['school'][0]['faculty']
+        .forEach((item) => list.add(item['name']));
+  } else if (mode == apiMode.department) {
+    jsRes['results']['school'][0]['faculty'].forEach((item) {
+      if (item['name'] == faculty) {
+        list.addAll(item['department'].cast<String>() as List<String>);
+      }
+    });
+  }
+}
+
 Future<List<String>> getList(
     apiMode mode, String prefCd, String university, String faculty) async {
-  String url =
-      baseApiUrl + '&pref_cd=$prefCd&name=$university&faculty=$faculty';
+  String url = baseApiUrl +
+      '&pref_cd=$prefCd&name=$university&faculty=$faculty&count=100';
   List<String> list = [];
-  var res = await http.get(url);
+  Response res = await http.get(url);
+
   if (res.statusCode == 200) {
     var jsRes = convert.jsonDecode(res.body);
-    if (mode == apiMode.university) {
-      var jsRes = convert.jsonDecode(res.body);
-      jsRes['results']['school'].forEach((item) => list.add(item['name']));
-    } else if (mode == apiMode.faculty) {
-      var jsRes = convert.jsonDecode(res.body);
-      jsRes['results']['school'][0]['faculty']
-          .forEach((item) => list.add(item['name']));
-    } else if (mode == apiMode.department) {
-      jsRes['results']['school'][0]['faculty'].forEach((item) {
-        if (item['name'] == faculty) {
-          list = item['department'].cast<String>() as List<String>;
-        }
-      });
+    getItem(mode, res, faculty, list);
+
+    // 取得結果が100個以上の時に、残りを取得.
+    int resultsCount = jsRes['results']['results_available'];
+    resultsCount = (resultsCount / 100).ceil();
+
+    for (var i = 1; i < resultsCount; i++) {
+      String requestUrl = url + '&start=${i * 100}';
+      res = await http.get(requestUrl);
+      getItem(mode, res, faculty, list);
     }
   }
   return list;
