@@ -142,7 +142,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     FirebaseFirestore.instance.collection('users').doc(id).update({
       'nickname': nickname,
       'aboutMe': aboutMe,
-      'photoUrl': photoUrl
+      'photoUrl': photoUrl,
     }).then((data) async {
       await prefs.setString('nickname', nickname);
       await prefs.setString('aboutMe', aboutMe);
