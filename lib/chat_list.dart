@@ -55,32 +55,34 @@ class ChatListState extends State<ChatList> {
         child: FlatButton(
           child: Row(
             children: <Widget>[
-              Material(
-                child: document.data()['photoUrl'] != null &&
-                        document.data()['photoUrl'].isNotEmpty
-                    ? CachedNetworkImage(
-                        placeholder: (context, url) => Container(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.0,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(themeColor),
+              FlatButton(
+                child: Material(
+                  child: document.data()['photoUrl'] != null &&
+                          document.data()['photoUrl'].isNotEmpty
+                      ? CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.0,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(themeColor),
+                            ),
+                            width: 50.0,
+                            height: 50.0,
+                            padding: EdgeInsets.all(15.0),
                           ),
+                          imageUrl: document.data()['photoUrl'],
                           width: 50.0,
                           height: 50.0,
-                          padding: EdgeInsets.all(15.0),
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.account_circle,
+                          size: 50.0,
+                          color: greyColor,
                         ),
-                        imageUrl: document.data()['photoUrl'],
-                        width: 50.0,
-                        height: 50.0,
-                        fit: BoxFit.cover,
-                      )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 50.0,
-                        color: greyColor,
-                      ),
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                clipBehavior: Clip.hardEdge,
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  clipBehavior: Clip.hardEdge,
+                ),
               ),
               Flexible(
                 child: Container(
