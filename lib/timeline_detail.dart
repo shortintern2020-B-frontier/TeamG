@@ -22,9 +22,18 @@ class TimelineDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        shape: UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
         title: Text(
-          'タイムライン詳細',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          'Timeline詳細',
+          style: TextStyle(color: themeColor, fontSize: 23,
+              // fontWeight: FontWeight.bold,
+              shadows: <Shadow>[
+                Shadow(
+                    offset: Offset(0, 2.0),
+                    blurRadius: 3.0,
+                    color: Color.fromARGB(125, 0, 0, 0))
+              ]),
         ),
         centerTitle: true,
       ),

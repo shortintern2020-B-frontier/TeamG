@@ -37,7 +37,7 @@ class HomeScreenState extends State<HomeScreen> {
   List<Choice> choices = const <Choice>[
     const Choice(title: 'ログアウト', icon: Icons.exit_to_app),
   ];
-  List<String> titles = ['探す', 'トーク', 'タイムライン', 'アカウント'];
+  List<String> titles = ['友達を探す', 'トークルーム', 'Timeline', 'アカウント'];
 
   PageController _pageController;
   int _page = 0;
@@ -140,9 +140,18 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        shape: UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
         title: Text(
           titles[_page],
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          style: TextStyle(color: themeColor, fontSize: 23,
+              // fontWeight: FontWeight.bold,
+              shadows: <Shadow>[
+                Shadow(
+                    offset: Offset(0, 2.0),
+                    blurRadius: 3.0,
+                    color: Color.fromARGB(125, 0, 0, 0))
+              ]),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
