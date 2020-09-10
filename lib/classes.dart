@@ -13,6 +13,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:search_choices/search_choices.dart';
 
 import 'main.dart';
+import 'classes2.dart';
 
 class Classes extends StatelessWidget {
   final String currentUserId;
@@ -50,6 +51,7 @@ class ClassesScreen extends StatefulWidget {
 
   @override
   State createState() =>
+
       ClassesScreenState(currentUserId: currentUserId, university: university, isMyProfile: isMyProfile);
 }
 
@@ -59,6 +61,7 @@ class ClassesScreenState extends State<ClassesScreen> {
 
   bool asTabs = false;
   String selectedValueUpdateFromOutsideThePlugin;
+ 
   final _formKey = GlobalKey<FormState>();
   String inputString = "";
   TextFormField input;
