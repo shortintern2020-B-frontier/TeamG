@@ -17,9 +17,18 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        shape: UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
         title: Text(
           this.peerDoc.data()['nickname'],
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          style: TextStyle(color: themeColor, fontSize: 23, letterSpacing: 2.0,
+              // fontWeight: FontWeight.bold,
+              shadows: <Shadow>[
+                Shadow(
+                    offset: Offset(0, 2.0),
+                    blurRadius: 3.0,
+                    color: Color.fromARGB(125, 0, 0, 0))
+              ]),
         ),
         centerTitle: true,
       ),
@@ -113,13 +122,23 @@ class ChatScreenState extends State<ChatScreen> {
               ? Container(
                   child: Text(
                     document.data()['content'],
-                    style: TextStyle(color: primaryColor),
+                    style: TextStyle(color: primaryColor, fontSize: 14),
                   ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   width: 200.0,
+                  height: 40,
                   decoration: BoxDecoration(
-                      color: greyColor2,
-                      borderRadius: BorderRadius.circular(8.0)),
+                      color: orangeColor,
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(color: greyColor),
+                      boxShadow: [
+                        BoxShadow(
+                          color: greyColor,
+                          spreadRadius: 1.0,
+                          blurRadius: 5.0,
+                          offset: Offset(3, 3),
+                        )
+                      ]),
                   margin: EdgeInsets.only(
                       bottom: isLastMessageRight(index) ? 20.0 : 10.0,
                       right: 10.0),
@@ -201,43 +220,45 @@ class ChatScreenState extends State<ChatScreen> {
             Row(
               children: <Widget>[
                 isLastMessageLeft(index)
-                    ?
-                    FlatButton(
-                      child:
-                Material(
-                        child: peerAvatar != null && peerAvatar.isNotEmpty
-                            ? CachedNetworkImage(
-                                placeholder: (context, url) => Container(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 1.0,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        themeColor),
+                    ? FlatButton(
+                        child: Material(
+                          child: peerAvatar != null && peerAvatar.isNotEmpty
+                              ? CachedNetworkImage(
+                                  placeholder: (context, url) => Container(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.0,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          themeColor),
+                                    ),
+                                    width: 35.0,
+                                    height: 35.0,
+                                    padding: EdgeInsets.all(10.0),
                                   ),
+                                  imageUrl: peerAvatar,
                                   width: 35.0,
                                   height: 35.0,
-                                  padding: EdgeInsets.all(10.0),
+                                  fit: BoxFit.cover,
+                                )
+                              : Icon(
+                                  Icons.account_circle,
+                                  size: 50.0,
+                                  color: greyColor,
                                 ),
-                                imageUrl: peerAvatar,
-                                width: 35.0,
-                                height: 35.0,
-                                fit: BoxFit.cover,
-                              )
-                            : Icon(
-                                Icons.account_circle,
-                                size: 50.0,
-                                color: greyColor,
-                              ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(18.0),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(18.0),
+                          ),
+                          clipBehavior: Clip.hardEdge,
                         ),
-                        clipBehavior: Clip.hardEdge,
-                      ),
-                      onPressed: () {
-                        print('doc:::' + document.data()['idFrom']);
-                        Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: document.data()['idFrom'], isMyProfile: false)));
-                      },
-                    )
+                        onPressed: () {
+                          print('doc:::' + document.data()['idFrom']);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ChatSettings(
+                                      currentUserId: document.data()['idFrom'],
+                                      isMyProfile: false)));
+                        },
+                      )
                     : Container(width: 35.0),
                 document.data()['type'] == 0
                     ? Container(

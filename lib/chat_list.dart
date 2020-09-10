@@ -57,8 +57,7 @@ class ChatListState extends State<ChatList> {
           child: Row(
             children: <Widget>[
               InkWell(
-                child:
-                Material(
+                child: Material(
                   child: document.data()['photoUrl'] != null &&
                           document.data()['photoUrl'].isNotEmpty
                       ? CachedNetworkImage(
@@ -87,7 +86,11 @@ class ChatListState extends State<ChatList> {
                 ),
                 onTap: () {
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: document.data()['id'], isMyProfile: false)));
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChatSettings(
+                              currentUserId: document.data()['id'],
+                              isMyProfile: false)));
                 },
               ),
               Flexible(
@@ -145,7 +148,7 @@ class ChatListState extends State<ChatList> {
                 MaterialPageRoute(
                     builder: (context) => Chat(peerDoc: document)));
           },
-          color: greyColor2,
+          color: Colors.white,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
