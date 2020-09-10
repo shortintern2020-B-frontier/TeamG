@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hikomaryu/chat.dart';
 import 'package:hikomaryu/const.dart';
+import 'package:hikomaryu/settings.dart';
 
 class ChatList extends StatefulWidget {
   final String currentUserId;
@@ -55,8 +56,9 @@ class ChatListState extends State<ChatList> {
         child: FlatButton(
           child: Row(
             children: <Widget>[
-              FlatButton(
-                child: Material(
+              InkWell(
+                child:
+                Material(
                   child: document.data()['photoUrl'] != null &&
                           document.data()['photoUrl'].isNotEmpty
                       ? CachedNetworkImage(
@@ -83,6 +85,11 @@ class ChatListState extends State<ChatList> {
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                   clipBehavior: Clip.hardEdge,
                 ),
+                onTap: () {
+                  print(widget.currentUserId);
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => ChatSettings(currentUserId: document.data()['id'], isMyProfile: false)));
+                },
               ),
               Flexible(
                 child: Container(
