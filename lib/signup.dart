@@ -192,6 +192,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                             controller: _nicknameController,
                             decoration:
                                 const InputDecoration(labelText: 'ニックネーム'),
+
                             validator: (String value) =>
                                 isEmptyValidator(value)),
                         SizedBox(height: 50.0),
@@ -334,6 +335,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                               Container(
                                 padding: EdgeInsets.all(8),
                                 child: const Text('学科'),
+
                                 decoration: BoxDecoration(
                                   color: greyColor2,
                                   borderRadius: BorderRadius.circular(8),
