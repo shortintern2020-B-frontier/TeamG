@@ -34,10 +34,6 @@ class UdfSearchScreenState extends State<UdfSearchScreen> {
   StreamController<List<DropdownMenuItem<String>>> _facultyEvents;
   StreamController<List<DropdownMenuItem<String>>> _departmentEvents;
 
-  final _formKey = GlobalKey<FormState>();
-  String inputString = "";
-  TextFormField input;
-
   List<DropdownMenuItem> lessonItems = [];
   List<int> lessonSelectedItems = [];
   List<String> stringLessonSelectedItems = [];
@@ -163,126 +159,6 @@ class UdfSearchScreenState extends State<UdfSearchScreen> {
     );
   }
 
-  addItemDialog() async {
-    return await showDialog(
-      context: UdfSearchScreen.navKey.currentState.overlay.context,
-      builder: (BuildContext alertContext) {
-        return (AlertDialog(
-          title: Text("授業を追加"),
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                input,
-                FlatButton(
-                  onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      setState(() {
-                        lessonItems.add(DropdownMenuItem(
-                          child: Text(inputString),
-                          value: inputString,
-                        ));
-                      });
-                      Navigator.pop(alertContext, inputString);
-                    }
-                  },
-                  child: Text("Ok"),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    Navigator.pop(alertContext, null);
-                  },
-                  child: Text("Cancel"),
-                ),
-              ],
-            ),
-          ),
-        ));
-      },
-    );
-  }
-
-  Widget multiMenu() {
-    return FutureBuilder(
-        future: FirebaseFirestore.instance
-            .collection('classes')
-            .orderBy(FieldPath.documentId)
-            .startAt([widget.university]).endAt(
-                [widget.university + '\uf8ff']).get(),
-        builder: (context, lessonSnapshot) {
-          if (!lessonSnapshot.hasData) {
-            return Center(
-                child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)));
-          }
-
-          lessonItems = [];
-          lessonSnapshot.data.docs.forEach((document) {
-            String lesson = document.id.split('-')[1];
-            lessonItems
-                .add(DropdownMenuItem(child: Text(lesson), value: lesson));
-          });
-
-          return SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: <Widget>[
-                SearchChoices.multiple(
-                  items: lessonItems,
-                  selectedItems: lessonSelectedItems,
-                  hint: "選択してください",
-                  searchHint: "選択してください",
-                  disabledHint: (Function updateParent) {
-                    return (FlatButton(
-                      onPressed: () {
-                        addItemDialog().then((value) async {
-                          if (value != null) {
-                            lessonSelectedItems = [0];
-                            updateParent(lessonSelectedItems);
-                          }
-                        });
-                      },
-                      child: Text("選択してください"),
-                    ));
-                  },
-                  onChanged: (values) {
-                    setState(() {
-                      if (!(values is NotGiven)) {
-                        lessonSelectedItems = values;
-                        stringLessonSelectedItems = [];
-                        for (int i in lessonSelectedItems) {
-                          stringLessonSelectedItems.add(lessonItems[i].value);
-                        }
-                      }
-                    });
-                  },
-                  displayItem: (item, selected, Function updateParent) {
-                    return (Row(children: <Widget>[
-                      selected
-                          ? Icon(
-                              Icons.check_box,
-                              color: Colors.black,
-                            )
-                          : Icon(
-                              Icons.check_box_outline_blank,
-                              color: Colors.black,
-                            ),
-                      SizedBox(width: 7),
-                      Expanded(
-                        child: item,
-                      ),
-                    ]));
-                  },
-                  dialogBox: true,
-                  isExpanded: true,
-                )
-              ],
-            ),
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -341,7 +217,9 @@ class UdfSearchScreenState extends State<UdfSearchScreen> {
                                       ? _emptyItems
                                       : snapshot.data,
                                   value: _selectedFaculty,
-                                  hint: "選択してください",
+                                  hint: _selectedUniversity == null
+                                      ? "先に大学を選択してください"
+                                      : "選択してください",
                                   searchHint: "選択してください",
                                   onChanged: (value) {
                                     setState(() {
@@ -380,7 +258,11 @@ class UdfSearchScreenState extends State<UdfSearchScreen> {
                                       ? _emptyItems
                                       : snapshot.data,
                                   value: _selectedDepartment,
-                                  hint: "選択してください",
+                                  hint: _selectedUniversity == null
+                                      ? "先に大学を選択してください"
+                                      : (_selectedFaculty == null
+                                          ? "先に学科を選択してください"
+                                          : "選択してください"),
                                   searchHint: "選択してください",
                                   onChanged: (value) {
                                     setState(() {
