@@ -452,10 +452,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     Container(
                       child: Text(
                         '大学情報',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 25,
-                            color: primaryColor),
                       ),
                       alignment: Alignment.topLeft,
                       margin:
@@ -894,7 +890,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     // 授業をみる
                     Container(
                       child: FlatButton(
-                        color: Colors.blue,
+                        color: themeColor,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0)),
                         child: Text(
@@ -1679,7 +1675,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 // 授業をみる
                 Container(
                   child: FlatButton(
-                    color: Colors.blue,
+                    color: themeColor,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0)),
                     child: Text(
