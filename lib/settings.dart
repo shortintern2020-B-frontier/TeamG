@@ -17,7 +17,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hikomaryu/classes.dart';
 
-
 class ChatSettings extends StatelessWidget {
   final String currentUserId;
   final isMyProfile;
@@ -28,9 +27,19 @@ class ChatSettings extends StatelessWidget {
     if (!isMyProfile) {
       return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.white,
+          shape:
+              UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
           title: Text(
             'プロフィール',
-            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+            style: TextStyle(color: themeColor, fontSize: 23,
+                // fontWeight: FontWeight.bold,
+                shadows: <Shadow>[
+                  Shadow(
+                      offset: Offset(0, 2.0),
+                      blurRadius: 3.0,
+                      color: Color.fromARGB(125, 0, 0, 0))
+                ]),
           ),
           centerTitle: true,
         ),
@@ -47,7 +56,6 @@ class ChatSettings extends StatelessWidget {
 }
 
 class SettingsScreen extends StatefulWidget {
-
   final String currentUserId;
   final bool isMyProfile;
   SettingsScreen({this.currentUserId, this.isMyProfile});
@@ -57,7 +65,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class SettingsScreenState extends State<SettingsScreen> {
-
   TextEditingController controllerNickname;
   // TextEditingController controllerAffiliation;
   TextEditingController controllerGrade;
@@ -78,7 +85,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   String birthplace = '';
   List<int> circle = [];
   List<int> travel = [];
-  List<int> gourmet= [];
+  List<int> gourmet = [];
   List<int> sport = [];
   List<int> music = [];
   List<int> hobby = [];
@@ -109,7 +116,6 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void readLocal() async {
-
     prefs = await SharedPreferences.getInstance();
     /*
     age = prefs.getString('age');
@@ -130,32 +136,48 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void readSetting() async {
-      final setting = await FirebaseFirestore.instance.collection('users')
-          .doc(widget.currentUserId)
-          .get();
-      final data = setting.data();
-      setState(() {
-        controllerNickname.text = (data['nickname'] != null) ? data['nickname'] : '';
-        nickname = (data['nickname'] != null) ? data['nickname'] : '';
-        university = (data['university'] != null) ? data['university'] : '';
-        faculty = (data['faculty'] != null) ? data['faculty'] : '';
-        department = (data['department'] != null) ? data['department'] : '';
-        grade = (data['grade'] != null) ? data['grade'] : '';
-        age = (data['age'] != null) ? data['age'] : '';
-        residence = (data['residence'] != null) ? data['residence'] : '';
-        birthplace = (data['birthplace'] != null) ? data['birthplace'] : '';
-        controllerGrade.text = (data['grade'] != null) ? data['grade'] : '';
-        controllerAge.text = (data['age'] != null) ? data['age'] : '';
-        controllerResidence.text = (data['residence'] != null) ? data['residence'] : '';
-        controllerBirthplace.text = (data['birthplace'] != null) ? data['birthplace'] : '';
-        circle = (data['circle'] != null) ? conv_to_intList(data['circle'].cast<String>()) : [];
-        travel = (data['travel'] != null) ? conv_to_intList(data['travel'].cast<String>()) : [];
-        gourmet = (data['gourmet'] != null) ? conv_to_intList(data['gourmet'].cast<String>()) : [];
-        sport = (data['sport'] != null) ? conv_to_intList(data['sport'].cast<String>()) : [];
-        music = (data['music'] != null) ? conv_to_intList(data['music'].cast<String>()) : [];
-        hobby = (data['hobby'] != null) ? conv_to_intList(data['hobby'].cast<String>()) : [];
-        photoUrl = data['photoUrl'];
-      });
+    final setting = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.currentUserId)
+        .get();
+    final data = setting.data();
+    setState(() {
+      controllerNickname.text =
+          (data['nickname'] != null) ? data['nickname'] : '';
+      nickname = (data['nickname'] != null) ? data['nickname'] : '';
+      university = (data['university'] != null) ? data['university'] : '';
+      faculty = (data['faculty'] != null) ? data['faculty'] : '';
+      department = (data['department'] != null) ? data['department'] : '';
+      grade = (data['grade'] != null) ? data['grade'] : '';
+      age = (data['age'] != null) ? data['age'] : '';
+      residence = (data['residence'] != null) ? data['residence'] : '';
+      birthplace = (data['birthplace'] != null) ? data['birthplace'] : '';
+      controllerGrade.text = (data['grade'] != null) ? data['grade'] : '';
+      controllerAge.text = (data['age'] != null) ? data['age'] : '';
+      controllerResidence.text =
+          (data['residence'] != null) ? data['residence'] : '';
+      controllerBirthplace.text =
+          (data['birthplace'] != null) ? data['birthplace'] : '';
+      circle = (data['circle'] != null)
+          ? conv_to_intList(data['circle'].cast<String>())
+          : [];
+      travel = (data['travel'] != null)
+          ? conv_to_intList(data['travel'].cast<String>())
+          : [];
+      gourmet = (data['gourmet'] != null)
+          ? conv_to_intList(data['gourmet'].cast<String>())
+          : [];
+      sport = (data['sport'] != null)
+          ? conv_to_intList(data['sport'].cast<String>())
+          : [];
+      music = (data['music'] != null)
+          ? conv_to_intList(data['music'].cast<String>())
+          : [];
+      hobby = (data['hobby'] != null)
+          ? conv_to_intList(data['hobby'].cast<String>())
+          : [];
+      photoUrl = data['photoUrl'];
+    });
   }
 
   Future getImage() async {
@@ -186,9 +208,10 @@ class SettingsScreenState extends State<SettingsScreen> {
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           photoUrl = downloadUrl;
 
-          FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
-            'photoUrl': photoUrl
-          }).then((data) async {
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(widget.currentUserId)
+              .update({'photoUrl': photoUrl}).then((data) async {
             await prefs.setString('photoUrl', photoUrl);
             setState(() {
               isLoading = false;
@@ -235,7 +258,10 @@ class SettingsScreenState extends State<SettingsScreen> {
       isLoading = true;
     });
 
-    FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.currentUserId)
+        .update({
       'nickname': nickname,
       'grade': grade,
       'age': controllerAge.text,
@@ -283,7 +309,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   List<String> conv_to_stringList(List<int> l) {
     List<String> ret = [];
-    for (int i = 0;i < l.length; i++) {
+    for (int i = 0; i < l.length; i++) {
       ret.add(l[i].toString());
     }
     return ret;
@@ -291,7 +317,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   List<int> conv_to_intList(List<String> l) {
     List<int> ret = [];
-    for (int i = 0;i < l.length; i++) {
+    for (int i = 0; i < l.length; i++) {
       ret.add(int.parse(l[i]));
     }
     return ret;
@@ -302,141 +328,51 @@ class SettingsScreenState extends State<SettingsScreen> {
     //controllerNickname.text = 'hoge';
     //print('build::nickname: ' + controllerNickname.text);
     List<DropdownMenuItem> circleList = [
-      DropdownMenuItem(
-          child: Text('サッカー'),
-          value: 'サッカー'
-      ),
-      DropdownMenuItem(
-          child: Text('野球'),
-          value: '野球'
-      ),
-      DropdownMenuItem(
-          child: Text('バスケットボール'),
-          value: 'バスケットボール'
-      ),
-      DropdownMenuItem(
-          child: Text('アカペラ'),
-          value: 'アカペラ'
-      ),
-      DropdownMenuItem(
-          child: Text('管弦楽団'),
-          value: '管弦楽団'
-      ),
+      DropdownMenuItem(child: Text('サッカー'), value: 'サッカー'),
+      DropdownMenuItem(child: Text('野球'), value: '野球'),
+      DropdownMenuItem(child: Text('バスケットボール'), value: 'バスケットボール'),
+      DropdownMenuItem(child: Text('アカペラ'), value: 'アカペラ'),
+      DropdownMenuItem(child: Text('管弦楽団'), value: '管弦楽団'),
     ];
 
     List<DropdownMenuItem> travelList = [
-      DropdownMenuItem(
-          child: Text('東京'),
-          value: '東京'
-      ),
-      DropdownMenuItem(
-          child: Text('京都'),
-          value: '京都'
-      ),
-      DropdownMenuItem(
-          child: Text('イスタンブール'),
-          value: 'イスタンブール'
-      ),
-      DropdownMenuItem(
-          child: Text('パリ'),
-          value: 'パリ'
-      ),
-      DropdownMenuItem(
-          child: Text('マドリード'),
-          value: 'マドリード'
-      ),
+      DropdownMenuItem(child: Text('東京'), value: '東京'),
+      DropdownMenuItem(child: Text('京都'), value: '京都'),
+      DropdownMenuItem(child: Text('イスタンブール'), value: 'イスタンブール'),
+      DropdownMenuItem(child: Text('パリ'), value: 'パリ'),
+      DropdownMenuItem(child: Text('マドリード'), value: 'マドリード'),
     ];
 
     List<DropdownMenuItem> gourmetList = [
-      DropdownMenuItem(
-          child: Text('寿司'),
-          value: '寿司'
-      ),
-      DropdownMenuItem(
-          child: Text('焼肉'),
-          value: '焼肉'
-      ),
-      DropdownMenuItem(
-          child: Text('ハンバーグ'),
-          value: 'ハンバーグ'
-      ),
-      DropdownMenuItem(
-          child: Text('うどん'),
-          value: 'うどん'
-      ),
-      DropdownMenuItem(
-          child: Text('ラーメン'),
-          value: 'ラーメン'
-      ),
+      DropdownMenuItem(child: Text('寿司'), value: '寿司'),
+      DropdownMenuItem(child: Text('焼肉'), value: '焼肉'),
+      DropdownMenuItem(child: Text('ハンバーグ'), value: 'ハンバーグ'),
+      DropdownMenuItem(child: Text('うどん'), value: 'うどん'),
+      DropdownMenuItem(child: Text('ラーメン'), value: 'ラーメン'),
     ];
 
     List<DropdownMenuItem> sportList = [
-      DropdownMenuItem(
-          child: Text('野球'),
-          value: '野球'
-      ),
-      DropdownMenuItem(
-          child: Text('サッカー'),
-          value: 'サッカー'
-      ),
-      DropdownMenuItem(
-          child: Text('バスケットボール'),
-          value: 'バスケットボール'
-      ),
-      DropdownMenuItem(
-          child: Text('テニス'),
-          value: 'テニス'
-      ),
-      DropdownMenuItem(
-          child: Text('ホッケー'),
-          value: 'ホッケー'
-      ),
+      DropdownMenuItem(child: Text('野球'), value: '野球'),
+      DropdownMenuItem(child: Text('サッカー'), value: 'サッカー'),
+      DropdownMenuItem(child: Text('バスケットボール'), value: 'バスケットボール'),
+      DropdownMenuItem(child: Text('テニス'), value: 'テニス'),
+      DropdownMenuItem(child: Text('ホッケー'), value: 'ホッケー'),
     ];
 
     List<DropdownMenuItem> musicList = [
-      DropdownMenuItem(
-          child: Text('J-POP'),
-          value: 'J-POP'
-      ),
-      DropdownMenuItem(
-          child: Text('K-POP'),
-          value: 'K-POP'
-      ),
-      DropdownMenuItem(
-          child: Text('レゲエ'),
-          value: 'レゲエ'
-      ),
-      DropdownMenuItem(
-          child: Text('R&B'),
-          value: 'R&B'
-      ),
-      DropdownMenuItem(
-          child: Text('クラシック'),
-          value: 'クラシック'
-      ),
+      DropdownMenuItem(child: Text('J-POP'), value: 'J-POP'),
+      DropdownMenuItem(child: Text('K-POP'), value: 'K-POP'),
+      DropdownMenuItem(child: Text('レゲエ'), value: 'レゲエ'),
+      DropdownMenuItem(child: Text('R&B'), value: 'R&B'),
+      DropdownMenuItem(child: Text('クラシック'), value: 'クラシック'),
     ];
 
     List<DropdownMenuItem> hobbyList = [
-      DropdownMenuItem(
-          child: Text('ランニング'),
-          value: 'ランニング'
-      ),
-      DropdownMenuItem(
-          child: Text('サイクリング'),
-          value: 'サイクリング'
-      ),
-      DropdownMenuItem(
-          child: Text('キャンプ'),
-          value: 'キャンプ'
-      ),
-      DropdownMenuItem(
-          child: Text('手芸'),
-          value: '手芸'
-      ),
-      DropdownMenuItem(
-          child: Text('読書'),
-          value: '読書'
-      ),
+      DropdownMenuItem(child: Text('ランニング'), value: 'ランニング'),
+      DropdownMenuItem(child: Text('サイクリング'), value: 'サイクリング'),
+      DropdownMenuItem(child: Text('キャンプ'), value: 'キャンプ'),
+      DropdownMenuItem(child: Text('手芸'), value: '手芸'),
+      DropdownMenuItem(child: Text('読書'), value: '読書'),
     ];
 
     if (!widget.isMyProfile) {
@@ -453,45 +389,45 @@ class SettingsScreenState extends State<SettingsScreen> {
                         children: <Widget>[
                           (avatarImageFile == null)
                               ? (photoUrl != null && photoUrl != ''
-                              ? Material(
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) =>
-                                  Container(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                      valueColor:
-                                      AlwaysStoppedAnimation<Color>(
-                                          themeColor),
-                                    ),
+                                  ? Material(
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) =>
+                                            Container(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    themeColor),
+                                          ),
+                                          width: 90.0,
+                                          height: 90.0,
+                                          padding: EdgeInsets.all(20.0),
+                                        ),
+                                        imageUrl: photoUrl,
+                                        width: 90.0,
+                                        height: 90.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(45.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                    )
+                                  : Icon(
+                                      Icons.account_circle,
+                                      size: 90.0,
+                                      color: greyColor,
+                                    ))
+                              : Material(
+                                  child: Image.file(
+                                    avatarImageFile,
                                     width: 90.0,
                                     height: 90.0,
-                                    padding: EdgeInsets.all(20.0),
+                                    fit: BoxFit.cover,
                                   ),
-                              imageUrl: photoUrl,
-                              width: 90.0,
-                              height: 90.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(45.0)),
-                            clipBehavior: Clip.hardEdge,
-                          )
-                              : Icon(
-                            Icons.account_circle,
-                            size: 90.0,
-                            color: greyColor,
-                          ))
-                              : Material(
-                            child: Image.file(
-                              avatarImageFile,
-                              width: 90.0,
-                              height: 90.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(45.0)),
-                            clipBehavior: Clip.hardEdge,
-                          ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(45.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
                         ],
                       ),
                       width: 90,
@@ -522,8 +458,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             color: primaryColor),
                       ),
                       alignment: Alignment.topLeft,
-                      margin: EdgeInsets.only(
-                          left: 10.0, bottom: 5.0, top: 10.0),
+                      margin:
+                          EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
                     ),
                     // 大学名
                     Padding(
@@ -532,7 +468,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                         height: 60,
                         child: Card(
                           color: orangeColor,
-
                           child: Row(
                             children: <Widget>[
                               Container(
@@ -540,7 +475,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   '大学',
                                   style: TextStyle(fontSize: 23),
                                 ),
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Flexible(
                                 child: Text(
@@ -561,7 +497,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                         height: 60,
                         child: Card(
                           color: orangeColor,
-
                           child: Row(
                             children: <Widget>[
                               Container(
@@ -569,7 +504,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   '学部',
                                   style: TextStyle(fontSize: 23),
                                 ),
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Flexible(
                                 child: Text(
@@ -590,7 +526,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                         height: 60,
                         child: Card(
                           color: orangeColor,
-
                           child: Row(
                             children: <Widget>[
                               Container(
@@ -598,7 +533,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   '学科',
                                   style: TextStyle(fontSize: 23),
                                 ),
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Flexible(
                                 child: Text(
@@ -619,7 +555,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                         height: 55,
                         child: Card(
                           color: orangeColor,
-
                           child: Row(
                             children: <Widget>[
                               Container(
@@ -627,7 +562,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   '学年',
                                   style: TextStyle(fontSize: 23),
                                 ),
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Flexible(
                                 child: Text(
@@ -651,8 +587,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             color: primaryColor),
                       ),
                       alignment: Alignment.topLeft,
-                      margin: EdgeInsets.only(
-                          left: 10.0, bottom: 5.0, top: 10.0),
+                      margin:
+                          EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
                     ),
                     // 年齢
                     Padding(
@@ -661,7 +597,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                         height: 45,
                         child: Card(
                           color: orangeColor,
-
                           child: Row(
                             children: <Widget>[
                               Container(
@@ -669,7 +604,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   '年齢',
                                   style: TextStyle(fontSize: 23),
                                 ),
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
                                 age,
@@ -686,27 +622,27 @@ class SettingsScreenState extends State<SettingsScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       child: Container(
-                      height: 45,
-                      child: Card(
-                        color: orangeColor,
-
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                            child: Text(
-                              '居住地',
-                              style: TextStyle(fontSize: 23),
-                              ),
-                              margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                        height: 45,
+                        child: Card(
+                          color: orangeColor,
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  '居住地',
+                                  style: TextStyle(fontSize: 23),
+                                ),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
                                 residence,
                                 // controllerResidence.text,
                                 style: TextStyle(fontSize: 17),
-                                ),
+                              ),
                             ],
                           ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                          margin: EdgeInsets.only(left: 30.0, right: 30.0),
                         ),
                       ),
                     ),
@@ -717,7 +653,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                         height: 45,
                         child: Card(
                           color: orangeColor,
-
                           child: Row(
                             children: <Widget>[
                               Container(
@@ -725,7 +660,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   '出身地',
                                   style: TextStyle(fontSize: 23),
                                 ),
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Text(
                                 birthplace,
@@ -753,11 +689,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   style: TextStyle(fontSize: 23),
                                 ),
                                 alignment: Alignment.topLeft,
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in circle) Text(circleList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
+                                  for (var i in circle)
+                                    Text(
+                                      circleList[i].value,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 17),
+                                    )
                                 ],
                               ),
                             ],
@@ -776,8 +718,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             color: primaryColor),
                       ),
                       alignment: Alignment.topLeft,
-                      margin: EdgeInsets.only(
-                          left: 10.0, bottom: 5.0, top: 10.0),
+                      margin:
+                          EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
                     ),
                     // 旅行
                     Padding(
@@ -794,11 +736,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   style: TextStyle(fontSize: 23),
                                 ),
                                 alignment: Alignment.topLeft,
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in travel) Text(travelList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
+                                  for (var i in travel)
+                                    Text(
+                                      travelList[i].value,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 17),
+                                    )
                                 ],
                               ),
                             ],
@@ -822,11 +770,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   style: TextStyle(fontSize: 23),
                                 ),
                                 alignment: Alignment.topLeft,
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in gourmet) Text(gourmetList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
+                                  for (var i in gourmet)
+                                    Text(
+                                      gourmetList[i].value,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 17),
+                                    )
                                 ],
                               ),
                             ],
@@ -850,11 +804,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   style: TextStyle(fontSize: 23),
                                 ),
                                 alignment: Alignment.topLeft,
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in sport) Text(sportList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
+                                  for (var i in sport)
+                                    Text(
+                                      sportList[i].value,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 17),
+                                    )
                                 ],
                               ),
                             ],
@@ -878,11 +838,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   style: TextStyle(fontSize: 23),
                                 ),
                                 alignment: Alignment.topLeft,
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in music) Text(musicList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
+                                  for (var i in music)
+                                    Text(
+                                      musicList[i].value,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 17),
+                                    )
                                 ],
                               ),
                             ],
@@ -906,11 +872,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   style: TextStyle(fontSize: 23),
                                 ),
                                 alignment: Alignment.topLeft,
-                                margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
                               ),
                               Column(
                                 children: <Widget>[
-                                  for (var i in hobby) Text(hobbyList[i].value, textAlign: TextAlign.left, style: TextStyle(fontSize: 17),)
+                                  for (var i in hobby)
+                                    Text(
+                                      hobbyList[i].value,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 17),
+                                    )
                                 ],
                               ),
                             ],
@@ -924,8 +896,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       child: FlatButton(
                         color: Colors.blue,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0)
-                        ),
+                            borderRadius: BorderRadius.circular(20.0)),
                         child: Text(
                           '授業情報を見る',
                           style: TextStyle(
@@ -935,7 +906,12 @@ class SettingsScreenState extends State<SettingsScreen> {
                         ),
                         onPressed: () {
                           Navigator.push(
-                              context, MaterialPageRoute(builder: (context) => Classes(currentUserId: widget.currentUserId, university: university, isMyProfile: false)));
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Classes(
+                                      currentUserId: widget.currentUserId,
+                                      university: university,
+                                      isMyProfile: false)));
                         },
                       ),
                     ),
@@ -961,45 +937,45 @@ class SettingsScreenState extends State<SettingsScreen> {
                         children: <Widget>[
                           (avatarImageFile == null)
                               ? (photoUrl != null && photoUrl != ''
-                              ? Material(
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) =>
-                                  Container(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                      valueColor:
-                                      AlwaysStoppedAnimation<Color>(
-                                          themeColor),
-                                    ),
+                                  ? Material(
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) =>
+                                            Container(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    themeColor),
+                                          ),
+                                          width: 90.0,
+                                          height: 90.0,
+                                          padding: EdgeInsets.all(20.0),
+                                        ),
+                                        imageUrl: photoUrl,
+                                        width: 90.0,
+                                        height: 90.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(45.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                    )
+                                  : Icon(
+                                      Icons.account_circle,
+                                      size: 90.0,
+                                      color: greyColor,
+                                    ))
+                              : Material(
+                                  child: Image.file(
+                                    avatarImageFile,
                                     width: 90.0,
                                     height: 90.0,
-                                    padding: EdgeInsets.all(20.0),
+                                    fit: BoxFit.cover,
                                   ),
-                              imageUrl: photoUrl,
-                              width: 90.0,
-                              height: 90.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(45.0)),
-                            clipBehavior: Clip.hardEdge,
-                          )
-                              : Icon(
-                            Icons.account_circle,
-                            size: 90.0,
-                            color: greyColor,
-                          ))
-                              : Material(
-                            child: Image.file(
-                              avatarImageFile,
-                              width: 90.0,
-                              height: 90.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(45.0)),
-                            clipBehavior: Clip.hardEdge,
-                          ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(45.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
                           IconButton(
                             icon: Icon(
                               Icons.camera_alt,
@@ -1048,8 +1024,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         fontSize: 25,
                         color: primaryColor),
                   ),
-                  margin: EdgeInsets.only(
-                      left: 10.0, bottom: 5.0, top: 10.0),
+                  margin: EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
                 ),
                 // 大学名
                 Padding(
@@ -1058,7 +1033,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     height: 60,
                     child: Card(
                       color: orangeColor,
-
                       child: Row(
                         children: <Widget>[
                           Container(
@@ -1087,7 +1061,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     height: 60,
                     child: Card(
                       color: orangeColor,
-
                       child: Row(
                         children: <Widget>[
                           Container(
@@ -1116,7 +1089,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     height: 60,
                     child: Card(
                       color: orangeColor,
-
                       child: Row(
                         children: <Widget>[
                           Container(
@@ -1154,8 +1126,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
-
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: SearchChoices.single(
                             items: [
                               DropdownMenuItem(
@@ -1185,7 +1157,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 grade = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'grade': grade,
                               }).then((data) async {
                                 setState(() {
@@ -1199,7 +1174,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             },
                             dialogBox: false,
                             isExpanded: true,
-                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                            menuConstraints:
+                                BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
@@ -1216,8 +1192,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         fontSize: 25,
                         color: primaryColor),
                   ),
-                  margin: EdgeInsets.only(
-                      left: 10.0, bottom: 5.0, top: 10.0),
+                  margin: EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
                 ),
                 // 年齢
                 Padding(
@@ -1234,7 +1209,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: Flexible(
                             child: TextField(
                               decoration: InputDecoration(
@@ -1245,7 +1221,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerAge,
                               onChanged: (value) {
                                 age = value;
-                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(widget.currentUserId)
+                                    .update({
                                   'age': age,
                                 }).then((data) async {
                                   setState(() {
@@ -1281,7 +1260,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: Flexible(
                             child: TextField(
                               decoration: InputDecoration(
@@ -1292,7 +1272,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerResidence,
                               onChanged: (value) {
                                 residence = value;
-                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(widget.currentUserId)
+                                    .update({
                                   'residence': residence,
                                 }).then((data) async {
                                   setState(() {
@@ -1328,7 +1311,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: Flexible(
                             child: TextField(
                               decoration: InputDecoration(
@@ -1339,7 +1323,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               controller: controllerBirthplace,
                               onChanged: (value) {
                                 birthplace = value;
-                                FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(widget.currentUserId)
+                                    .update({
                                   'birthplace': birthplace,
                                 }).then((data) async {
                                   setState(() {
@@ -1375,7 +1362,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: SearchChoices.multiple(
                             items: circleList,
                             selectedItems: circle,
@@ -1383,7 +1371,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 circle = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'circle': conv_to_stringList(circle),
                               }).then((data) async {
                                 setState(() {
@@ -1397,7 +1388,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             },
                             dialogBox: false,
                             isExpanded: true,
-                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                            menuConstraints:
+                                BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
@@ -1414,8 +1406,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         fontSize: 25,
                         color: primaryColor),
                   ),
-                  margin: EdgeInsets.only(
-                      left: 10.0, bottom: 5.0, top: 10.0),
+                  margin: EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
                 ),
                 // 旅行
                 Padding(
@@ -1432,7 +1423,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: SearchChoices.multiple(
                             items: travelList,
                             selectedItems: travel,
@@ -1440,7 +1432,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 travel = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'travel': conv_to_stringList(travel),
                               }).then((data) async {
                                 setState(() {
@@ -1454,7 +1449,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             },
                             dialogBox: false,
                             isExpanded: true,
-                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                            menuConstraints:
+                                BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
@@ -1477,7 +1473,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: SearchChoices.multiple(
                             items: gourmetList,
                             selectedItems: gourmet,
@@ -1485,7 +1482,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 gourmet = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'gourmet': conv_to_stringList(gourmet),
                               }).then((data) async {
                                 setState(() {
@@ -1499,7 +1499,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             },
                             dialogBox: false,
                             isExpanded: true,
-                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                            menuConstraints:
+                                BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
@@ -1522,7 +1523,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: SearchChoices.multiple(
                             items: sportList,
                             selectedItems: sport,
@@ -1530,7 +1532,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 sport = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'sport': conv_to_stringList(sport),
                               }).then((data) async {
                                 setState(() {
@@ -1544,7 +1549,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             },
                             dialogBox: false,
                             isExpanded: true,
-                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                            menuConstraints:
+                                BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
@@ -1567,7 +1573,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: SearchChoices.multiple(
                             items: musicList,
                             selectedItems: music,
@@ -1575,7 +1582,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 music = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'music': conv_to_stringList(music),
                               }).then((data) async {
                                 setState(() {
@@ -1589,7 +1599,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             },
                             dialogBox: false,
                             isExpanded: true,
-                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                            menuConstraints:
+                                BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
@@ -1612,7 +1623,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           margin: EdgeInsets.only(left: 10.0, right: 10.0),
                         ),
                         Theme(
-                          data: Theme.of(context).copyWith(primaryColor: primaryColor),
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: primaryColor),
                           child: SearchChoices.multiple(
                             items: hobbyList,
                             selectedItems: hobby,
@@ -1620,7 +1632,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                               setState(() {
                                 hobby = value;
                               });
-                              FirebaseFirestore.instance.collection('users').doc(widget.currentUserId).update({
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(widget.currentUserId)
+                                  .update({
                                 'hobby': conv_to_stringList(hobby),
                               }).then((data) async {
                                 setState(() {
@@ -1634,7 +1649,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             },
                             dialogBox: false,
                             isExpanded: true,
-                            menuConstraints: BoxConstraints.tight(Size.fromHeight(350)),
+                            menuConstraints:
+                                BoxConstraints.tight(Size.fromHeight(350)),
                           ),
                         ),
                       ],
@@ -1665,8 +1681,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   child: FlatButton(
                     color: Colors.blue,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0)
-                    ),
+                        borderRadius: BorderRadius.circular(20.0)),
                     child: Text(
                       '授業情報を見る',
                       style: TextStyle(
@@ -1676,7 +1691,12 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                     onPressed: () {
                       Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => Classes(currentUserId: widget.currentUserId, university: university, isMyProfile: true)));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Classes(
+                                  currentUserId: widget.currentUserId,
+                                  university: university,
+                                  isMyProfile: true)));
                     },
                   ),
                 ),
@@ -1689,12 +1709,13 @@ class SettingsScreenState extends State<SettingsScreen> {
           Positioned(
             child: isLoading
                 ? Container(
-              child: Center(
-                child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
-              ),
-              color: Colors.white.withOpacity(0.8),
-            )
+                    child: Center(
+                      child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(themeColor)),
+                    ),
+                    color: Colors.white.withOpacity(0.8),
+                  )
                 : Container(),
           ),
         ],
