@@ -250,7 +250,6 @@ class ChatScreenState extends State<ChatScreen> {
                           clipBehavior: Clip.hardEdge,
                         ),
                         onPressed: () {
-                          print('doc:::' + document.data()['idFrom']);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -344,7 +343,7 @@ class ChatScreenState extends State<ChatScreen> {
             isLastMessageLeft(index)
                 ? Container(
                     child: Text(
-                      DateFormat('dd MMM kk:mm').format(
+                      DateFormat('MM/dd HH:mm').format(
                           DateTime.fromMillisecondsSinceEpoch(
                               int.parse(document.data()['timestamp']))),
                       style: TextStyle(
