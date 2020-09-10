@@ -97,9 +97,6 @@ class LoginScreenState extends State<LoginScreen> {
       await _prefs.setString('photoUrl', documents[0].data()['photoUrl']);
       await _prefs.setString('aboutMe', documents[0].data()['aboutMe']);
 
-      // 成功した場合は表示させない
-      // Fluttertoast.showToast(
-      //     msg: loginMsgs['success'], backgroundColor: themeColor);
       this.setState(() {
         _isLoading = false;
       });

@@ -8,6 +8,7 @@ import 'package:hikomaryu/chat_list.dart';
 import 'package:hikomaryu/timeline.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/settings.dart';
+import 'package:hikomaryu/classes.dart';
 import 'package:hikomaryu/search.dart';
 import 'package:hikomaryu/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -33,7 +34,6 @@ class HomeScreenState extends State<HomeScreen> {
 
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
-    const Choice(title: '設定', icon: Icons.settings),
     const Choice(title: 'ログアウト', icon: Icons.exit_to_app),
   ];
   List<String> titles = ['探す', 'トーク', 'タイムライン', 'アカウント'];
@@ -116,9 +116,6 @@ class HomeScreenState extends State<HomeScreen> {
   void onItemMenuPress(Choice choice) {
     if (choice.title == 'ログアウト') {
       handleSignOut();
-    } else {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChatSettings()));
     }
   }
 
@@ -203,7 +200,9 @@ class HomeScreenState extends State<HomeScreen> {
                         new ChatList(
                             currentUserId: currentUserId, snapshot: snapshot),
                         new Timeline(currentUserId: currentUserId),
-                        Text("Account"),
+                        new ChatSettings(
+                          currentUserId: currentUserId, isMyProfile: true
+                        ),
                       ],
                     );
                   }
