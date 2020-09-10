@@ -25,8 +25,8 @@ class TimelineDetail extends StatelessWidget {
         backgroundColor: Colors.white,
         shape: UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
         title: Text(
-          'Timeline詳細',
-          style: TextStyle(color: themeColor, fontSize: 23,
+          'Timeline',
+          style: TextStyle(color: themeColor, fontSize: 23, letterSpacing: 2.0,
               // fontWeight: FontWeight.bold,
               shadows: <Shadow>[
                 Shadow(
@@ -402,7 +402,7 @@ class TimelineDetailScreenState extends State<TimelineDetailScreen> {
                       padding: EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 10.0),
                     ),
                     Divider(
-                      color: Colors.black,
+                      color: Colors.grey,
                       thickness: 1,
                     ),
                     // コメント一覧

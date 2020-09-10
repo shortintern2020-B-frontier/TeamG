@@ -144,7 +144,7 @@ class HomeScreenState extends State<HomeScreen> {
         shape: UnderlineInputBorder(borderSide: BorderSide(color: themeColor)),
         title: Text(
           titles[_page],
-          style: TextStyle(color: themeColor, fontSize: 23,
+          style: TextStyle(color: themeColor, fontSize: 23, letterSpacing: 2.0,
               // fontWeight: FontWeight.bold,
               shadows: <Shadow>[
                 Shadow(
