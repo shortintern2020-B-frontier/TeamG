@@ -2,10 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-<<<<<<< HEAD
-// import 'package:firebase_core/firebase_core.dart';
-=======
->>>>>>> develop
 import 'package:flutter/material.dart';
 import 'package:hikomaryu/const.dart';
 import 'package:hikomaryu/home.dart';
@@ -112,21 +108,12 @@ class SignUpScreenState extends State<SignUpScreen> {
         'photoUrl': null,
         'chattingWith': null
       });
-<<<<<<< HEAD
-      Fluttertoast.showToast(
-          msg: signUpMsgs['success'], backgroundColor: themeColor);
-      this.setState(() {
-        _isLoading = false;
-      });
-      // print('新規登録成功!!!!!!');
-=======
       // 成功した場合は表示させない
       // Fluttertoast.showToast(
       //     msg: signUpMsgs['success'], backgroundColor: themeColor);
       this.setState(() {
         _isLoading = false;
       });
->>>>>>> develop
 
       // Write data to local
       await _prefs.setString('id', userCredential.user.uid);
@@ -181,12 +168,8 @@ class SignUpScreenState extends State<SignUpScreen> {
                       children: <Widget>[
                         TextFormField(
                           controller: _emailController,
-<<<<<<< HEAD
-                          decoration: const InputDecoration(labelText: 'Email'),
-=======
                           decoration:
                               const InputDecoration(labelText: 'メールアドレス'),
->>>>>>> develop
                           validator: (String value) {
                             if (value.isEmpty) {
                               return textFieldMsgs['required'];
@@ -201,22 +184,15 @@ class SignUpScreenState extends State<SignUpScreen> {
                             obscureText: true,
                             controller: _passwordController,
                             decoration:
-<<<<<<< HEAD
-                                const InputDecoration(labelText: 'Password'),
-=======
                                 const InputDecoration(labelText: 'パスワード'),
->>>>>>> develop
                             validator: (String value) =>
                                 isEmptyValidator(value)),
                         SizedBox(height: 20.0),
                         TextFormField(
                             controller: _nicknameController,
                             decoration:
-<<<<<<< HEAD
-                                const InputDecoration(labelText: 'Nickname'),
-=======
                                 const InputDecoration(labelText: 'ニックネーム'),
->>>>>>> develop
+
                             validator: (String value) =>
                                 isEmptyValidator(value)),
                         SizedBox(height: 50.0),
@@ -225,11 +201,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                             children: <Widget>[
                               Container(
                                 padding: EdgeInsets.all(8),
-<<<<<<< HEAD
-                                child: const Text('Prefecture'),
-=======
                                 child: const Text('都道府県'),
->>>>>>> develop
                                 decoration: BoxDecoration(
                                   color: greyColor2,
                                   borderRadius: BorderRadius.circular(8),
@@ -265,11 +237,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                             children: <Widget>[
                               Container(
                                 padding: EdgeInsets.all(8),
-<<<<<<< HEAD
-                                child: const Text('University'),
-=======
                                 child: const Text('大学'),
->>>>>>> develop
                                 decoration: BoxDecoration(
                                   color: greyColor2,
                                   borderRadius: BorderRadius.circular(8),
@@ -319,11 +287,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                             children: <Widget>[
                               Container(
                                 padding: EdgeInsets.all(8),
-<<<<<<< HEAD
-                                child: const Text('Faculty'),
-=======
                                 child: const Text('学部'),
->>>>>>> develop
                                 decoration: BoxDecoration(
                                   color: greyColor2,
                                   borderRadius: BorderRadius.circular(8),
@@ -370,11 +334,8 @@ class SignUpScreenState extends State<SignUpScreen> {
                             children: <Widget>[
                               Container(
                                 padding: EdgeInsets.all(8),
-<<<<<<< HEAD
-                                child: const Text('Department'),
-=======
                                 child: const Text('学科'),
->>>>>>> develop
+
                                 decoration: BoxDecoration(
                                   color: greyColor2,
                                   borderRadius: BorderRadius.circular(8),
@@ -415,11 +376,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                           children: <Widget>[
                             Container(
                               padding: EdgeInsets.all(8),
-<<<<<<< HEAD
-                              child: const Text('Grade'),
-=======
                               child: const Text('学年'),
->>>>>>> develop
                               decoration: BoxDecoration(
                                 color: greyColor2,
                                 borderRadius: BorderRadius.circular(8),
@@ -453,11 +410,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                 Container(
                   alignment: Alignment.center,
                   child: MaterialButton(
-<<<<<<< HEAD
-                    child: const Text('Sign up'),
-=======
                     child: const Text('新規登録'),
->>>>>>> develop
                     minWidth: 200,
                     color: themeColor,
                     textColor: Colors.white,

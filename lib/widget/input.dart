@@ -177,11 +177,7 @@ class InputState extends State<Input> {
                 style: TextStyle(color: primaryColor, fontSize: 15.0),
                 controller: textEditingController,
                 decoration: InputDecoration.collapsed(
-<<<<<<< HEAD
-                  hintText: 'Type your message...',
-=======
                   hintText: 'メッセージを入力',
->>>>>>> develop
                   hintStyle: TextStyle(color: greyColor),
                 ),
                 focusNode: focusNode,
