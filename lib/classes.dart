@@ -316,7 +316,8 @@ class ClassesScreenState extends State<ClassesScreen> {
                   String lesson = docs[i].id.split('-')[1];
                   lessonItems.add(
                       DropdownMenuItem(child: Text(lesson), value: lesson));
-                  if (userSnapshot.data.data()['classes'].contains(lesson)) {
+                  var userClasses = userSnapshot.data.data()['classes'];
+                  if (userClasses != null && userClasses.contains(lesson)) {
                     lessonSelectedItems.add(i);
                   }
                 }

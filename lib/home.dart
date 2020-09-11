@@ -187,8 +187,10 @@ class HomeScreenState extends State<HomeScreen> {
             // List
             Container(
               child: StreamBuilder(
-                stream:
-                    FirebaseFirestore.instance.collection('users').snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(
